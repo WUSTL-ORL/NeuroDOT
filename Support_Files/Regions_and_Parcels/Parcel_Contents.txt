@@ -1,0 +1,13 @@
+Contents:
+
+"Parcels_LR.dtseries.nii" contains the uniquely numbered parcels, mapped onto the fs_LR 32k cortical surface.
+
+"Parcels_L.func.gii" and "Parcels_R.func.gii" similarly contain the uniquely numbered parcels, mapped onto the fs_LR 32k cortical surface, split by hemisphere. 
+
+"Parcels_L_164.func.gii" and "Parcels_R_164.func.gii" similarly contain the uniquely numbered parcels, mapped onto the fs_LR 32k cortical surface, split by hemisphere and then upsampled onto the fs_LR 164k cortical surface. These parcel borders should be considered tentative due to the upsampling.
+
+"Parcels_MNI_XXX.nii" contains the uniquely numbered parcels, registered to MNI space, at 1x1x1 mm, 2x2x2 mm, and 3x3x3 mm resolutions.
+
+"Parcels_711-2b_XXX.nii" contains the uniquely numbered parcels, registered to 711-2b space, at 1x1x1 mm, 2x2x2 mm, and 3x3x3 mm resolutions.
+
+"Parcels.xlsx" contains the unique number, hemisphere, approximate surface area (calculated on the fs_LR 32k "midthickness" cortical surface), and putative network membership of each parcel.

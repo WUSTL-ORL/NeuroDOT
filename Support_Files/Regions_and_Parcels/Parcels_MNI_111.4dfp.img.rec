@@ -1,0 +1,10 @@
+rec Parcels_MNI_111.4dfp.img  Thu Dec 11 10:41:33 2014  adame@coltrane Linux 2.6.32-358.14.1.el6.x86_64 x86_64
+nifti_4dfp -4 Parcels_MNI_111.nii Parcels_MNI_111 
+$Id: nifti_4dfp.c,v 1.9 2011/09/13 03:40:37 avi Exp $
+littleendian
+datatype: 16	 bitpix: 32
+scale: 1.000000	 offset: 0.000000
+common sform[0]:     1.000000	    0.000000	    0.000000	  -91.000000
+common sform[1]:     0.000000	    1.000000	    0.000000	 -126.000000
+common sform[2]:     0.000000	    0.000000	    1.000000	  -72.000000
+endrec Thu Dec 11 10:41:33 2014  adame
