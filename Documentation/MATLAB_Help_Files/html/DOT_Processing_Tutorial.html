@@ -1,0 +1,1248 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>NeuroDOT 2.2.0 Tutorial - Preprocessing Pipeline</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-05-16"><meta name="DC.source" content="DOT_Processing_Tutorial.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>NeuroDOT 2.2.0 Tutorial - Preprocessing Pipeline</h1><!--introduction--><p><img vspace="5" hspace="5" src="logo_fixed.png" alt=""> </p><p>Welcome to NeuroDOT 2.2.0 Base Edition!</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Diffuse Optical Tomography</a></li><li><a href="#2">NeuroDOT 2 Overview Flowcharts</a></li><li><a href="#3">Preprocessing Pipeline Flowchart</a></li><li><a href="#4">Mapping Hearing Words</a></li><li><a href="#5">The Preprocessing Pipeline</a></li><li><a href="#6">Sample Data</a></li><li><a href="#8">S-D Measurements</a></li><li><a href="#26">Logmean Light Levels</a></li><li><a href="#30">Detect Noisy Channels</a></li><li><a href="#35">Linear Detrending</a></li><li><a href="#38">High Pass Filter</a></li><li><a href="#43">Low Pass Filter 1</a></li><li><a href="#47">Superficial Signal Regression</a></li><li><a href="#53">Low Pass Filter 2</a></li><li><a href="#56">1 Hz Resampling</a></li><li><a href="#59">Block Averaging</a></li><li><a href="#63">Preprocessing Pipeline Complete!</a></li><li><a href="#64">NeuroDOT 2 Overview Flowchart</a></li><li><a href="#65">Reconstruction Pipeline Flowchart</a></li><li><a href="#66">Reconstructing Image Volumes</a></li><li><a href="#67">HD-DOT Sensitivity Profile</a></li><li><a href="#68">Sensitivity A Matrix</a></li><li><a href="#70">Invert A Matrix</a></li><li><a href="#72">Smooth Inverted A Matrix</a></li><li><a href="#74">Reconstruct Image Volume</a></li><li><a href="#83">Spectroscopy</a></li><li><a href="#91">Reconstruction Pipeline Complete!</a></li><li><a href="#92">Saving Your Results</a></li><li><a href="#93">Conclusion</a></li><li><a href="#94">Citations</a></li><li><a href="#95">Appendix: Preprocessing</a></li></ul></div><h2>Diffuse Optical Tomography<a name="1"></a></h2><p>In diffuse optical tomography (DOT), cap arrays of optical sources and detectors are used to perform functional neuroimaging experiments.</p><p>These experiments are broken into several components pipelines: preprocessing of the raw source-detector measurements, modeling of the light emission, diffusion, and detection through the head, reconstruction and spectroscopy of the preprocessed data and light model into a functional neuroimaging volume, and analysis of these results.</p><p><img vspace="5" hspace="5" src="dot_overview.png" alt=""> </p><p>These pipelines allow a variety of experimental paradigms to be investigated.</p><h2>NeuroDOT 2 Overview Flowcharts<a name="2"></a></h2><p><img vspace="5" hspace="5" src="all_pipelines.png" alt=""> </p><h2>Preprocessing Pipeline Flowchart<a name="3"></a></h2><p><img vspace="5" hspace="5" src="preprocessing_diagram.png" alt=""> </p><h2>Mapping Hearing Words<a name="4"></a></h2><p>In the &#8220;hearing words&#8221; (HW) paradigm, which we will use in this tutorial, a participant quietly listens to auditory stimuli presented through speakers.</p><p><img vspace="5" hspace="5" src="hearing_words_diagram.png" alt=""> </p><p>The stimuli are divided into six 30-second blocks (white rectangles on bottom-right), with one spoken word per s for 15 s, followed by 15 s of silence.</p><p><img vspace="5" hspace="5" src="block_diagram.png" alt=""> </p><p>These blocks are averaged together and reconstructed into a 5D time series movie of brain function: 3 dimensions of space, 1 dimension for time, and 1 dimension for Hemoglobin contrasts: oxy, deoxy, and total.</p><h2>The Preprocessing Pipeline<a name="5"></a></h2><p>The first part of this tutorial focuses on the first stage of our research scenario: preprocessing.</p><p>Preprocessing involves using a number of digital signal processing and analysis techniques to remove interfering or systemic signals, and isolate the brain activity responses to stimuli (such as the Hearing Words experiment).</p><p>We will assess data quality at every step along the way to ensure that we are acquiring high-quality maps of brain activity.</p><p>You will be given syntax prompts along the way. Copy and type these into the MATLAB command line, or highlight them and either press F9 or right-click and select "Evaluate Selection" on the pop-up menu.</p><p>If you are unfamiliar with NeuroDOT and its data structures at any point, please refer to the Overview Tutorial and User Manual. Also, the <a href="List_of_Files_and_Functions.html">List of Files and Functions</a> provides easy reference to all other help documentation.</p><h2>Sample Data<a name="6"></a></h2><p>First, we need to load up our sample data. There are two sets, one of high quality that has been presented in published papers [1], and another "noisy" set that was chosen to contrast against the first.</p><pre class="codeinput">hw1 = load(<span class="string">'NeuroDOT_Base_HW_Sample_1.mat'</span>);
+noisy = load(<span class="string">'NeuroDOT_Base_HW_Sample_Noisy.mat'</span>);
+</pre><p>In the workspace, these samples are stored as structures with fields <tt>data</tt>, <tt>info</tt>, and <tt>flags</tt>.</p><p>Now, we're ready to start working on the Preprocessing Pipeline!</p><h2>S-D Measurements<a name="8"></a></h2><p>We'll work first from the raw source-detector pair measurements in <tt>data</tt>. We can visualize the time traces of each channel with <tt>plot</tt>.</p><p>Create a new figure and plot the data:</p><pre class="codeinput">figure
+plot(hw1.data')
+</pre><p>Calculate x-axis limits from the array&#8217;s size, and label the axes:</p><pre class="codeinput">[Nm, Nt] = size(hw1.data);
+xlim([0, Nt+1])
+xlabel(<span class="string">'samples'</span>)
+ylabel(<span class="string">'light level'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas.png" alt=""> </p><p>If we use MATLAB&#8217;s magnification tool to zoom in on the figure, we can see the signal in more detail. Each line is a single channel's time trace. The fast, periodic spikes we see are the heart pulse signal.</p><p><img vspace="5" hspace="5" src="allmeas_zoomed_in.png" alt=""> </p><p>The mean value of each channel is relatively consistent, but the channels are spread across several orders of magnitude. We see this in traces bunched at the bottom.</p><p>We can alleviate this bunching with a <tt>semilogy</tt> plot. We'll also convert the 'samples' units to 'seconds' using the system framerate.</p><p>Create a new figure and plot the data:</p><pre class="codeinput">dt = 1 / hw1.info.system.framerate;
+figure
+semilogy([0:dt:(Nt-1)*dt]', hw1.data')
+ylabel(<span class="string">'light level'</span>)
+xlim([0, (Nt-1)*dt])
+xlabel(<span class="string">'seconds'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas_seconds.png" alt=""> </p><p>Zooming in again shows the time traces spread more evenly among the orders of magnitude.</p><p><img vspace="5" hspace="5" src="allmeas_seconds_zoomed_in.png" alt=""> </p><p>There is a characteristic log-linear relationship between S-D distance and mean light level for light diffusion in biological tissue. Let's explore that by plotting it!</p><p>Create a new figure and plot the TIME mean of each channel versus S-D distance:</p><pre class="codeinput">figure
+semilogy(hw1.info.pairs.r2d, mean(hw1.data, 2), <span class="string">'*'</span>)
+xlabel(<span class="string">'S-D Separation [mm]'</span>)
+ylabel(<span class="string">'Light Levels'</span>)
+</pre><p><img vspace="5" hspace="5" src="LLfalloff.png" alt=""> </p><p>Why do the channels all line up vertically in the same 5 S-D distance, or pair radius, bands? They represent groups of nearest neighbor pairs on a 3D cap. In this data, the first through fifth nearest neighbors were measured.</p><p><img vspace="5" hspace="5" src="cap_nns.png" alt=""> </p><p>We can visualize the differences in mean light levels between radius ranges with <tt>hw1.info.pairs.r2d</tt>.</p><p>Create a new figure and plot time traces for the <tt>[10, 16]</tt> and <tt>[27, 33]</tt> radius ranges:</p><pre class="codeinput">figure
+keep = (hw1.info.pairs.r2d &gt;= 10) &amp; (hw1.info.pairs.r2d &lt;= 16);
+semilogy(hw1.data(keep, :)')
+xlim([0, Nt+1 * dt])
+xlabel(<span class="string">'seconds'</span>)
+ylabel(<span class="string">'light level'</span>)
+title(<span class="string">'r \in [10, 16]'</span>)
+
+figure
+keep = (hw1.info.pairs.r2d &gt;= 27) &amp; (hw1.info.pairs.r2d &lt;= 33);
+semilogy(hw1.data(keep, :)')
+xlim([0, Nt+1 * dt])
+xlabel(<span class="string">'seconds'</span>)
+ylabel(<span class="string">'light level'</span>)
+title(<span class="string">'r \in [27, 33]'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas_nn12.png" alt=""> </p><p>This logical indexing from the <tt>info.pairs</tt> table forms the core of how NeuroDOT 2 groups and categorizes measurement data by pair radius range (<tt>r2d</tt> or <tt>r3d</tt>), nearest neighbors (<tt>NN</tt>), and wavelengths (<tt>WL</tt>).</p><p>We'll use the <tt>info.pairs.r2d</tt> range of <tt>[10, 16]</tt> and <tt>WL2</tt> to start with. This is done with the <tt>params</tt> structure, which passes parameters on to NeuroDOT's visualization functions:</p><pre class="codeinput">params.rlimits = [10, 16];
+params.Nwls = 2;
+</pre><p>To learn more about the <tt>params</tt> structure, please consult the User Manual or the "params Usage" appendix at the end of the Overview tutorial.</p><p>There are two NeuroDOT 2 functions for the visualizations we've just learned:</p><pre class="codeinput">PlotTimeTraceAllMeas(hw1.data, hw1.info, params)
+PlotFalloffLL(hw1.data, hw1.info)
+</pre><p><img vspace="5" hspace="5" src="allmeas_LLfalloff.png" alt=""> </p><p>Let's also run the Light Level Falloff visualization for the <b>Noisy</b> data set:</p><pre class="codeinput">PlotFalloffLL(noisy.data, noisy.info)
+</pre><p><img vspace="5" hspace="5" src="llfalloff_noisy_comparison.png" alt=""> </p><p>And here is the light level falloff. The higher radius/NN pairs lose their log-linearity in the <b>Noisy</b> data, potentially indicating a bad cap fit.</p><p>Let's visualize the cap's topography now. We'll be using a NeuroDOT function, <tt>PlotCapData</tt>, that plots RGB inputs onto the the cap grid provided in <tt>info</tt>.</p><p>Create arrays of RGB values for each source and detector:</p><pre class="codeinput">Ns = length(unique(hw1.info.pairs.Src));
+Nd = length(unique(hw1.info.pairs.Det));
+SrcRGB = repmat([1, 0.75, 0.75], Ns, 1);
+DetRGB = repmat([0.55, 0.55, 1], Nd, 1);
+</pre><p>Set up <tt>params</tt> and call <tt>PlotCapData</tt>:</p><pre class="codeinput">params.mode = <span class="string">'textpatch'</span>;
+PlotCapData(SrcRGB, DetRGB, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcapdata.png" alt=""> </p><p>The NeuroDOT function for this is <tt>PlotCap</tt>:</p><pre class="codeinput">PlotCap(hw1.info)
+</pre><p><tt>PlotCapData</tt> is a <b>low-level</b> function that several different <b>high-level</b> functions like <tt>PlotCap</tt> call to make variations on the same basic plot.</p><p>The <b>low-level</b> visualizations in NeuroDOT 2 all have the word "|Data|" at the end of their name.</p><p><img vspace="5" hspace="5" src="plotcap.png" alt=""> </p><p>Next, we'll use another <b>high-level</b> visualization to map the channel temporal means we calculated for the Light Level Falloff plot (<tt>PlotFalloffLL</tt>) onto the cap grid:</p><pre class="codeinput">params.mode = []; <span class="comment">% Removing the mode.</span>
+PlotCapMeanLL(hw1.data, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcapmeanll.png" alt=""> </p><p>Let's also plot the Cap Mean Light Levels for <tt>r2d = [27, 33]</tt>, <tt>WL2</tt>. We'll scale the two plots to the same value to see how they correspond to the Light Level Falloff plots:</p><pre class="codeinput">params2 = params;
+params2.rlimits = [27, 33];
+PlotCapMeanLL(hw1.data, hw1.info, params2)
+</pre><p>Due to the units scaling, large portions of the <tt>[27, 33]</tt> channels fall under the <tt>10 nW</tt> noise floor.</p><p><img vspace="5" hspace="5" src="plotcapmeanll_r1016_r2733.png" alt=""> </p><p>Now, let's compare this to the <b>Noisy</b> data for <tt>[10, 16]</tt>:</p><pre class="codeinput">PlotCapMeanLL(noisy.data, noisy.info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcapmeanll_noisy_comparison.png" alt=""> </p><p>The <b>Noisy</b> data is getting poorer light coupling in the middle of the cap and along the top-right side.</p><p>These functions also support 3D rendering:</p><pre class="codeinput">params.dimension = <span class="string">'3D'</span>;
+PlotCap(hw1.info, params)
+PlotCapMeanLL(hw1.data, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcap_and_ll_3d.png" alt=""> </p><p>NeuroDOT's 3D visualizations enable you to inspect the plot from any angle. Try it now by clicking anywhere on the cap and dragging it around!</p><p>Let's also not forget to clear some variables:</p><pre class="codeinput">clear <span class="string">DetRGB</span> <span class="string">dt</span> <span class="string">params2</span> <span class="string">SrcRGB</span> <span class="string">keep</span> <span class="string">Nm</span> <span class="string">Nd</span> <span class="string">Ns</span> <span class="string">Nt</span>
+</pre><p>And clear unnecessary <tt>params</tt> fields:</p><pre class="codeinput">params.dimension = [];
+</pre><h2>Logmean Light Levels<a name="26"></a></h2><p>For imaging brain function throughout a volume, the Rytov approximation is the most accurate model. This approximation uses log-normalized light level data. Thus, our first step is encapsulated in the equation below, where \Phi is the measured light level and <a href="\Phi">\Phi</a> is the temporal mean, for each channel.</p><p>See the DOT Appendix for more information on this model.</p><p><img vspace="5" hspace="5" src="logmean_explanation.png" alt=""> </p><p>NeuroDOT's function for this is simply named <tt>logmean</tt>. Let's run it on our data and visualize the All Measurements time traces.</p><p>We'll add a <tt>params</tt> command to switch the traces to <tt>'linear'</tt> scaling:</p><pre class="codeinput">hw1.lmdata = logmean(hw1.data);
+params.yscale = <span class="string">'linear'</span>;
+params.ylimits = <span class="string">'auto'</span>;
+PlotTimeTraceAllMeas(hw1.lmdata, hw1.info, params)
+</pre><p>Comparing the logmean'ed data (bottom) to the raw measurements (top), we can see that the logmean reveals more of the signal variance resulting from hemodynamics.</p><p><img vspace="5" hspace="5" src="logmean_allmeas.png" alt=""> </p><p>Let's look at the logmean of the <b>Noisy</b> data:</p><pre class="codeinput">noisy.lmdata = logmean(noisy.data);
+PlotTimeTraceAllMeas(noisy.lmdata, noisy.info, params)
+</pre><p><img vspace="5" hspace="5" src="logmean_allmeas_noisy_comparison.png" alt=""> </p><p>The irregular, sawtooth epochs of data (yellow arrows) along these time traces are indicative of possible motion artifacts. The <b>Noisy</b> data clearly has more such epochs than <b>HW1</b>.</p><p>These motion artifacts will also show if we plot the data as a grayscale image, which we can do with the function <tt>PlotGray</tt>:</p><pre class="codeinput">PlotGray(hw1.lmdata, hw1.info, params)
+PlotGray(noisy.lmdata, noisy.info, params)
+</pre><p><img vspace="5" hspace="5" src="logmean_plotgray.png" alt=""> </p><p>Here we see that <b>HW1</b> (top right) has fewer abrupt signal discontinuities (yellow bars) than <b>Noisy</b> (bottom right).</p><p>Let's clear unnecessary <tt>params</tt> fields:</p><pre class="codeinput">params.ylimits = [];
+params.yscale = [];
+</pre><h2>Detect Noisy Channels<a name="30"></a></h2><p>The next step is detecting noisy channels. The variation in each channel is ideally driven by hemodynamic changes; however, in lower signal-to-noise data, motion or poor coupling (etc) could add unwanted variance, which we would consider to be noise.</p><p>NeuroDOT 2 recommends a threshold of <tt>7.5%</tt> in units of standard deviation of the channel time trace, to label a channel as noisy, based on empirical comparisons of data quality [1].</p><p>The NeuroDOT function for detecting these channels and applying this threshold is <tt>FindGoodMeas</tt>, where the last input is the threshold:</p><pre class="codeinput">hw1.info = FindGoodMeas(hw1.lmdata, hw1.info, 0.075);
+noisy.info = FindGoodMeas(noisy.lmdata, noisy.info, 0.075);
+</pre><p>In order to understand this filtering of noisy channels, let's examine the distribution of standard deviations by channel. The NeuroDOT function <tt>PlotHistogramSTD</tt> is specifically designed for this:</p><pre class="codeinput">PlotHistogramSTD(hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="PHSTD.png" alt=""> </p><p>Here we see that most of these superficial (low S-D distance) pairs in <tt>[10, 16]</tt> fall below the <tt>7.5%</tt> threshold.</p><p>NeuroDOT has a visualization for displaying a map of noisy channels filtering on the cap grid, <tt>PlotCapGoodMeas</tt>, which has two modes for the <tt>params.mode</tt> input: <tt>'good'</tt> and <tt>'bad'</tt>. Let's compare these for our <b>HW1</b> and <b>Noisy</b> data sets, first in <tt>'good'</tt> mode:</p><pre class="codeinput">params.mode = <span class="string">'good'</span>;
+params.rlimits = [10, 16; 27, 33; 36, 42; 44, 50];
+PlotCapGoodMeas(hw1.info, params)
+PlotCapGoodMeas(noisy.info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcapgoodmeas.png" alt=""> </p><p>Here we see on the Good Measurements (GM) plot that <b>HW1</b> has retained more channels in all radius groups above <tt>[10, 16]</tt>. We can see this reflected in the less dense grid for the <b>Noisy</b> data.</p><pre class="codeinput">params.mode =<span class="string">'bad'</span>;
+params.rlimits = [10, 16; 27, 33; 36, 42];
+PlotCapGoodMeas(hw1.info, params)
+PlotCapGoodMeas(noisy.info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcapbadmeas.png" alt=""> </p><p>Conversely, the Bad Measurements plot is more dense for the <b>Noisy</b> data, especially along the middle-right and top-right edge of the cap.</p><p>The thicker lines represent closer measurements.</p><p>Let's clear unnecessary <tt>params</tt> fields and restore our radius limits:</p><pre class="codeinput">params.mode = [];
+params.rlimits = [10, 16];
+</pre><h2>Linear Detrending<a name="35"></a></h2><p>The next step is an easy one!</p><p>Linear detrending removes the linear component of the signal, or in other words, it flattens out long-term drift. This an optional step in the pipeline.</p><p>We can use MATLAB's <tt>detrend</tt> function on the transpose of <tt>data</tt>, and take the transpose of that result to maintain <tt>data</tt>'s MEAS x TIME shape:</p><pre class="codeinput">hw1.ddata = detrend(hw1.lmdata')';
+</pre><p>This is best visualized with a mean time trace for the <tt>r2d = [10, 16]</tt>, <tt>WL2</tt> group that we care about, using <tt>PlotTimeTraceMean</tt>:</p><pre class="codeinput">PlotTimeTraceMean(hw1.lmdata, hw1.info, params)
+PlotTimeTraceMean(hw1.ddata, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="detrend.png" alt=""> </p><p>As we see from the red lines, the result clearly shows the removal of a trend.</p><p>The NeuroDOT 2 version, <tt>detrend_tts</tt>, ensures compatibility with NeuroDOT data structures. Let's run it on the <b>Noisy</b> data:</p><pre class="codeinput">noisy.ddata = detrend_tts(noisy.lmdata);
+</pre><h2>High Pass Filter<a name="38"></a></h2><p>The next step is a high pass filter (HPF), to remove long term drift. The choice of cutoff frequency is dictated by the stimulus paradigm. For this data set and paradigm, the repetition rate is every <tt>30 seconds</tt>. The cutoff frequency here of <tt>0.02 Hz</tt> translates to <tt>1/50 s</tt>, which gives us a healthy margin. We will also need the framerate, which is stored in <tt>hw1.info.system.framerate</tt> and has a value of <tt>10.0005 Hz</tt>.</p><p>The NeuroDOT function for this is <tt>highpass</tt>:</p><pre class="codeinput">hw1.hpdata = highpass(hw1.ddata, 0.02, hw1.info.system.framerate);
+noisy.hpdata = highpass(noisy.ddata, 0.02, noisy.info.system.framerate);
+</pre><p>This function employs a 5-pole, forward-backward Butterworth filter.</p><p>We can visualize this operation with <tt>PlotPowerSpectrumMean</tt>, before and after the filter, using <tt>params.fig_handle</tt> to plot both spectra in the same figure:</p><pre class="codeinput">params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+params.ylimits = [0, 1e-5];
+PlotPowerSpectrumMean(hw1.ddata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.hpdata, hw1.info, params)
+legend({<span class="string">'detrended'</span>, <span class="string">'highpassed'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p>NeuroDOT calculates the power spectrum by taking an FFT of the time traces, then multiplying the positive half of the frequency domain's absolute value by 2 for its full magnitude. The square of that magnitude is the power.</p><p>Let's also take a look at the mean power spectrum for the <b>Noisy</b> data:</p><pre class="codeinput">params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+PlotPowerSpectrumMean(noisy.ddata, noisy.info, params)
+PlotPowerSpectrumMean(noisy.hpdata, noisy.info, params)
+legend({<span class="string">'detrended'</span>, <span class="string">'highpassed'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="hpf_ps_noisy_comparison.png" alt=""> </p><p>We see that the HPF attenuated signals below the <tt>0.02 Hz</tt> cutoff (yellow lines). The poor coupling we observed in the Light Level Falloff, Cap Mean Light Levels and Good Measurements is reflected in the <b>Noisy</b> plots' weaker power between <tt>10^-2</tt> and <tt>10^0 Hz</tt>.</p><p>We can also visualize the HPF by taking the mean of a subset of channels' time traces. The NeuroDOT function for this is <tt>PlotTimeTraceMean</tt>:</p><pre class="codeinput">params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+params.ylimits = [];
+PlotTimeTraceMean(hw1.ddata, hw1.info, params)
+PlotTimeTraceMean(hw1.hpdata, hw1.info, params)
+legend({<span class="string">'detrended'</span>, <span class="string">'highpassed'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="hpf_meantts.png" alt=""> </p><p>This plot can also be useful for visualizing each pipeline step's effect on the global signal. However, spatial information is diminished. Because <tt>r2d = [10, 16]</tt> mostly covers superficial tissue (scalp &amp; skull), averaging these channels gives us a sense of the superficial hemoglobin contrast dynamics.</p><h2>Low Pass Filter 1<a name="43"></a></h2><p>The next step is a low pass filter (LPF1) with a cutoff frequency at <tt>1 Hz</tt>. This is because we typically downsample to a <tt>1 Hz</tt> sampling frequency after preprocessing, so any signals above <tt>1 Hz</tt> are irrelevant.</p><p>The NeuroDOT function for this is <tt>lowpass</tt>, which has the exact same inputs as <tt>highpass</tt> in the previous section. The only difference is that <tt>lowpass</tt> filters frequencies above a cutoff, and <tt>highpass</tt> below.</p><p>Also, plot the power spectra of your LPF1 data, for both <b>HW1</b> and <b>Noisy</b>, using the NeuroDOT 2 functions you've just learned.</p><p>In case you had trouble, here is the syntax for these:</p><pre class="codeinput">hw1.lp1data = lowpass(hw1.hpdata, 1, hw1.info.system.framerate);
+noisy.lp1data = lowpass(noisy.hpdata, 1, noisy.info.system.framerate);
+
+params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+params.ylimits = [0 1e-5];
+PlotPowerSpectrumMean(hw1.hpdata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.lp1data, hw1.info, params)
+legend({<span class="string">'highpassed'</span>, <span class="string">'lowpassed'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+
+params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+PlotPowerSpectrumMean(noisy.hpdata, noisy.info, params)
+PlotPowerSpectrumMean(noisy.lp1data, noisy.info, params)
+legend({<span class="string">'highpassed'</span>, <span class="string">'lowpassed'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="lpf_hpf_noisy_comparison.png" alt=""> </p><p>On both <b>HW1</b> and <b>Noisy</b>, we see the action of LPF1 in the disappearance of the right-most peak, highlighted in red, which was just above the <tt>1 Hz</tt> cutoff. Remember that you can use MATLAB's zoom tool to examine plots more closely!</p><p>Below is a zoomed-in view of HW1.</p><p><img vspace="5" hspace="5" src="lpf_hpf_noisy_zoomed.png" alt=""> </p><p>Let's also take a quick look at what would happen if we lowered the cutoff to <tt>0.5 Hz</tt>:</p><pre class="codeinput">temp = lowpass(hw1.hpdata, 0.5, hw1.info.system.framerate);
+params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+PlotPowerSpectrumMean(hw1.hpdata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.lp1data, hw1.info, params)
+PlotPowerSpectrumMean(temp, hw1.info, params)
+legend({<span class="string">'highpassed'</span>, <span class="string">'lowpass 1 Hz'</span>, <span class="string">'lowpass 0.5 Hz'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="lpf_alt_zoomed.png" alt=""> </p><p>Before we move on, let's also look at <b>HW1</b>'s mean time traces, as we did for the HPF:</p><pre class="codeinput">params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+params.ylimits = [];
+PlotTimeTraceMean(hw1.hpdata, hw1.info, params)
+PlotTimeTraceMean(hw1.lp1data, hw1.info, params)
+legend({<span class="string">'highpassed'</span>, <span class="string">'lowpassed'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="lpf_meantts.png" alt=""> </p><h2>Superficial Signal Regression<a name="47"></a></h2><p>Next is Superficial Signal Regression, or SSR, which removes superficial hemodynamics of the scalp &amp; skull. This systemic signal (of the cardiovascular pulse in superficial blood vessels) is estimated by taking an average of the <tt>r2d = [10, 16]</tt> measurements.</p><p>The NeuroDOT function for taking this average is <tt>gethem</tt>:</p><pre class="codeinput">hw1.hem = gethem(hw1.lp1data, hw1.info, <span class="string">'NN'</span>, 1);
+noisy.hem = gethem(noisy.lp1data, noisy.info, <span class="string">'NN'</span>, 1);
+</pre><p>Then, we regress this hemodynamic signal from the rest of the data using NeuroDOT's <tt>regcorr</tt>.</p><pre class="codeinput">hw1.SSRdata = regcorr(hw1.lp1data, hw1.info, hw1.hem);
+noisy.SSRdata = regcorr(noisy.lp1data, noisy.info, noisy.hem);
+</pre><p>This regression follows the formula outlined in the literature [2]:</p><p><img vspace="5" hspace="5" src="zeff_eqn.png" alt=""> </p><p>where <img src="DOT_Processing_Tutorial_eq16949843601793904612.png" alt="$y_{i}$"> is the corrected signal, <img src="DOT_Processing_Tutorial_eq17818505392369373738.png" alt="$y_{i}^{'}$"> is the uncorrected signal, and <img src="DOT_Processing_Tutorial_eq03133971348043604638.png" alt="$y_{r\in[10,16]}$"> is the estimated superficial hemodynamic signal.</p><p>Go ahead and plot the mean power spectra for <b>HW1</b>, this time including the <tt>[27, 33]</tt> radius pairs. You can refer to the previous syntax in this tutorial for hints!</p><p>Here's the syntax in case you were having trouble:</p><pre class="codeinput">params.rlimits = [10, 16; 27, 33];
+params.fig_handle = [];
+PlotPowerSpectrumMean(hw1.lp1data, hw1.info, params)
+PlotPowerSpectrumMean(hw1.SSRdata, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="SSR_lpf_ps.png" alt=""> </p><p>It is clear that the systemic signal (blue) has been regressed out (red).</p><p>Let's also look at the Gray Plots. Here's the syntax:</p><pre class="codeinput">PlotGray(hw1.lp1data, hw1.info, params)
+PlotGray(hw1.SSRdata, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="SSR_lpf_gray.png" alt=""> </p><p>Notice that the <tt>r2d = [10, 16]</tt> channels have not been completely attenuated by SSR. Rather, it's the <b>average</b> of the <tt>[10, 16]</tt> channels' time traces that has been regressed out.</p><p>These channels still contain useful information that will be included in the final HD-DOT reconstruction.</p><p>Before we move on, let's see what the mean time traces look like again:</p><pre class="codeinput">params.fig_handle = [];
+params.ylimits = [];
+PlotTimeTraceMean(hw1.lp1data, hw1.info, params)
+PlotTimeTraceMean(hw1.SSRdata, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="SSR_lpf_meantts.png" alt=""> </p><p>These results match what we've already seen: the <tt>[10, 16]</tt> pairs have had their average regressed from the data, resulting in ~0 signal.</p><h2>Low Pass Filter 2<a name="53"></a></h2><p>The penultimate step is a second lowpass filter, this time at a lower cutoff frequency of <tt>0.5 Hz</tt>. This removes the cardiac pulse from the signal, and uses the same NeuroDOT function, <tt>lowpass</tt>, as before.</p><p>Using the functions you've learned, apply a <tt>0.5 Hz</tt> filter to the <b>HW1</b> and <b>Noisy</b> data sets, and visualize their power spectra before and after.</p><p>Here is the syntax:</p><pre class="codeinput">hw1.lp2data = lowpass(hw1.SSRdata, 0.5, hw1.info.system.framerate);
+noisy.lp2data = lowpass(noisy.SSRdata, 0.5, noisy.info.system.framerate);
+
+params.rlimits = [27, 33];
+params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+PlotPowerSpectrumMean(hw1.SSRdata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.lp2data, hw1.info, params)
+legend({<span class="string">'SSR'</span>, <span class="string">'LPF2'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="lpf2_SSR_ps_with_zoom.png" alt=""> </p><p>Here, we see that the pulse signal, just below <tt>1 Hz</tt> (blue) has been filtered out (red).</p><p>One more time, let's look at the mean time traces:</p><pre class="codeinput">params.rlimits = [27, 33];
+params.fig_handle = figure(<span class="string">'Color'</span>, <span class="string">'k'</span>);
+PlotTimeTraceMean(hw1.SSRdata, hw1.info, params)
+PlotTimeTraceMean(hw1.lp2data, hw1.info, params)
+legend({<span class="string">'SSR'</span>, <span class="string">'LPF2'</span>}, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'TextColor'</span>, <span class="string">'w'</span>)
+</pre><p><img vspace="5" hspace="5" src="lpf2_SSR_meantts.png" alt=""> </p><p>The signal is now very clearly defined after LPF2 (red).</p><h2>1 Hz Resampling<a name="56"></a></h2><p>The last preprocessing step is to resample the data from <tt>~10 Hz</tt> to <tt>1 Hz</tt>. We do this because the range of hemodynamic signals is far below <tt>1 Hz</tt>, and thus functional neuroimaging is typically done on a <tt>1 Hz</tt> time scale. This also has the benefit of reducing data storage requirements, eliminating noise, and providing a benchmark framerate to standardize all stimulus, data acquisitions, and analysis to.</p><p>The NeuroDOT function for this is <tt>resample_tts</tt>. The last input is the resampling frequency:</p><pre class="codeinput">[hw1.rdata, hw1.info] = resample_tts(hw1.lp2data, hw1.info, 1);
+[noisy.rdata, noisy.info] = resample_tts(noisy.lp2data, noisy.info, 1);
+</pre><p>Go ahead and plot the mean time trace for HW1 now.</p><p>Here's the syntax for the time traces:</p><pre class="codeinput">params.ylimits = [-0.005 0.005];
+params.fig_handle = [];
+PlotTimeTraceMean(hw1.lp2data, hw1.info, params)
+PlotTimeTraceMean(hw1.rdata, hw1.info, params)
+</pre><p><img vspace="5" hspace="5" src="resampled.png" alt=""> </p><p>We see on the Time axis that the data has been resampled from <tt>~2000</tt> time points to <tt>~200</tt> - exactly the <tt>~10x</tt> factor that we expected.</p><h2>Block Averaging<a name="59"></a></h2><p>We finally have preprocessed data ready for analysis. What&#8217;s next?</p><p>The first major analysis step is to average the stimulus blocks together. Averaging is a common way to increase signal-to-noise ratio (SNR) in neuroscience and other imaging experiments.</p><p>NeuroDOT's function for this is <tt>BlockAverage</tt>. The last input specifies which stimulus pulse to average for; in this case, we are averaging <tt>Pulse_2</tt>, which codes for the stimulus ON pulses:</p><pre class="codeinput">hw1.badata = BlockAverage(hw1.rdata, hw1.info, 2);
+noisy.badata = BlockAverage(noisy.rdata, noisy.info, 2);
+</pre><p>Let's visualize the <b>HW1</b> and <b>Noisy</b> time traces. First, in order to see any activations, we need to normalize them due to the variance in mean light level between channels.</p><p>We'll normalize each channel to the mean of its first four seconds using NeuroDOT's <tt>normalize2range_tts</tt>:</p><pre class="codeinput">hw1.ndata = normalize2range_tts(hw1.badata, 1:4);
+noisy.ndata = normalize2range_tts(noisy.badata, 1:4);
+</pre><p>And now we'll plot the time traces, setting <tt>params</tt> to filter for Good Measurements (since only GM are reconstructed):</p><pre class="codeinput">params.useGM = 1;
+params.fig_handle = [];
+params.ylimits = [-0.06, 0.06];
+params.yscale = <span class="string">'linear'</span>;
+PlotTimeTraceAllMeas(hw1.ndata, hw1.info, params)
+PlotTimeTraceAllMeas(noisy.ndata, noisy.info, params)
+
+PlotGray(hw1.ndata, hw1.info, params)
+PlotGray(noisy.ndata, noisy.info, params)
+</pre><p><img vspace="5" hspace="5" src="normed.png" alt=""> </p><p>Even when filtering for Good Measurements, we still see some rather noisy channels (yellow arrows), and only a faint pattern of activation curves can be detected (it should be noted that this is also pre-spectroscopy).</p><p>These channels are global, not localized to the focal activation region, which is another reason why we do not see strong activation patterns.</p><p>We won't see any true activations until we've finished reconstructing this data.</p><h2>Preprocessing Pipeline Complete!<a name="63"></a></h2><p><img vspace="5" hspace="5" src="prepro_complete.png" alt=""> </p><h2>NeuroDOT 2 Overview Flowchart<a name="64"></a></h2><p><img vspace="5" hspace="5" src="overview_prepro_complete.png" alt=""> </p><h2>Reconstruction Pipeline Flowchart<a name="65"></a></h2><p><img vspace="5" hspace="5" src="recon_pipeline.png" alt=""> </p><h2>Reconstructing Image Volumes<a name="66"></a></h2><p><img vspace="5" hspace="5" src="cap_nns.png" alt=""> </p><p>After block averaging, we must reconstruct our measurement pairs into an image volume. This is done by applying a Tikhonov inversion to a linear Rytov approximation. What this ultimately means is that in the equation below, our measurements correspond to <tt>y</tt>, our sensitivity matrix is <tt>A</tt>, and the desired image volume is <tt>x</tt>.</p><p><img vspace="5" hspace="5" src="recon_eqn.png" alt=""> </p><p>After the reconstruction, we use the differing extinction coefficients of deoxy- and oxy-hemoglobin (HbO and HbR, respectively) at our two wavelengths (750 and 850 nm) to isolate each concentration from the other and calculate functional neural activity maps.</p><p><img vspace="5" hspace="5" src="extinction_curves.png" alt=""> </p><h2>HD-DOT Sensitivity Profile<a name="67"></a></h2><p>Here is a sensitivity profile for a single source-detector pair (a), and for the entire HD-DOT large cap system (b), which was used to gather the measurements we are using for our examples in this tutorial.</p><p><img vspace="5" hspace="5" src="sensitivity_profile.png" alt=""> </p><p>The summed sensitivity profile in (b) also essentially gives us our field of view (FOV) for the system. Note that this FOV overlaps with tissue superficial to the brain of the underlain atlas, such as scalp and skull.</p><h2>Sensitivity A Matrix<a name="68"></a></h2><p>The first step is to load our pre-calculated sensitivity matrix:</p><pre class="codeinput">load(<span class="string">'A_Adult_96x92.mat'</span>)
+</pre><p>This file is quite large, so depending on your workstation, you may have to wait several minutes for it to load. It contains 3 variables: <tt>A</tt>, the sensitivity matrix, <tt>dim</tt>, a structure describing the reconstruction space, and <tt>infoA</tt>, a structure describing the <tt>A</tt>-matrix space.</p><p>We'll also need to load the spectroscopy matrix, <tt>E</tt>:</p><pre class="codeinput">load(<span class="string">'E.mat'</span>)
+</pre><h2>Invert A Matrix<a name="70"></a></h2><p>The first reconstruction step is to invert the sensitivity <tt>A</tt> matrix so that it can be used in a linear approximation. NeuroDOT uses a Tikhonov inversion algorithm for this, in the function <tt>Tikhonov_invert_Amat</tt>.</p><p>We'll also have to do the processing separately for each wavelength. We will include pair radii below <tt>42 mm</tt> and using only Good Measurements.</p><pre class="codeinput">keep1 = (hw1.info.pairs.WL == 1) &amp; (hw1.info.pairs.r2d &lt;= 42) &amp; hw1.info.MEAS.GI;
+keep2 = (hw1.info.pairs.WL == 2) &amp; (hw1.info.pairs.r2d &lt;= 42) &amp; hw1.info.MEAS.GI;
+
+hw1.iA1 = Tikhonov_invert_Amat(A(keep1, :), 0.01, 0.1);
+hw1.iA2 = Tikhonov_invert_Amat(A(keep2, :), 0.01, 0.1);
+</pre><p>The last two inputs are parameters for the Tikhonov regularization. This calculation may run for some time - <tt>~10-20 minutes</tt>, depending on your CPU.</p><h2>Smooth Inverted A Matrix<a name="72"></a></h2><p>The next step is to smooth the sensitivity matrix with a Gaussian kernel. The NeuroDOT function for this is <tt>smooth_Amat</tt>:</p><pre class="codeinput">hw1.siA1 = smooth_Amat(hw1.iA1, dim, 5, 1.2);
+hw1.siA2 = smooth_Amat(hw1.iA2, dim, 5, 1.2);
+</pre><p>The last two inputs are the width and STD parameters for the Gaussian kernel.</p><h2>Reconstruct Image Volume<a name="74"></a></h2><p>It's finally time to reconstruct the image from our raw data! We'll use NeuroDOT's <tt>reconstruct_img</tt> to do this:</p><pre class="codeinput">hw1.cortex_mu_a1 = reconstruct_img(hw1.badata(keep1, :), hw1.siA1);
+hw1.cortex_mu_a2 = reconstruct_img(hw1.badata(keep2, :), hw1.siA2);
+</pre><p>With these two wavelengths reconstructed, let's take a look at the resultant images. First, we'll need to convert the images into a 3D space using dim and the NeuroDOT function <tt>Good_Vox2vol</tt>, and then we'll need to subtract the first four time points:</p><pre class="codeinput">hw1.cortex_mu_a_vol1 = Good_Vox2vol(hw1.cortex_mu_a1, dim);
+hw1.cortex_mu_a_vol2 = Good_Vox2vol(hw1.cortex_mu_a2, dim);
+
+hw1.cortex_mu_a_vol1 = normalize2range_tts(hw1.cortex_mu_a_vol1, 1:4);
+hw1.cortex_mu_a_vol2 = normalize2range_tts(hw1.cortex_mu_a_vol2, 1:4);
+</pre><p>Now, we can visualize these volumes using the NeuroDOT function <tt>PlotSlices</tt>, which creates an interactive, colormapped, 3-slice view of the reconstructed volume. Let's use <tt>t = 18</tt> as our time point:</p><pre class="codeinput">t18 = hw1.cortex_mu_a_vol1(:, :, :, 18);
+PlotSlices(t18)
+</pre><p><img vspace="5" hspace="5" src="t18_WL1.png" alt=""> </p><p>With the interactive navigation, try clicking around in <tt>PlotSlices</tt> to explore the volume. The general form of PlotSlices is:</p><p><tt>PlotSlices(underlay, infoVol, params, overlay)</tt></p><p>To look at an activity volume alone, use <tt>underlay</tt>. To view two volumes overlain together, the activity volume goes in <tt>overlay</tt>, and the background (such as an atlas) goes in <tt>underlay</tt>.</p><p>See the User Manual for more on how to use <tt>params</tt> in <tt>PlotSlices</tt>.</p><p>These volumes will be easier to contextualize if we use an atlas as a background. If you are unfamiliar with this concept, please refer to the Atlases appendix.</p><p>Let's load and visualize one of our several pre-prepared atlases:</p><pre class="codeinput">load(<span class="string">'Atlas_MNI152nl_T1_on_111.mat'</span>)
+PlotSlices(atlas, [], [], t18)
+</pre><p><img vspace="5" hspace="5" src="t18_WL1_a.png" alt=""> </p><p>Since this is a Hearing Words paradigm, let's try to find a region of activation in the right superior temporal gyrus (STG for short). The bottom plot has been navigated to this region.</p><p><img vspace="5" hspace="5" src="t18_WL1_nav.png" alt=""> </p><p>This is easier with an anatomical underlay to aid navigation now! From now on, we'll navigate directly to these areas using <tt>params</tt>:</p><pre class="codeinput">params.slices = [9, 45, 33];
+</pre><p>It was difficult to find activations in the STG, mainly because the <tt>WL1</tt> signal was weak. Let's also take a look at the image we reconstructed from <tt>WL2</tt>, and navigate to the STG:</p><pre class="codeinput">t18 = hw1.cortex_mu_a_vol2(:, :, :, 18);
+PlotSlices(atlas, [], params, t18)
+</pre><p><img vspace="5" hspace="5" src="t18_WL2_nav.png" alt=""> </p><p>Note: Per the sensitivity profile from earlier, some activations may appear slightly superficial to the tissues they occur in. Also remember, <tt>hw1.cortex_mu_a2</tt> are absorption values, not actual activations.</p><p>Let's try averaging <tt>t = 13:21</tt> for <tt>WL2</tt>:</p><pre class="codeinput">t13_21 = mean(hw1.cortex_mu_a_vol2(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t13_21)
+</pre><p><img vspace="5" hspace="5" src="t18_WL2_nav_avg.png" alt=""> </p><p>The averaging appears to have helped (1) filter out many of the spurious activations distal to the STG, and (2) increased the size and strength of the activations proximal to the STG.</p><p>Let's go back and average <tt>WL1</tt> as well:</p><pre class="codeinput">t13_21 = mean(hw1.cortex_mu_a_vol1(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t13_21)
+</pre><p><img vspace="5" hspace="5" src="t18_WL1_nav_avg.png" alt=""> </p><p>The activations are clearer now.</p><h2>Spectroscopy<a name="83"></a></h2><p>The last step here is to perform spectroscopy. This allows us to get the <tt>HbO</tt> and <tt>HbR</tt> concentrations from our light levels in <tt>cortex_mu_a</tt> and <tt>cortex_mu_a2</tt>. The NeuroDOT function is <tt>spectroscopy_img</tt>:</p><pre class="codeinput">cortex_mu_a = cat(3, hw1.cortex_mu_a1, hw1.cortex_mu_a2);
+hw1.cortex_Hb = spectroscopy_img(cortex_mu_a, E);
+</pre><p>Before we image anything, let's separate out the <tt>HbO</tt> results, convert to <tt>dim</tt> space, and subtract the first four time points again:</p><pre class="codeinput">hw1.cortex_HbO = hw1.cortex_Hb(:, :, 1);
+hw1.cortex_HbOvol = Good_Vox2vol(hw1.cortex_HbO, dim);
+hw1.cortex_HbOvol = normalize2range_tts(hw1.cortex_HbOvol, 1:4);
+</pre><p>Let's visualize <tt>HbO</tt> with <tt>PlotSlices</tt>:</p><pre class="codeinput">t18 = hw1.cortex_HbOvol(:, :, :, 18);
+PlotSlices(atlas, [], params, t18)
+</pre><p><img vspace="5" hspace="5" src="t18_HbO.png" alt=""> </p><p>We can probably improve our SNR by doing some averaging again. Let's use the same <tt>t = 13:20</tt> interval as before:</p><pre class="codeinput">t13_21 = hw1.cortex_HbOvol(:, :, :, 13:21);
+PlotSlices(atlas, [], params, mean(t13_21, 4))
+</pre><p><img vspace="5" hspace="5" src="t13_21_HbO.png" alt=""> </p><p>We can also map these activation volumes onto a surface mesh of the brain. It's easy to miss some activations while navigating three-slice views. Surface mapping avoids this by showing activations on the surface of the brain.</p><p>First, we need to load a mesh:</p><pre class="codeinput">load(<span class="string">'LR_Meshes_MNI_164k.mat'</span>)
+</pre><p>This file contains two meshes of the mesh data type, <tt>MNIl</tt> and <tt>MNIr</tt>, corresponding to the left and right hemispheres of a segmented version of the non-linear MNI 152 atlas we've been using with <tt>PlotSlices</tt>. This mesh has nearly 164,000 nodes, corresponding to the "|164k|" in the file name.</p><p>The NeuroDOT function we'll be using here is <tt>PlotInterpSurfMesh</tt>. This function interpolates our <tt>HbO</tt> volume onto the mesh we just loaded, and displays it with similar formatting, spatial orientation, and colormapping features to <tt>PlotSlices</tt>. The general syntax of this function is:</p><pre class="codeinput">t18 = hw1.cortex_HbOvol(:, :, :, 18);
+PlotInterpSurfMesh(t18, MNIl, MNIr, dim, params)
+</pre><p><img vspace="5" hspace="5" src="t18_PISM_HbO.png" alt=""> </p><p>And finally, we'll do the time averages:</p><pre class="codeinput">t13_21 = hw1.cortex_HbOvol(:, :, :, 13:21);
+PlotInterpSurfMesh(mean(t13_21, 4), MNIl, MNIr, dim, params)
+</pre><p><img vspace="5" hspace="5" src="t13_21_PISM_HbO.png" alt=""> </p><h2>Reconstruction Pipeline Complete!<a name="91"></a></h2><p><img vspace="5" hspace="5" src="recon_complete.png" alt=""> </p><h2>Saving Your Results<a name="92"></a></h2><p>With the pipeline complete, it's always important to save our data.</p><p>As a native MATLAB toolbox, NeuroDOT does not require any specific file formats. We recommend that you use MATLAB's save function to save the entire workspace as a .MAT file. You can also right-click on the MATLAB workspace panel to access a save dialog.</p><p>Alternatively, there are a number of file formats supported by NeuroDOT. All of this functionality is explained in greater detail in the File IO Appendix.</p><h2>Conclusion<a name="93"></a></h2><p>Congratulations! You have finished the NeuroDOT 2 Base Edition Preprocessing Pipeline Tutorial.</p><p>For further questions or more information, please consult the NeuroDOT 2 Base User Manual and the various Appendices.</p><p>NeuroDOT 2 Support Team:</p><div><ul><li>Adam Eggebrecht (<a href="mailto:aeggebre@wustl.edu">aeggebre@wustl.edu</a>)</li><li>David Muccigrosso (<a href="mailto:muccigrosso.david@wustl.edu">muccigrosso.david@wustl.edu</a>)</li></ul></div><h2>Citations<a name="94"></a></h2><div><ol><li>Eggebrecht et al., "Mapping distributed brain function with diffuse optical tomography." Nature Photonics, 2014. DOI: 10.1038/NPHOTON.2014.107</li><li>Zeff et al., "Retinotopic mapping of adult human visual cortex with high-density diffuse optical tomography." PNAS, 2007. DOI: 10.1073/pnas.0611266104</li></ol></div><h2>Appendix: Preprocessing<a name="95"></a></h2><p>Some notes on the block averaging and LPF1 stages: * Because LPF1 filters out the Nyquist frequency of the downsampling stage (see Neuro Photonics 2014 paper), which is not featured here, it really could be featured at any point in this pipeline after the logmean. The point of LPF1 is to remove all signal components at frequencies higher than the one it will be eventually downsampled to, so that they do not affect any of the other stages of the pipeline, and thus it is placed after the logmean and HPF. * Similarly, block averaging can be done at any point after LPF1. Since the raw data after the logmean is technically in a state that can be feasibly reconstructed, pretty much every step afterwards is just clearing up interfering signals. If a different sort of optical data does not have such signals present, there is little need for further preprocessing.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% NeuroDOT 2.2.0 Tutorial - Preprocessing Pipeline
+%
+% <<logo_fixed.png>>
+%
+% Welcome to NeuroDOT 2.2.0 Base Edition!
+%
+%% Diffuse Optical Tomography
+% In diffuse optical tomography (DOT), cap arrays of optical sources and
+% detectors are used to perform functional neuroimaging experiments.
+%
+% These experiments are broken into several components pipelines:
+% preprocessing of the raw source-detector measurements, modeling of the
+% light emission, diffusion, and detection through the head, reconstruction
+% and spectroscopy of the preprocessed data and light model into a
+% functional neuroimaging volume, and analysis of these results.
+%
+% <<dot_overview.png>>
+%
+% These pipelines allow a variety of experimental paradigms to be
+% investigated.
+%
+%% NeuroDOT 2 Overview Flowcharts
+% <<all_pipelines.png>>
+%% Preprocessing Pipeline Flowchart
+% <<preprocessing_diagram.png>>
+%% Mapping Hearing Words
+% In the “hearing words” (HW) paradigm, which we will use in this tutorial,
+% a participant quietly listens to auditory stimuli presented through
+% speakers.
+%
+% <<hearing_words_diagram.png>>
+%
+% The stimuli are divided into six 30-second blocks (white rectangles on
+% bottom-right), with one spoken word per s for 15 s, followed by 15 s of
+% silence.
+%
+% <<block_diagram.png>>
+%
+% These blocks are averaged together and reconstructed into a 5D time
+% series movie of brain function: 3 dimensions of space, 1 dimension for
+% time, and 1 dimension for Hemoglobin contrasts: oxy, deoxy, and total.
+%% The Preprocessing Pipeline
+% The first part of this tutorial focuses on the first stage of our
+% research scenario: preprocessing.
+%
+% Preprocessing involves using a number of digital signal processing and
+% analysis techniques to remove interfering or systemic signals, and
+% isolate the brain activity responses to stimuli (such as the Hearing
+% Words experiment).
+%
+% We will assess data quality at every step along the way to ensure that we
+% are acquiring high-quality maps of brain activity.
+%
+% You will be given syntax prompts along the way. Copy and type these into
+% the MATLAB command line, or highlight them and either press F9 or
+% right-click and select "Evaluate Selection" on the pop-up menu.
+%
+% If you are unfamiliar with NeuroDOT and its data structures at any point,
+% please refer to the Overview Tutorial and User Manual. Also, the
+% <List_of_Files_and_Functions.html List of Files and Functions> provides
+% easy reference to all other help documentation.
+%
+%% Sample Data
+% First, we need to load up our sample data. There are two sets, one of
+% high quality that has been presented in published papers [1], and another
+% "noisy" set that was chosen to contrast against the first.
+hw1 = load('NeuroDOT_Base_HW_Sample_1.mat');
+noisy = load('NeuroDOT_Base_HW_Sample_Noisy.mat');
+%%
+% In the workspace, these samples are stored as structures with fields
+% |data|, |info|, and |flags|.
+%
+% Now, we're ready to start working on the Preprocessing Pipeline!
+%% S-D Measurements
+% We'll work first from the raw source-detector pair measurements in
+% |data|. We can visualize the time traces of each channel with |plot|.
+%
+% Create a new figure and plot the data:
+figure
+plot(hw1.data')
+%%
+% Calculate x-axis limits from the array’s size, and label the axes:
+[Nm, Nt] = size(hw1.data);
+xlim([0, Nt+1])
+xlabel('samples')
+ylabel('light level')
+%%
+%
+% <<allmeas.png>>
+%
+% If we use MATLAB’s magnification tool to zoom in on the figure, we can
+% see the signal in more detail. Each line is a single channel's time
+% trace. The fast, periodic spikes we see are the heart pulse signal.
+%
+% <<allmeas_zoomed_in.png>>
+%
+% The mean value of each channel is relatively consistent, but the channels
+% are spread across several orders of magnitude. We see this in traces
+% bunched at the bottom.
+%
+% We can alleviate this bunching with a |semilogy| plot. We'll also convert
+% the 'samples' units to 'seconds' using the system framerate.
+%
+% Create a new figure and plot the data:
+dt = 1 / hw1.info.system.framerate;
+figure
+semilogy([0:dt:(Nt-1)*dt]', hw1.data')
+ylabel('light level')
+xlim([0, (Nt-1)*dt])
+xlabel('seconds')
+%%
+%
+% <<allmeas_seconds.png>>
+%
+% Zooming in again shows the time traces spread more evenly among the
+% orders of magnitude.
+%
+% <<allmeas_seconds_zoomed_in.png>>
+%
+% There is a characteristic log-linear relationship between S-D distance
+% and mean light level for light diffusion in biological tissue. Let's
+% explore that by plotting it!
+%
+% Create a new figure and plot the TIME mean of each channel versus S-D
+% distance:
+figure
+semilogy(hw1.info.pairs.r2d, mean(hw1.data, 2), '*')
+xlabel('S-D Separation [mm]')
+ylabel('Light Levels')
+%%
+%
+% <<LLfalloff.png>>
+%
+% Why do the channels all line up vertically in the same 5 S-D distance, or
+% pair radius, bands? They represent groups of nearest neighbor pairs on a
+% 3D cap. In this data, the first through fifth nearest neighbors were
+% measured.
+%
+% <<cap_nns.png>>
+%
+% We can visualize the differences in mean light levels between radius
+% ranges with |hw1.info.pairs.r2d|.
+%
+% Create a new figure and plot time traces for the |[10, 16]| and |[27,
+% 33]| radius ranges:
+figure
+keep = (hw1.info.pairs.r2d >= 10) & (hw1.info.pairs.r2d <= 16);
+semilogy(hw1.data(keep, :)')
+xlim([0, Nt+1 * dt])
+xlabel('seconds')
+ylabel('light level')
+title('r \in [10, 16]')
+
+figure
+keep = (hw1.info.pairs.r2d >= 27) & (hw1.info.pairs.r2d <= 33);
+semilogy(hw1.data(keep, :)')
+xlim([0, Nt+1 * dt])
+xlabel('seconds')
+ylabel('light level')
+title('r \in [27, 33]')
+%%
+%
+% <<allmeas_nn12.png>>
+%
+% This logical indexing from the |info.pairs| table forms the core of how
+% NeuroDOT 2 groups and categorizes measurement data by pair radius range
+% (|r2d| or |r3d|), nearest neighbors (|NN|), and wavelengths (|WL|).
+%
+% We'll use the |info.pairs.r2d| range of |[10, 16]| and |WL2| to start
+% with. This is done with the |params| structure, which passes parameters
+% on to NeuroDOT's visualization functions:
+params.rlimits = [10, 16];
+params.Nwls = 2;
+%%
+% To learn more about the |params| structure, please consult the User
+% Manual or the "params Usage" appendix at the end of the Overview
+% tutorial.
+%
+% There are two NeuroDOT 2 functions for the visualizations we've just
+% learned:
+PlotTimeTraceAllMeas(hw1.data, hw1.info, params)
+PlotFalloffLL(hw1.data, hw1.info)
+%%
+%
+% <<allmeas_LLfalloff.png>>
+%
+% Let's also run the Light Level Falloff visualization for the *Noisy* data
+% set:
+PlotFalloffLL(noisy.data, noisy.info)
+%%
+%
+% <<llfalloff_noisy_comparison.png>>
+%
+% And here is the light level falloff. The higher radius/NN pairs lose
+% their log-linearity in the *Noisy* data, potentially indicating a bad cap
+% fit.
+%
+% Let's visualize the cap's topography now. We'll be using a NeuroDOT
+% function, |PlotCapData|, that plots RGB inputs onto the the cap grid
+% provided in |info|.
+%
+% Create arrays of RGB values for each source and detector:
+Ns = length(unique(hw1.info.pairs.Src));
+Nd = length(unique(hw1.info.pairs.Det));
+SrcRGB = repmat([1, 0.75, 0.75], Ns, 1);
+DetRGB = repmat([0.55, 0.55, 1], Nd, 1);
+%%
+% Set up |params| and call |PlotCapData|:
+params.mode = 'textpatch';
+PlotCapData(SrcRGB, DetRGB, hw1.info, params)
+%%
+%
+% <<plotcapdata.png>>
+%
+% The NeuroDOT function for this is |PlotCap|:
+PlotCap(hw1.info)
+%%
+% |PlotCapData| is a *low-level* function that several different
+% *high-level* functions like |PlotCap| call to make variations on the same
+% basic plot.
+%
+% The *low-level* visualizations in NeuroDOT 2 all have the word "|Data|"
+% at the end of their name.
+%
+% <<plotcap.png>>
+%%
+% Next, we'll use another *high-level* visualization to map the channel
+% temporal means we calculated for the Light Level Falloff plot
+% (|PlotFalloffLL|) onto the cap grid:
+params.mode = []; % Removing the mode.
+PlotCapMeanLL(hw1.data, hw1.info, params)
+%%
+%
+% <<plotcapmeanll.png>>
+%
+% Let's also plot the Cap Mean Light Levels for |r2d = [27, 33]|, |WL2|.
+% We'll scale the two plots to the same value to see how they correspond to
+% the Light Level Falloff plots:
+params2 = params;
+params2.rlimits = [27, 33];
+PlotCapMeanLL(hw1.data, hw1.info, params2)
+%%
+% Due to the units scaling, large portions of the |[27, 33]| channels fall
+% under the |10 nW| noise floor.
+%
+% <<plotcapmeanll_r1016_r2733.png>>
+%
+% Now, let's compare this to the *Noisy* data for |[10, 16]|:
+PlotCapMeanLL(noisy.data, noisy.info, params)
+%%
+%
+% <<plotcapmeanll_noisy_comparison.png>>
+%
+% The *Noisy* data is getting poorer light coupling in the middle of the cap
+% and along the top-right side.
+%
+% These functions also support 3D rendering:
+params.dimension = '3D';
+PlotCap(hw1.info, params)
+PlotCapMeanLL(hw1.data, hw1.info, params)
+%%
+%
+% <<plotcap_and_ll_3d.png>>
+%
+% NeuroDOT's 3D visualizations enable you to inspect the plot from any
+% angle. Try it now by clicking anywhere on the cap and dragging it around!
+%
+% Let's also not forget to clear some variables:
+clear DetRGB dt params2 SrcRGB keep Nm Nd Ns Nt
+%%
+% And clear unnecessary |params| fields:
+params.dimension = [];
+%% Logmean Light Levels
+% For imaging brain function throughout a volume, the Rytov approximation
+% is the most accurate model. This approximation uses log-normalized light
+% level data. Thus, our first step is encapsulated in the equation below,
+% where \Phi is the measured light level and <\Phi> is the temporal mean,
+% for each channel.
+%
+% See the DOT Appendix for more information on this model.
+%
+% <<logmean_explanation.png>>
+%
+% NeuroDOT's function for this is simply named |logmean|. Let's run it on
+% our data and visualize the All Measurements time traces.
+%
+% We'll add a |params| command to switch the traces to |'linear'| scaling:
+hw1.lmdata = logmean(hw1.data);
+params.yscale = 'linear';
+params.ylimits = 'auto';
+PlotTimeTraceAllMeas(hw1.lmdata, hw1.info, params)
+%%
+% Comparing the logmean'ed data (bottom) to the raw measurements (top), we
+% can see that the logmean reveals more of the signal variance resulting
+% from hemodynamics.
+%
+% <<logmean_allmeas.png>>
+%
+% Let's look at the logmean of the *Noisy* data:
+noisy.lmdata = logmean(noisy.data);
+PlotTimeTraceAllMeas(noisy.lmdata, noisy.info, params)
+%%
+%
+% <<logmean_allmeas_noisy_comparison.png>>
+%
+% The irregular, sawtooth epochs of data (yellow arrows) along these time
+% traces are indicative of possible motion artifacts. The *Noisy* data
+% clearly has more such epochs than *HW1*.
+%
+% These motion artifacts will also show if we plot the data as a grayscale
+% image, which we can do with the function |PlotGray|:
+PlotGray(hw1.lmdata, hw1.info, params)
+PlotGray(noisy.lmdata, noisy.info, params)
+%%
+%
+% <<logmean_plotgray.png>>
+%
+% Here we see that *HW1* (top right) has fewer abrupt signal
+% discontinuities (yellow bars) than *Noisy* (bottom right).
+%
+% Let's clear unnecessary |params| fields:
+params.ylimits = [];
+params.yscale = [];
+%% Detect Noisy Channels
+% The next step is detecting noisy channels. The variation in each channel
+% is ideally driven by hemodynamic changes; however, in lower
+% signal-to-noise data, motion or poor coupling (etc) could add unwanted
+% variance, which we would consider to be noise.
+%
+% NeuroDOT 2 recommends a threshold of |7.5%| in units of standard
+% deviation of the channel time trace, to label a channel as noisy, based
+% on empirical comparisons of data quality [1].
+%
+% The NeuroDOT function for detecting these channels and applying this
+% threshold is |FindGoodMeas|, where the last input is the threshold:
+hw1.info = FindGoodMeas(hw1.lmdata, hw1.info, 0.075);
+noisy.info = FindGoodMeas(noisy.lmdata, noisy.info, 0.075);
+%%
+% In order to understand this filtering of noisy channels, let's examine
+% the distribution of standard deviations by channel. The NeuroDOT function
+% |PlotHistogramSTD| is specifically designed for this:
+PlotHistogramSTD(hw1.info, params)
+%%
+%
+% <<PHSTD.png>>
+%
+% Here we see that most of these superficial (low S-D distance) pairs in
+% |[10, 16]| fall below the |7.5%| threshold.
+%
+% NeuroDOT has a visualization for displaying a map of noisy channels
+% filtering on the cap grid, |PlotCapGoodMeas|, which has two modes for the
+% |params.mode| input: |'good'| and |'bad'|. Let's compare these for our
+% *HW1* and *Noisy* data sets, first in |'good'| mode:
+params.mode = 'good';
+params.rlimits = [10, 16; 27, 33; 36, 42; 44, 50];
+PlotCapGoodMeas(hw1.info, params)
+PlotCapGoodMeas(noisy.info, params)
+%%
+%
+% <<plotcapgoodmeas.png>>
+%
+% Here we see on the Good Measurements (GM) plot that *HW1* has retained
+% more channels in all radius groups above |[10, 16]|. We can see this
+% reflected in the less dense grid for the *Noisy* data.
+%
+params.mode ='bad';
+params.rlimits = [10, 16; 27, 33; 36, 42];
+PlotCapGoodMeas(hw1.info, params)
+PlotCapGoodMeas(noisy.info, params)
+%%
+%
+% <<plotcapbadmeas.png>>
+%
+% Conversely, the Bad Measurements plot is more dense for the *Noisy* data,
+% especially along the middle-right and top-right edge of the cap.
+%
+% The thicker lines represent closer measurements.
+%
+% Let's clear unnecessary |params| fields and restore our radius limits:
+params.mode = [];
+params.rlimits = [10, 16];
+%% Linear Detrending
+% The next step is an easy one!
+%
+% Linear detrending removes the linear component of the signal, or in other
+% words, it flattens out long-term drift. This an optional step in the
+% pipeline.
+%
+% We can use MATLAB's |detrend| function on the transpose of |data|, and
+% take the transpose of that result to maintain |data|'s MEAS x TIME shape:
+hw1.ddata = detrend(hw1.lmdata')';
+%%
+% This is best visualized with a mean time trace for the |r2d = [10, 16]|,
+% |WL2| group that we care about, using |PlotTimeTraceMean|:
+PlotTimeTraceMean(hw1.lmdata, hw1.info, params)
+PlotTimeTraceMean(hw1.ddata, hw1.info, params)
+%%
+%
+% <<detrend.png>>
+%
+% As we see from the red lines, the result clearly shows the removal of a
+% trend.
+%
+% The NeuroDOT 2 version, |detrend_tts|, ensures compatibility with NeuroDOT data structures. Let's run it on the *Noisy* data:
+noisy.ddata = detrend_tts(noisy.lmdata);
+%% High Pass Filter
+% The next step is a high pass filter (HPF), to remove long term drift. The
+% choice of cutoff frequency is dictated by the stimulus paradigm. For this
+% data set and paradigm, the repetition rate is every |30 seconds|. The
+% cutoff frequency here of |0.02 Hz| translates to |1/50 s|, which gives us
+% a healthy margin. We will also need the framerate, which is stored in
+% |hw1.info.system.framerate| and has a value of |10.0005 Hz|.
+%
+% The NeuroDOT function for this is |highpass|:
+hw1.hpdata = highpass(hw1.ddata, 0.02, hw1.info.system.framerate);
+noisy.hpdata = highpass(noisy.ddata, 0.02, noisy.info.system.framerate);
+%%
+% This function employs a 5-pole, forward-backward Butterworth filter.
+%
+% We can visualize this operation with |PlotPowerSpectrumMean|, before and
+% after the filter, using |params.fig_handle| to plot both spectra in the
+% same figure:
+params.fig_handle = figure('Color', 'k');
+params.ylimits = [0, 1e-5];
+PlotPowerSpectrumMean(hw1.ddata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.hpdata, hw1.info, params)
+legend({'detrended', 'highpassed'}, 'Color', 'k', 'TextColor', 'w')
+%%
+% NeuroDOT calculates the power spectrum by taking an FFT of the time
+% traces, then multiplying the positive half of the frequency domain's
+% absolute value by 2 for its full magnitude. The square of that magnitude
+% is the power.
+%
+% Let's also take a look at the mean power spectrum for the *Noisy* data:
+params.fig_handle = figure('Color', 'k');
+PlotPowerSpectrumMean(noisy.ddata, noisy.info, params)
+PlotPowerSpectrumMean(noisy.hpdata, noisy.info, params)
+legend({'detrended', 'highpassed'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<hpf_ps_noisy_comparison.png>>
+%
+% We see that the HPF attenuated signals below the |0.02 Hz| cutoff (yellow
+% lines). The poor coupling we observed in the Light Level Falloff, Cap
+% Mean Light Levels and Good Measurements is reflected in the *Noisy*
+% plots' weaker power between |10^-2| and |10^0 Hz|.
+%
+% We can also visualize the HPF by taking the mean of a subset of channels'
+% time traces. The NeuroDOT function for this is |PlotTimeTraceMean|:
+params.fig_handle = figure('Color', 'k');
+params.ylimits = [];
+PlotTimeTraceMean(hw1.ddata, hw1.info, params)
+PlotTimeTraceMean(hw1.hpdata, hw1.info, params)
+legend({'detrended', 'highpassed'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<hpf_meantts.png>>
+%
+% This plot can also be useful for visualizing each pipeline step's effect
+% on the global signal. However, spatial information is diminished.
+% Because |r2d = [10, 16]| mostly covers superficial tissue (scalp &
+% skull), averaging these channels gives us a sense of the superficial
+% hemoglobin contrast dynamics.
+%% Low Pass Filter 1
+% The next step is a low pass filter (LPF1) with a cutoff frequency at |1
+% Hz|. This is because we typically downsample to a |1 Hz| sampling
+% frequency after preprocessing, so any signals above |1 Hz| are
+% irrelevant.
+%
+% The NeuroDOT function for this is |lowpass|, which has the exact same
+% inputs as |highpass| in the previous section. The only difference is that
+% |lowpass| filters frequencies above a cutoff, and |highpass| below.
+%
+% Also, plot the power spectra of your LPF1 data, for both *HW1* and
+% *Noisy*, using the NeuroDOT 2 functions you've just learned.
+%
+% In case you had trouble, here is the syntax for these:
+hw1.lp1data = lowpass(hw1.hpdata, 1, hw1.info.system.framerate);
+noisy.lp1data = lowpass(noisy.hpdata, 1, noisy.info.system.framerate);
+
+params.fig_handle = figure('Color', 'k');
+params.ylimits = [0 1e-5];
+PlotPowerSpectrumMean(hw1.hpdata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.lp1data, hw1.info, params)
+legend({'highpassed', 'lowpassed'}, 'Color', 'k', 'TextColor', 'w')
+
+params.fig_handle = figure('Color', 'k');
+PlotPowerSpectrumMean(noisy.hpdata, noisy.info, params)
+PlotPowerSpectrumMean(noisy.lp1data, noisy.info, params)
+legend({'highpassed', 'lowpassed'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<lpf_hpf_noisy_comparison.png>>
+%
+% On both *HW1* and *Noisy*, we see the action of LPF1 in the disappearance
+% of the right-most peak, highlighted in red, which was just above the |1
+% Hz| cutoff. Remember that you can use MATLAB's zoom tool to examine plots
+% more closely!
+%
+% Below is a zoomed-in view of HW1.
+%
+% <<lpf_hpf_noisy_zoomed.png>>
+%
+% Let's also take a quick look at what would happen if we lowered the
+% cutoff to |0.5 Hz|:
+temp = lowpass(hw1.hpdata, 0.5, hw1.info.system.framerate);
+params.fig_handle = figure('Color', 'k');
+PlotPowerSpectrumMean(hw1.hpdata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.lp1data, hw1.info, params)
+PlotPowerSpectrumMean(temp, hw1.info, params)
+legend({'highpassed', 'lowpass 1 Hz', 'lowpass 0.5 Hz'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<lpf_alt_zoomed.png>>
+%
+% Before we move on, let's also look at *HW1*'s mean time traces, as we did
+% for the HPF:
+params.fig_handle = figure('Color', 'k');
+params.ylimits = [];
+PlotTimeTraceMean(hw1.hpdata, hw1.info, params)
+PlotTimeTraceMean(hw1.lp1data, hw1.info, params)
+legend({'highpassed', 'lowpassed'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<lpf_meantts.png>>
+%% Superficial Signal Regression
+% Next is Superficial Signal Regression, or SSR, which removes superficial
+% hemodynamics of the scalp & skull. This systemic signal (of the
+% cardiovascular pulse in superficial blood vessels) is estimated by taking
+% an average of the |r2d = [10, 16]| measurements.
+%
+% The NeuroDOT function for taking this average is |gethem|:
+hw1.hem = gethem(hw1.lp1data, hw1.info, 'NN', 1);
+noisy.hem = gethem(noisy.lp1data, noisy.info, 'NN', 1);
+%%
+% Then, we regress this hemodynamic signal from the rest of the data using
+% NeuroDOT's |regcorr|.
+hw1.SSRdata = regcorr(hw1.lp1data, hw1.info, hw1.hem);
+noisy.SSRdata = regcorr(noisy.lp1data, noisy.info, noisy.hem);
+%%
+% This regression follows the formula outlined in the literature [2]:
+%
+% <<zeff_eqn.png>>
+%
+% where $y_{i}$ is the corrected signal, $y_{i}^{'}$ is the uncorrected
+% signal, and $y_{r\in[10,16]}$ is the estimated superficial hemodynamic
+% signal.
+%
+% Go ahead and plot the mean power spectra for *HW1*, this time including
+% the |[27, 33]| radius pairs. You can refer to the previous syntax in this
+% tutorial for hints!
+%
+% Here's the syntax in case you were having trouble:
+params.rlimits = [10, 16; 27, 33];
+params.fig_handle = [];
+PlotPowerSpectrumMean(hw1.lp1data, hw1.info, params)
+PlotPowerSpectrumMean(hw1.SSRdata, hw1.info, params)
+%%
+%
+% <<SSR_lpf_ps.png>>
+%
+% It is clear that the systemic signal (blue) has been regressed out (red).
+%
+% Let's also look at the Gray Plots. Here's the syntax:
+PlotGray(hw1.lp1data, hw1.info, params)
+PlotGray(hw1.SSRdata, hw1.info, params)
+%%
+%
+% <<SSR_lpf_gray.png>>
+%
+% Notice that the |r2d = [10, 16]| channels have not been completely
+% attenuated by SSR. Rather, it's the *average* of the |[10, 16]| channels'
+% time traces that has been regressed out.
+%
+% These channels still contain useful information that will be included in
+% the final HD-DOT reconstruction.
+%
+% Before we move on, let's see what the mean time traces look like again:
+params.fig_handle = [];
+params.ylimits = [];
+PlotTimeTraceMean(hw1.lp1data, hw1.info, params)
+PlotTimeTraceMean(hw1.SSRdata, hw1.info, params)
+%%
+%
+% <<SSR_lpf_meantts.png>>
+%
+% These results match what we've already seen: the |[10, 16]| pairs have
+% had their average regressed from the data, resulting in ~0 signal.
+%% Low Pass Filter 2
+% The penultimate step is a second lowpass filter, this time at a lower
+% cutoff frequency of |0.5 Hz|. This removes the cardiac pulse from the
+% signal, and uses the same NeuroDOT function, |lowpass|, as before.
+%
+% Using the functions you've learned, apply a |0.5 Hz| filter to the *HW1*
+% and *Noisy* data sets, and visualize their power spectra before and
+% after.
+%
+% Here is the syntax:
+hw1.lp2data = lowpass(hw1.SSRdata, 0.5, hw1.info.system.framerate);
+noisy.lp2data = lowpass(noisy.SSRdata, 0.5, noisy.info.system.framerate);
+
+params.rlimits = [27, 33];
+params.fig_handle = figure('Color', 'k');
+PlotPowerSpectrumMean(hw1.SSRdata, hw1.info, params)
+PlotPowerSpectrumMean(hw1.lp2data, hw1.info, params)
+legend({'SSR', 'LPF2'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<lpf2_SSR_ps_with_zoom.png>>
+%
+% Here, we see that the pulse signal, just below |1 Hz| (blue) has been
+% filtered out (red).
+%
+% One more time, let's look at the mean time traces:
+params.rlimits = [27, 33];
+params.fig_handle = figure('Color', 'k');
+PlotTimeTraceMean(hw1.SSRdata, hw1.info, params)
+PlotTimeTraceMean(hw1.lp2data, hw1.info, params)
+legend({'SSR', 'LPF2'}, 'Color', 'k', 'TextColor', 'w')
+%%
+%
+% <<lpf2_SSR_meantts.png>>
+%
+% The signal is now very clearly defined after LPF2 (red).
+%% 1 Hz Resampling
+% The last preprocessing step is to resample the data from |~10 Hz| to |1
+% Hz|. We do this because the range of hemodynamic signals is far below |1
+% Hz|, and thus functional neuroimaging is typically done on a |1 Hz| time
+% scale. This also has the benefit of reducing data storage requirements,
+% eliminating noise, and providing a benchmark framerate to standardize all
+% stimulus, data acquisitions, and analysis to.
+%
+% The NeuroDOT function for this is |resample_tts|. The last input is the
+% resampling frequency:
+[hw1.rdata, hw1.info] = resample_tts(hw1.lp2data, hw1.info, 1);
+[noisy.rdata, noisy.info] = resample_tts(noisy.lp2data, noisy.info, 1);
+%%
+% Go ahead and plot the mean time trace for HW1 now.
+%
+% Here's the syntax for the time traces:
+params.ylimits = [-0.005 0.005];
+params.fig_handle = [];
+PlotTimeTraceMean(hw1.lp2data, hw1.info, params)
+PlotTimeTraceMean(hw1.rdata, hw1.info, params)
+%%
+%
+% <<resampled.png>>
+%
+% We see on the Time axis that the data has been resampled from |~2000|
+% time points to |~200| - exactly the |~10x| factor that we expected.
+%% Block Averaging
+% We finally have preprocessed data ready for analysis. What’s next?
+%
+% The first major analysis step is to average the stimulus blocks together.
+% Averaging is a common way to increase signal-to-noise ratio (SNR) in
+% neuroscience and other imaging experiments.
+%
+% NeuroDOT's function for this is |BlockAverage|. The last input specifies
+% which stimulus pulse to average for; in this case, we are averaging
+% |Pulse_2|, which codes for the stimulus ON pulses:
+hw1.badata = BlockAverage(hw1.rdata, hw1.info, 2);
+noisy.badata = BlockAverage(noisy.rdata, noisy.info, 2);
+%%
+% Let's visualize the *HW1* and *Noisy* time traces. First, in order to see
+% any activations, we need to normalize them due to the variance in mean
+% light level between channels.
+%
+% We'll normalize each channel to the mean of its first four seconds using
+% NeuroDOT's |normalize2range_tts|:
+hw1.ndata = normalize2range_tts(hw1.badata, 1:4);
+noisy.ndata = normalize2range_tts(noisy.badata, 1:4);
+%%
+% And now we'll plot the time traces, setting |params| to filter for Good
+% Measurements (since only GM are reconstructed):
+params.useGM = 1;
+params.fig_handle = [];
+params.ylimits = [-0.06, 0.06];
+params.yscale = 'linear';
+PlotTimeTraceAllMeas(hw1.ndata, hw1.info, params)
+PlotTimeTraceAllMeas(noisy.ndata, noisy.info, params)
+
+PlotGray(hw1.ndata, hw1.info, params)
+PlotGray(noisy.ndata, noisy.info, params)
+%%
+%
+% <<normed.png>>
+%
+% Even when filtering for Good Measurements, we still see some rather noisy
+% channels (yellow arrows), and only a faint pattern of activation curves
+% can be detected (it should be noted that this is also pre-spectroscopy).
+%
+% These channels are global, not localized to the focal activation region,
+% which is another reason why we do not see strong activation patterns.
+%
+% We won't see any true activations until we've finished reconstructing
+% this data.
+%% Preprocessing Pipeline Complete!
+% <<prepro_complete.png>>
+%% NeuroDOT 2 Overview Flowchart
+% <<overview_prepro_complete.png>>
+%% Reconstruction Pipeline Flowchart
+% <<recon_pipeline.png>>
+%% Reconstructing Image Volumes
+%
+% <<cap_nns.png>>
+%
+% After block averaging, we must reconstruct our measurement pairs into an
+% image volume. This is done by applying a Tikhonov inversion to a linear
+% Rytov approximation. What this ultimately means is that in the equation
+% below, our measurements correspond to |y|, our sensitivity matrix is |A|, and the desired image volume is |x|.
+%
+% <<recon_eqn.png>>
+%
+% After the reconstruction, we use the differing extinction coefficients of
+% deoxy- and oxy-hemoglobin (HbO and HbR, respectively) at our two
+% wavelengths (750 and 850 nm) to isolate each concentration from the other
+% and calculate functional neural activity maps.
+%
+% <<extinction_curves.png>>
+%
+%% HD-DOT Sensitivity Profile
+% Here is a sensitivity profile for a single source-detector pair (a), and
+% for the entire HD-DOT large cap system (b), which was used to gather the
+% measurements we are using for our examples in this tutorial.
+%
+% <<sensitivity_profile.png>>
+%
+% The summed sensitivity profile in (b) also essentially gives us our field
+% of view (FOV) for the system. Note that this FOV overlaps with tissue
+% superficial to the brain of the underlain atlas, such as scalp and skull.
+%
+%
+%% Sensitivity A Matrix
+% The first step is to load our pre-calculated sensitivity matrix:
+load('A_Adult_96x92.mat')
+%%
+% This file is quite large, so depending on your workstation, you may have
+% to wait several minutes for it to load. It contains 3 variables: |A|, the
+% sensitivity matrix, |dim|, a structure describing the reconstruction
+% space, and |infoA|, a structure describing the |A|-matrix space.
+%
+% We'll also need to load the spectroscopy matrix, |E|:
+load('E.mat')
+%% Invert A Matrix
+% The first reconstruction step is to invert the sensitivity |A| matrix so
+% that it can be used in a linear approximation. NeuroDOT uses a Tikhonov
+% inversion algorithm for this, in the function |Tikhonov_invert_Amat|.
+%
+% We'll also have to do the processing separately for each wavelength. We
+% will include pair radii below |42 mm| and using only Good Measurements.
+keep1 = (hw1.info.pairs.WL == 1) & (hw1.info.pairs.r2d <= 42) & hw1.info.MEAS.GI;
+keep2 = (hw1.info.pairs.WL == 2) & (hw1.info.pairs.r2d <= 42) & hw1.info.MEAS.GI;
+
+hw1.iA1 = Tikhonov_invert_Amat(A(keep1, :), 0.01, 0.1);
+hw1.iA2 = Tikhonov_invert_Amat(A(keep2, :), 0.01, 0.1);
+%%
+% The last two inputs are parameters for the Tikhonov regularization. This
+% calculation may run for some time - |~10-20 minutes|, depending on your
+% CPU.
+%% Smooth Inverted A Matrix
+% The next step is to smooth the sensitivity matrix with a Gaussian kernel.
+% The NeuroDOT function for this is |smooth_Amat|:
+hw1.siA1 = smooth_Amat(hw1.iA1, dim, 5, 1.2);
+hw1.siA2 = smooth_Amat(hw1.iA2, dim, 5, 1.2);
+%%
+% The last two inputs are the width and STD parameters for the Gaussian
+% kernel.
+%% Reconstruct Image Volume
+% It's finally time to reconstruct the image from our raw data! We'll use
+% NeuroDOT's |reconstruct_img| to do this:
+hw1.cortex_mu_a1 = reconstruct_img(hw1.badata(keep1, :), hw1.siA1);
+hw1.cortex_mu_a2 = reconstruct_img(hw1.badata(keep2, :), hw1.siA2);
+%%
+% With these two wavelengths reconstructed, let's take a look at the
+% resultant images. First, we'll need to convert the images into a 3D space
+% using dim and the NeuroDOT function |Good_Vox2vol|, and then we'll need
+% to subtract the first four time points:
+hw1.cortex_mu_a_vol1 = Good_Vox2vol(hw1.cortex_mu_a1, dim);
+hw1.cortex_mu_a_vol2 = Good_Vox2vol(hw1.cortex_mu_a2, dim);
+
+hw1.cortex_mu_a_vol1 = normalize2range_tts(hw1.cortex_mu_a_vol1, 1:4);
+hw1.cortex_mu_a_vol2 = normalize2range_tts(hw1.cortex_mu_a_vol2, 1:4);
+%%
+% Now, we can visualize these volumes using the NeuroDOT function
+% |PlotSlices|, which creates an interactive, colormapped, 3-slice view of
+% the reconstructed volume. Let's use |t = 18| as our time point:
+t18 = hw1.cortex_mu_a_vol1(:, :, :, 18);
+PlotSlices(t18)
+%%
+%
+% <<t18_WL1.png>>
+%
+% With the interactive navigation, try clicking around in |PlotSlices| to
+% explore the volume.
+% The general form of PlotSlices is:
+%
+% |PlotSlices(underlay, infoVol, params, overlay)|
+%
+% To look at an activity volume alone, use |underlay|. To view two volumes
+% overlain together, the activity volume goes in |overlay|, and the
+% background (such as an atlas) goes in |underlay|.
+%
+% See the User Manual for more on how to use |params| in |PlotSlices|.
+%
+% These volumes will be easier to contextualize if we use an atlas as a
+% background. If you are unfamiliar with this concept, please refer to the
+% Atlases appendix.
+%
+% Let's load and visualize one of our several pre-prepared atlases:
+load('Atlas_MNI152nl_T1_on_111.mat')
+PlotSlices(atlas, [], [], t18)
+%%
+%
+% <<t18_WL1_a.png>>
+%
+% Since this is a Hearing Words paradigm, let's try to find a region of
+% activation in the right superior temporal gyrus (STG for short). The
+% bottom plot has been navigated to this region.
+%
+% <<t18_WL1_nav.png>>
+%
+% This is easier with an anatomical underlay to aid navigation now! From
+% now on, we'll navigate directly to these areas using |params|:
+params.slices = [9, 45, 33];
+%%
+% It was difficult to find activations in the STG, mainly because the |WL1|
+% signal was weak. Let's also take a look at the image we reconstructed
+% from |WL2|, and navigate to the STG:
+t18 = hw1.cortex_mu_a_vol2(:, :, :, 18);
+PlotSlices(atlas, [], params, t18)
+%%
+%
+% <<t18_WL2_nav.png>>
+%
+% Note: Per the sensitivity profile from earlier, some activations may
+% appear slightly superficial to the tissues they occur in. Also remember,
+% |hw1.cortex_mu_a2| are absorption values, not actual activations.
+%
+% Let's try averaging |t = 13:21| for |WL2|:
+t13_21 = mean(hw1.cortex_mu_a_vol2(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t13_21)
+%%
+%
+% <<t18_WL2_nav_avg.png>>
+%
+% The averaging appears to have helped (1) filter out many of the spurious
+% activations distal to the STG, and (2) increased the size and strength of
+% the activations proximal to the STG.
+%
+% Let's go back and average |WL1| as well:
+t13_21 = mean(hw1.cortex_mu_a_vol1(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t13_21)
+%%
+%
+% <<t18_WL1_nav_avg.png>>
+%
+% The activations are clearer now.
+%% Spectroscopy
+% The last step here is to perform spectroscopy. This allows us to get the
+% |HbO| and |HbR| concentrations from our light levels in |cortex_mu_a| and
+% |cortex_mu_a2|. The NeuroDOT function is |spectroscopy_img|:
+cortex_mu_a = cat(3, hw1.cortex_mu_a1, hw1.cortex_mu_a2);
+hw1.cortex_Hb = spectroscopy_img(cortex_mu_a, E);  
+%%
+% Before we image anything, let's separate out the |HbO| results, convert
+% to |dim| space, and subtract the first four time points again:
+hw1.cortex_HbO = hw1.cortex_Hb(:, :, 1);
+hw1.cortex_HbOvol = Good_Vox2vol(hw1.cortex_HbO, dim);
+hw1.cortex_HbOvol = normalize2range_tts(hw1.cortex_HbOvol, 1:4); 
+%%
+% Let's visualize |HbO| with |PlotSlices|:
+t18 = hw1.cortex_HbOvol(:, :, :, 18);
+PlotSlices(atlas, [], params, t18)
+%%
+%
+% <<t18_HbO.png>>
+%
+% We can probably improve our SNR by doing some averaging again. Let's use
+% the same |t = 13:20| interval as before:
+t13_21 = hw1.cortex_HbOvol(:, :, :, 13:21);
+PlotSlices(atlas, [], params, mean(t13_21, 4))
+%%
+%
+% <<t13_21_HbO.png>>
+%
+% We can also map these activation volumes onto a surface mesh of the
+% brain. It's easy to miss some activations while navigating three-slice
+% views. Surface mapping avoids this by showing activations on the surface
+% of the brain.
+%
+% First, we need to load a mesh:
+load('LR_Meshes_MNI_164k.mat')
+%%
+% This file contains two meshes of the mesh data type, |MNIl| and |MNIr|,
+% corresponding to the left and right hemispheres of a segmented version of
+% the non-linear MNI 152 atlas we've been using with |PlotSlices|. This
+% mesh has nearly 164,000 nodes, corresponding to the "|164k|" in the file
+% name.
+%
+% The NeuroDOT function we'll be using here is |PlotInterpSurfMesh|. This
+% function interpolates our |HbO| volume onto the mesh we just loaded,
+% and displays it with similar formatting, spatial orientation, and
+% colormapping features to |PlotSlices|. The general syntax of this
+% function is:
+t18 = hw1.cortex_HbOvol(:, :, :, 18);
+PlotInterpSurfMesh(t18, MNIl, MNIr, dim, params)
+%%
+%
+% <<t18_PISM_HbO.png>>
+%
+% And finally, we'll do the time averages:
+t13_21 = hw1.cortex_HbOvol(:, :, :, 13:21);
+PlotInterpSurfMesh(mean(t13_21, 4), MNIl, MNIr, dim, params)
+%%
+%
+% <<t13_21_PISM_HbO.png>>
+%% Reconstruction Pipeline Complete!
+% <<recon_complete.png>>
+%% Saving Your Results
+% With the pipeline complete, it's always important to save our data.
+%
+% As a native MATLAB toolbox, NeuroDOT does not require any specific file
+% formats. We recommend that you use MATLAB's save function to save the
+% entire workspace as a .MAT file. You can also right-click on the MATLAB
+% workspace panel to access a save dialog.
+%
+% Alternatively, there are a number of file formats supported by NeuroDOT.
+% All of this functionality is explained in greater detail in the File IO
+% Appendix.
+%
+%% Conclusion
+% Congratulations! You have finished the NeuroDOT 2 Base Edition
+% Preprocessing Pipeline Tutorial.
+%
+% For further questions or more information, please consult the NeuroDOT 2
+% Base User Manual and the various Appendices.
+%
+% NeuroDOT 2 Support Team:
+%
+% * Adam Eggebrecht (aeggebre@wustl.edu)
+% * David Muccigrosso (muccigrosso.david@wustl.edu)
+%
+%% Citations
+% #  Eggebrecht et al., "Mapping distributed brain function with diffuse
+% optical tomography." Nature Photonics, 2014. DOI:
+% 10.1038/NPHOTON.2014.107
+% #  Zeff et al., "Retinotopic mapping of adult human visual cortex with
+% high-density diffuse optical tomography." PNAS, 2007. DOI:
+% 10.1073/pnas.0611266104
+%
+%% Appendix: Preprocessing
+% Some notes on the block averaging and LPF1 stages:
+% * Because LPF1 filters out the Nyquist frequency of the downsampling
+% stage (see Neuro Photonics 2014 paper), which is not featured here, it
+% really could be featured at any point in this pipeline after the logmean.
+% The point of LPF1 is to remove all signal components at frequencies
+% higher than the one it will be eventually downsampled to, so that they do
+% not affect any of the other stages of the pipeline, and thus it is placed
+% after the logmean and HPF.
+% * Similarly, block averaging can be done at any point after LPF1. Since
+% the raw data after the logmean is technically in a state that can be
+% feasibly reconstructed, pretty much every step afterwards is just
+% clearing up interfering signals. If a different sort of optical data does
+% not have such signals present, there is little need for further
+% preprocessing.
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,1237 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>NeuroDOT 2.2.0 Tutorial - Preprocessing Pipeline</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-29"><meta name="DC.source" content="Preprocessing_Tutorial.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>NeuroDOT 2.2.0 Tutorial - Preprocessing Pipeline</h1><!--introduction--><p><img vspace="5" hspace="5" src="logo_fixed.png" alt=""> </p><p>Welcome to NeuroDOT 2.2.0 Base Edition!</p><p><img vspace="5" hspace="5" src="all_pipelines.png" alt=""> </p><p><img vspace="5" hspace="5" src="preprocessing_diagram.png" alt=""> </p><p>In the "hearing words" (HW) paradigm, which we will use in this tutorial, a patient quietly listens to auditory stimulus presented through speakers.</p><p><img vspace="5" hspace="5" src="hearing_words_diagram.png" alt=""> </p><p>The stimulus is divided into six 30-second blocks (cyan lines on bottom-right), with one spoken word per s for 15 s, followed by 15 s of silence (0 words per s).</p><p><img vspace="5" hspace="5" src="block_diagram.png" alt=""> </p><p>These blocks are averaged together and reconstructed into a 3D time series map (a movie) of brain function.</p><p>This tutorial focuses on the first stage of our research scenario: preprocessing.</p><p>Preprocessing involves using a number of digital signal processing and analysis techniques to remove interfering or systemic signals, and isolate the brain activity responses to stimuli (such as the Hearing Words experiment).</p><p>We will assess data quality at every step along the way to ensure that we are acquiring high-quality maps of brain activity.</p><p>You will be given syntax prompts along the way. Copy and type these into the MATLAB command line, or highlight them and either press F9 or right-click and select "Evaluate Selection" on the pop-up menu.</p><p>If you are unfamiliar with NeuroDOT and its data structures at any point, please refer to the Overview Tutorial and User Manual. Also, the <a href="List_of_Files_and_Functions.html">List of Files and Functions</a> provides easy reference to all other help documentation.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Sample Data</a></li><li><a href="#5">S-D Measurements</a></li><li><a href="#40">Logmean Light Levels</a></li><li><a href="#48">Detect Noisy Channels</a></li><li><a href="#63">Linear Detrending</a></li><li><a href="#66">High Pass Filter</a></li><li><a href="#83">Low Pass Filter 1</a></li><li><a href="#86">Superficial Signal Regression</a></li><li><a href="#93">Low Pass Filter 2</a></li><li><a href="#96">1 Hz Resampling</a></li><li><a href="#105">Block Averaging</a></li><li><a href="#115">Conclusion</a></li><li><a href="#116">Appendix: Preprocessing</a></li></ul></div><h2>Sample Data<a name="1"></a></h2><p>First, if you haven't already, you need to unzip the NeuroDOT 2.2.0 Base Edition file in your chosen directory and install it on the MATLAB search path: addpath(genpath('your_NeuroDOT_directory_here'))</p><p>Next, we need to load up our sample data. There are two sets, one of high quality that has been presented in published papers, and another "noisy" set that was chosen to contrast against the first.</p><pre class="codeinput">load(<span class="string">'NeuroDOT_Base_HW_Sample_1.mat'</span>)
+load(<span class="string">'NeuroDOT_Base_HW_Sample_Noisy.mat'</span>)
+</pre><p>In the workspace, HW Sample 1 is associated with <tt>data</tt>, <tt>info</tt>, and <tt>flags</tt>, while HW Sample Noisy is associated with <tt>data2</tt>, <tt>info2</tt>, and <tt>flags2</tt>.</p><p><img vspace="5" hspace="5" src="workspace.png" alt=""> </p><p>Now, let's take a look at the full Preprocessing Pipeline diagram again:</p><p><img vspace="5" hspace="5" src="pipeline_SD.png" alt=""> </p><h2>S-D Measurements<a name="5"></a></h2><p>We'll work first from the raw source-detector pair measurements in <tt>data</tt>.</p><p>1. Since <tt>data</tt> is a 2D array (MEASUREMENTS x TIME), let&#8217;s display it as a grayscale image, and add a color bar while we&#8217;re at it:</p><pre class="codeinput">imagesc(data)
+colormap(gray)
+colorbar
+</pre><p>2. The resulting image is very dark, so let&#8217;s rescale the color axis:</p><pre class="codeinput">caxis([-0.03, 0.03])
+</pre><p><b>Step 3.</b> Now let's add some labels:</p><pre class="codeinput">xlabel(<span class="string">'samples'</span>)
+ylabel(<span class="string">'measurements'</span>)
+</pre><p><img vspace="5" hspace="5" src="grayplot.png" alt=""> </p><p>Each horizontal line of this gray plot represents a S-D pair, or channel.</p><p>We can visualize this same information with <tt>plot</tt>, which we call the "time traces" of each channel.</p><p>1. Create a new figure and plot the data:</p><pre class="codeinput">figure
+plot(data')
+</pre><p>2. Calculate x-axis limits from the array&#8217;s size:</p><pre class="codeinput">[Nm, Nt] = size(data);
+xlim([0, Nt+1])
+</pre><p>3. Label the axes:</p><pre class="codeinput">xlabel(<span class="string">'samples'</span>)
+ylabel(<span class="string">'light level'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas.png" alt=""> </p><p>If we use MATLAB's magnification tool to zoom in, we can see the signal in more detail. Each line is a single channel's time trace. The fast, periodic, "jaggy" spikes we see are the heart pulse signal. The slower, periodic, sinusoid-like peaks are the respiration signal.</p><p><img vspace="5" hspace="5" src="allmeas_zoomed_in.png" alt=""> </p><p>The mean value of each channel is relatively consistent, but the channels are spread across several orders of magnitude. We see this in traces bunched at the bottom.</p><p>We can alleviate this bunching with a <tt>semilogy</tt> plot.</p><p>1. Create a new figure and plot the data with axis limits and labels as before:</p><pre class="codeinput">figure
+semilogy(data')
+xlim([0, Nt+1])
+xlabel(<span class="string">'samples'</span>)
+ylabel(<span class="string">'light level'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas_semilog.png" alt=""> </p><p>Another improvement we can make is to convert from samples to time.</p><p><b>Step 1.</b> Calculate the time length of each sample:</p><pre class="codeinput">dt = 1 / info.system.framerate;
+</pre><p><b>Step 2.</b> Replot and relabel.</p><pre class="codeinput">figure
+semilogy([1:Nt] .* dt, data')
+xlim([0, (Nt+1) * dt])
+xlabel(<span class="string">'seconds'</span>)
+ylabel(<span class="string">'light level'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas_seconds.png" alt=""> </p><p>Zooming in again shows the time traces spread more evenly among the orders of magnitude.</p><p><img vspace="5" hspace="5" src="allmeas_seconds_zoomed_in.png" alt=""> </p><p>There is a characteristic log-linear relationship between S-D distance and mean light level for light diffusion in biological tissue. Let's explore that by plotting it!</p><p><b>Step 1.</b> Create a new figure and plot channel means versus S-D distance:</p><pre class="codeinput">figure
+semilogy(info.pairs.r2d, mean(data, 2), <span class="string">'*'</span>)
+</pre><p><b>Step 2.</b> Let's label the axes, noting their units:</p><pre class="codeinput">xlabel(<span class="string">'Distance [mm]'</span>)
+ylabel(<span class="string">'Detector Voltage [V]'</span>)
+</pre><p><img vspace="5" hspace="5" src="LLfalloff.png" alt=""> </p><p>Why do the channels all line up vertically in the same 5 distance bands? They represent groups of nearest neighbor pairs on a 3D cap. In this data, the first through fifth nearest neighbors were measured. We can visualize the differences in mean light levels between NN groups with <tt>info.pairs.NN</tt>.</p><p><b>Step 1.</b> Create a new figure and plot time traces for each of the NN1 and NN2 groups:</p><pre class="codeinput">figure
+semilogy(data(info.pairs.NN == 1, :)')
+xlim([0, Nt+1]); xlabel(<span class="string">'samples'</span>);
+ylabel(<span class="string">'light level'</span>); title(<span class="string">'NN1'</span>)
+
+figure
+semilogy(data(info.pairs.NN == 2, :)')
+xlim([0, Nt+1]); xlabel(<span class="string">'samples'</span>);
+ylabel(<span class="string">'light level'</span>); title(<span class="string">'NN2'</span>)
+</pre><p><img vspace="5" hspace="5" src="allmeas_nn12.png" alt=""> </p><p>NeuroDOT's visualization functions can automatically separate these plots by wavelength and NN number.</p><p>For gray plots:</p><pre class="codeinput">params.Nnns = 1; params.Nwls = 2;
+PlotGray(data, info, params)
+</pre><p><img vspace="5" hspace="5" src="plotgray.png" alt=""> </p><p>where the structure <tt>params</tt> passes visualization parameters on to the function.</p><p>For <tt>semilogy</tt> time traces:</p><pre class="codeinput">PlotAllMeasTTs(data, info, params)
+</pre><p>where again the last input selects NN pair(s).</p><p><b>Step 3.</b> For mean light-levels vs. S-D distance:</p><pre class="codeinput">PlotLLFalloff(data, info)
+</pre><p><img vspace="5" hspace="5" src="allmeas_LLfalloff.png" alt=""> </p><p>The params structure is omitted here to allow PlotLLFalloff's defaults to display all NN's and WL's.</p><p>To learn more about the params structure, please consult the User Manual or the "params Usage" appendix at the end of the Overview tutorial.</p><p>Let's run these same visualizations for the Noisy data set:</p><pre class="codeinput">PlotGray(data2, info2, params)
+PlotAllMeasTTs(data2, info2, params)
+PlotLLFalloff(data2, info2)
+</pre><p>Here are the gray plots side by side, on the same color scale. Notice the lower signal intensities in the middle of the noisy data - this roughly corresponds to the middle of the cap.</p><p><img vspace="5" hspace="5" src="grayplots_noisy_comparison.png" alt=""> </p><p>Here are the all-measurements time traces. Again, the mean signal levels in the noisy data are much lower.</p><p><img vspace="5" hspace="5" src="allmeastts_noisy_comparison.png" alt=""> </p><p>And here is the light level (LL) falloff. The higher NN's lose their log-linearity in the noisy data, indicating bad cap fit.</p><p><img vspace="5" hspace="5" src="llfalloff_noisy_comparison.png" alt=""> </p><p>Let's visualize the cap's topography now.</p><p>1. We will visualize each source and detector as a square, initialized here:</p><pre class="codeinput">l = norm(info.optodes.spos2(1,:) - info.optodes.spos2(2,:)) / 2;
+sqx = [l 0 -l 0];
+sqy = [0 -l 0 l];
+</pre><p><b>Step 2.</b> We'll create a figure large enough to house this visualization:</p><pre class="codeinput">figure(<span class="string">'Position'</span>, [20, 200, 1240, 420])
+</pre><p><b>Step 3.</b> Calculate source and detector numbers.</p><pre class="codeinput">Ns = length(unique(info.pairs.Src));
+Nd = length(unique(info.pairs.Det));
+</pre><p><b>Step 4.</b> Now, we'll loop through sources (in light red) and give them number labels:</p><pre class="codeinput"><span class="keyword">for</span> s = 1:Ns
+    patch(info.optodes.spos2(s,1) + sqx, info.optodes.spos2(s,2) + sqy, [1 .75 .75])
+    text(info.optodes.spos2(s,1), info.optodes.spos2(s,2), num2str(s))
+<span class="keyword">end</span>
+</pre><p><b>Step 5.</b> And detectors (in light blue) with their own labels:</p><pre class="codeinput"><span class="keyword">for</span> d = 1:Nd
+    patch(info.optodes.dpos2(d,1) + sqx, info.optodes.dpos2(d,2) + sqy, [.55 .55 1])
+    text(info.optodes.dpos2(d,1), info.optodes.dpos2(d,2), num2str(d))
+<span class="keyword">end</span>
+</pre><p><b>Step 6.</b> And last, to pretty it up, we'll remove and resize the axes.</p><pre class="codeinput">axis <span class="string">off</span>
+axis <span class="string">image</span>
+</pre><p>(tip: Some users may want to maximize the figure window as well)</p><p><img vspace="5" hspace="5" src="plotcap.png" alt=""> </p><p>Another plot we can make is the mean LL's of each optode on the cap.</p><p><b>Step 1.</b> Let's average each source's measurements for NN1 and WL2.</p><pre class="codeinput"><span class="keyword">for</span> s = 1:Ns
+    keep = (info.pairs.Src == s) &amp; (info.pairs.NN == 1) &amp; (info.pairs.WL == 2);
+    savg(s) = real(0.25 * (99 * log10(mean(data(keep))) + 301));
+<span class="keyword">end</span>
+</pre><p><b>Step 2.</b> Let's do the same for detectors:</p><pre class="codeinput"><span class="keyword">for</span> d = 1:Nd
+    keep = (info.pairs.Det == d) &amp; (info.pairs.NN == 1) &amp; (info.pairs.WL == 2);
+    davg(d) = real(0.25 * (99 * log10(mean(data(keep))) + 301));
+<span class="keyword">end</span>
+</pre><p><b>Step 3.</b> We can use these to color in the same squares as before. But first we need to apply a colormap:</p><pre class="codeinput">M = max([savg(:); davg(:)]); cmap = hot(1000);
+savg = cmap(round((savg ./ M) .* (999) + 1), :);
+davg = cmap(round((davg ./ M) .* (999) + 1), :);
+</pre><p><b>Step 4.</b> Now to plot. Sources first:</p><pre class="codeinput">figure(<span class="string">'Position'</span>, [20, 200, 1240, 420])
+<span class="keyword">for</span> s = 1:Ns
+    patch(info.optodes.spos2(s,1) + sqx, info.optodes.spos2(s,2) + sqy, savg(s, :));
+<span class="keyword">end</span>
+</pre><p><b>Step 5.</b> Detectors next:</p><pre class="codeinput"><span class="keyword">for</span> d = 1:Nd
+    patch(info.optodes.dpos2(d,1) + sqx, info.optodes.dpos2(d,2) + sqy, davg(d, :));
+<span class="keyword">end</span>
+</pre><p><b>Step 6.</b> Remove and resize the axes again. We'll add a title while we're at it, too:</p><pre class="codeinput">axis <span class="string">off</span>
+axis <span class="string">image</span>
+title(<span class="string">'Cap Mean Light Levels'</span>)
+</pre><p><img vspace="5" hspace="5" src="plotcapmeanll.png" alt=""> </p><p>Now we have a beautiful mapping of mean light levels onto the cap!</p><p>Let's also not forget to clear some variables.</p><pre class="codeinput">clear <span class="string">cmap</span> <span class="string">d</span> <span class="string">davg</span> <span class="string">dt</span> <span class="string">keep</span> <span class="string">l</span> <span class="string">M</span> <span class="string">s</span> <span class="string">savg</span> <span class="string">sqx</span> <span class="string">sqy</span>
+</pre><p>Here are the NeuroDOT functions for these visualizations.</p><pre class="codeinput">PlotCap(info, params)
+PlotCapMeanLL(data, info, params)
+</pre><p><img vspace="5" hspace="5" src="plotcap_and_ll.png" alt=""> </p><p>Let's also plot the Cap Mean LL's for NN2, WL2. We'll scale the two plots to the same value to see how they correspond to the LL Falloff plots:</p><pre class="codeinput">params2 = params; params2.climits = [9.2e-1 9.2e1]; params2.Nnns = 2;
+PlotCapMeanLL(data, info, params2)
+</pre><p><img vspace="5" hspace="5" src="plotcapmeanll_NN1_NN2.png" alt=""> </p><p>Now let's compare this to the Noisy data, for NN1:</p><pre class="codeinput">params2.Nnns = 1;
+PlotCapMeanLL(data2, info2, params2)
+</pre><p><img vspace="5" hspace="5" src="plotcapmeanll_noisy_comparison.png" alt=""> </p><p>These functions also support 3D rendering:</p><pre class="codeinput">params2.dimension = <span class="string">'3D'</span>;
+params2.climits = [];
+PlotCap(info, params2)
+PlotCapMeanLL(data, info, params2)
+</pre><p><img vspace="5" hspace="5" src="plotcap_and_ll_3d.png" alt=""> </p><p>NeuroDOT's 3D visualizations enable you to inspect the plot from any angle. Try it now by clicking anywhere on the cap and dragging it around!</p><h2>Logmean Light Levels<a name="40"></a></h2><p>The first preprocessing step is derived from a linear Rytov approximation, where the change in light absorption at the scalp <img src="Preprocessing_Tutorial_eq05422302997434487463.png" alt="$\Delta\Phi$"> can be approximated by the negative log of the measured light levels <img src="Preprocessing_Tutorial_eq01908532921846404702.png" alt="$\Phi$"> divided by a baseline light level <img src="Preprocessing_Tutorial_eq01670008314846846562.png" alt="$\Phi_0$"> (taken as the mean of the entire time trace, or <img src="Preprocessing_Tutorial_eq00317252262327978340.png" alt="$<\Phi_0&gt;$">).</p><p>This approximation, <img src="Preprocessing_Tutorial_eq14244902674035489835.png" alt="$\Delta\Phi = -ln{\frac{\Phi}{\Phi_0}}$">, only applies when <img src="Preprocessing_Tutorial_eq14922297878003199588.png" alt="$\Phi_0 &gt;&gt; \Delta\Phi$"> ?_0 ? ??.</p><p><b>Step 1.</b> Let's do the logmean:</p><pre class="codeinput">normed = bsxfun(@rdivide, data, mean(data, 2));
+logmeaned = -log(normed);
+</pre><p><b>Step 2.</b> And then visualize it:</p><pre class="codeinput">PlotAllMeasTTs(logmeaned, info, params)
+PlotGray(logmeaned, info, params)
+</pre><p><img vspace="5" hspace="5" src="logmean_allmeas_plotgray.png" alt=""> </p><p>As you may suspect, NeuroDOT also has a <tt>logmean</tt> function.</p><p><b>Step 1.</b> Use this function to generate logmean data:</p><pre class="codeinput">lmdata = logmean(data);
+</pre><p>We can't tell much from the time traces besides that the signal variance has been greatly amplified over that of the raw data. The gray plot shows the effect much better, though. Here we can clearly see significant, periodic patterns in the signal.</p><p>Showing these side-by-side with the raw data visualizations gives us an even better idea.</p><p><img vspace="5" hspace="5" src="logmean_raw.png" alt=""> </p><p>Next, let's try to clean up these logmean'ed time traces by averaging all channels together.</p><p><b>Step 1.</b> Average the channels of NN2, WL1 together:</p><pre class="codeinput">keep = lmdata(info.pairs.NN == 2 &amp; info.pairs.WL == 1, :);
+meankeep = mean(keep);
+</pre><p><b>Step 2.</b> Create a new figure and plot with axis limits:</p><pre class="codeinput">figure
+plot(meankeep)
+[Nm, Nt] = size(data);
+xlim([0, Nt+1])
+xlabel(<span class="string">'samples'</span>); ylabel(<span class="string">'light level'</span>)
+</pre><p><img vspace="5" hspace="5" src="meantts.png" alt=""> </p><p><b>Step 1.</b> NeuroDOT has a function for this as well:</p><pre class="codeinput">PlotMeanTTs(lmdata, info, params)
+</pre><p>This can be a useful plot for seeing the action of each step on global signal levels.</p><p><img vspace="5" hspace="5" src="plotmeantts.png" alt=""> </p><p>And let's clear up some variables again:</p><pre class="codeinput">clear <span class="string">logmeaned</span> <span class="string">normed</span> <span class="string">keep</span> <span class="string">meankeep</span>
+<span class="comment">%</span>
+</pre><h2>Detect Noisy Channels<a name="48"></a></h2><p>The next step is detecting noisy channels. Channels that exhibit noise above a certain threshold tend to be less reliable, so we want a way to eliminate them from consideration.</p><p>The best threshold for ORL systems has been determined to be <tt>0.075</tt>.</p><p>We will store this information in an "on-the-fly" table called <tt>info.MEAS</tt>.</p><p><b>Step 1.</b> Calculate noise as the standard deviation of each channel:</p><pre class="codeinput">STD = std(lmdata, [], 2);
+</pre><p><b>Step 2.</b> Threshold the data (GI stands for Good Indices):</p><pre class="codeinput">GI = STD &lt;= 0.075;
+</pre><p><b>Step 3.</b> Store it all in a new table.</p><pre class="codeinput">info.MEAS = table(STD, GI, <span class="string">'VariableNames'</span>, {<span class="string">'noise'</span>, <span class="string">'GI'</span>});
+</pre><p>Now that we've got these good measurements, how can we visualize them? Let's start by creating a cap plot, and marking good measurements with green lines. <b>Step 1.</b> Find indices of the good measurements:</p><pre class="codeinput">figure
+hold <span class="string">on</span>
+keep = find(info.MEAS.GI == 1);
+</pre><p><b>Step 2.</b> Plot the good measurements:</p><pre class="codeinput"><span class="keyword">for</span> m = keep'
+    plot([info.optodes.spos2(info.pairs.Src(m), 1); info.optodes.dpos2(info.pairs.Det(m), 1)], [info.optodes.spos2(info.pairs.Src(m), 2); info.optodes.dpos2(info.pairs.Det(m), 2)], <span class="string">'g'</span>)
+<span class="keyword">end</span>
+</pre><p><b>Step 3.</b> Plot source numbers (in light blue):</p><pre class="codeinput"><span class="keyword">for</span> s = 1:Ns
+    text(info.optodes.spos2(s, 1), info.optodes.spos2(s, 2), num2str(s), <span class="string">'Color'</span>, [1 .75 .75])
+<span class="keyword">end</span>
+</pre><p><b>Step 4.</b> Plot detector numbers:</p><pre class="codeinput"><span class="keyword">for</span> d = 1:Nd
+    text(info.optodes.dpos2(d, 1), info.optodes.dpos2(d, 2), num2str(d), <span class="string">'Color'</span>, [.55 .55 1])
+<span class="keyword">end</span>
+</pre><p><b>Step 5.</b> And one more time, remove and resize the axes.</p><pre class="codeinput">axis <span class="string">off</span>
+axis <span class="string">image</span>
+</pre><p><img vspace="5" hspace="5" src="plotcapgoodmeas.png" alt=""> </p><p>As before, there are corresponding NeuroDOT 2 functions for each of these:</p><pre class="codeinput">info = FindGoodMeas(lmdata, info, 0.075);
+PlotCapGoodMeas(info)
+</pre><p>And there is a 3D version of the visualization:</p><pre class="codeinput">params2.Nnns = [];
+PlotCapGoodMeas(info, params2)
+</pre><p><a href="<plotcapgoodmeas_and_3d.png">&lt;plotcapgoodmeas_and_3d.png</a></p><p>There is one more way to visualize the data, by plotting a histogram of the channels by their noise level.</p><p><b>Step 1.</b> Set number of bins:</p><pre class="codeinput">bins = [0:0.5:100];
+</pre><p><b>Step 2.</b> Keep noise for NN2, WL1:</p><pre class="codeinput">keep = info.pairs.WL == 1 &amp; info.pairs.NN == 2;
+STD = info.MEAS.STD(keep)*100;
+</pre><p><b>Step 3.</b> Plot histogram and adjust limits.</p><pre class="codeinput">figure
+histogram(STD, bins)
+ylim([0 200])
+xlim([0 50])
+ylabel(<span class="string">'Variance (%)'</span>)
+xlabel(<span class="string">'# Measurements'</span>)
+</pre><p><img vspace="5" hspace="5" src="hist_ex.png" alt=""> </p><p>And again, let's clear some variables:</p><pre class="codeinput">clear <span class="string">bins</span> <span class="string">GI</span> <span class="string">STD</span> <span class="string">keep</span> <span class="string">noise</span> <span class="string">m</span> <span class="string">d</span> <span class="string">s</span>
+<span class="comment">% The NeuroDOT function for this is:</span>
+PlotNoiseHistogram(info, params, 0.075)
+</pre><p><img vspace="5" hspace="5" src="plotnoisehist.png" alt=""> </p><h2>Linear Detrending<a name="63"></a></h2><p>The next step is an easy one! Linear detrending is largely self-explanatory: it removes the linear component of the signal, flattening out long-term drift. This is a largely optional step, but still a part of the toolbox.</p><p><b>Step 1.</b> We can use MATLAB's <tt>detrend</tt> function on the transpose of data, and take the transpose of that:</p><pre class="codeinput">ddata = detrend(lmdata')';
+</pre><p><b>Step 2.</b> Let's see what this looks like in the mean time traces:</p><pre class="codeinput">PlotMeanTTs(lmdata, info, params)
+PlotMeanTTs(ddata, info, params)
+</pre><p>As we see from the red lines, the detrended data clearly shows the removal of a gradual down-slope in the original data.</p><p><img vspace="5" hspace="5" src="detrend.png" alt=""> </p><p>The NeuroDOT 2 function for this step is:</p><pre class="codeinput">ddata = detrend_tts(lmdata);
+</pre><h2>High Pass Filter<a name="66"></a></h2><p>The next step is a high pass filter (HPF). The cutoff frequency we use for this is 0.02 Hz. The typical block length is 50-60 s, and 1/50 s = 0.02 Hz. Thus, the HPF removes long term signal drift between blocks. We will also need the framerate, which is stored in <tt>info.system.framerate</tt> and has a value of 10.0005 Hz. The filtering requires several steps.</p><p><b>Step 1.</b> First, let's pad <tt>lmdata</tt> by 100 in the TIME dimension to reduce edge effects:</p><pre class="codeinput">padded = padarray(ddata, [0 100]);
+</pre><p><b>Step 2.</b> Next, we calculate the Nyquist frequency:</p><pre class="codeinput">omegaNy = 0.02 * (2 / info.system.framerate);
+</pre><p><b>Step 3.</b> Then, we generate a 5-pole Butterworth highpass filter:</p><pre class="codeinput">[b, a] = butter(5, omegaNy, <span class="string">'high'</span>);
+</pre><p><b>Step 4.</b> We apply the filter forwards and backwards to each channel's time series:</p><pre class="codeinput"><span class="keyword">for</span> n = 1:size(padded, 1),
+    hpdata(n, :) = filtfilt(b, a, padded(n,:));
+<span class="keyword">end</span>
+</pre><p><b>Step 5.</b> Remove the padding:</p><pre class="codeinput">hpdata = hpdata(:, 101:end-100);
+</pre><p><b>Step 6.</b> Lastly, we visualize the gray plot and mean time trace:</p><pre class="codeinput">PlotGray(hpdata, info, params)
+PlotMeanTTs(hpdata, info, params)
+</pre><p><img vspace="5" hspace="5" src="hpf_plotgray_meantts.png" alt=""> </p><p>Another way we can visualize the HPF is with a mean power spectrum. To do this, we need to calculate a discrete Fourier Transform with MATLAB's <tt>fft</tt> function, but it needs to be done in a specific way.</p><p><b>Step 1.</b> First, take the mean of NN2, WL1 channels for the logmean &amp; HPF:</p><pre class="codeinput">keep = (info.pairs.NN == 2) &amp; (info.pairs.WL == 1);
+lmkeep = mean(lmdata(keep, :));
+hpkeep = mean(hpdata(keep, :));
+</pre><p><b>Step 2.</b> Next, we need to zero pack to the next power of two in the time dimension (this improves calculation speed):</p><pre class="codeinput">[Nm, Nt] = size(lmkeep);
+Ndft = pow2(nextpow2(Nt));
+</pre><p><b>Step 3.</b> Then, we define the positive half of the frequency domain:</p><pre class="codeinput">Nf = 1 + Ndft/2;
+ftdomain = (info.system.framerate/2) * linspace(0, 1, Nf);
+</pre><p><b>Step 4.</b> We strip out the 'DC' component, which is simply the mean light levels from before:</p><pre class="codeinput">lmkeep = bsxfun(@minus, lmkeep, mean(lmkeep, 2));
+hpkeep = bsxfun(@minus, hpkeep, mean(hpkeep, 2));
+</pre><p><b>Step 5.</b> Now we can take the Fourier transform (normalized by the full frequency domain size) and keep the positive frequency domain:</p><pre class="codeinput">lmmag = fft(lmkeep) / Ndft;
+lmmag = lmmag(:, 1:Nf);
+
+hpmag = fft(hpkeep) / Ndft;
+hpmag = hpmag(:, 1:Nf);
+</pre><p><b>Step 6.</b> <tt>lmmag</tt> and <tt>hpmag</tt> are magnitude ' what we really need is power, the absolute value of magnitude squared:</p><pre class="codeinput">lmpower = abs(lmmag) .* 2;
+hppower = abs(hpmag) .* 2;
+</pre><p>We're almost done!</p><p><b>Step 7.</b> Last, we plot the power on a <tt>semilogx</tt> graph with some appropriate labels:</p><pre class="codeinput">figure
+semilogx(ftdomain, lmpower)
+ylabel(<span class="string">'Power [W]'</span>)
+xlabel(<span class="string">'Frequency [Hz]'</span>)
+title(<span class="string">'Logmean data'</span>)
+
+figure
+semilogx(ftdomain, hppower)
+ylabel(<span class="string">'Power [W]'</span>)
+xlabel(<span class="string">'Frequency [Hz]'</span>)
+title(<span class="string">'HPF data'</span>)
+</pre><p><img vspace="5" hspace="5" src="hpf_ps.png" alt=""> </p><p>And of course, NeuroDOT has several functions that can automate these more complex tasks and standardize formatting.</p><p><b>Step 1.</b> Here is the HPF function, with the last two inputs being the cutoff frequency and frame rate:</p><pre class="codeinput">hpdata = highpass(lmdata, 0.02, info.system.framerate);
+</pre><p><b>Step 2.</b> And here are corresponding functions to plot the mean and all-measurements power spectra:</p><pre class="codeinput">PlotMeanPS(hpdata, info, info.system.framerate, params)
+PlotAllMeasPS(hpdata, info, info.system.framerate, params)
+</pre><p>Clearing excess variables:</p><pre class="codeinput">clear <span class="string">a</span> <span class="string">b</span> <span class="string">ftdomain</span> <span class="string">hpkeep</span> <span class="string">hpmag</span> <span class="string">hppower</span> <span class="string">keep</span> <span class="string">lmkeep</span> <span class="string">lmmag</span> <span class="string">lmpower</span> <span class="string">n</span> <span class="string">Ndft</span> <span class="string">Nf</span> <span class="string">omegaNy</span> <span class="string">padded</span>
+</pre><p><img vspace="5" hspace="5" src="hpf_plotps.png" alt=""> </p><p>Here are the logmean (left) and HPF (right) power spectra. We see quite starkly that % the lower frequency components' power is reduced below 0.02 Hz.</p><p><img vspace="5" hspace="5" src="hpf_logmean.png" alt=""> </p><h2>Low Pass Filter 1<a name="83"></a></h2><p>The next step is a low pass filter (LPF1) at 1 Hz. This is because we typically downsample to a 1 Hz sampling frequency after preprocessing (not featured in this pipeline), so any signals above 1 Hz are irrelevant.</p><p><b>Step 1.</b> In case you had trouble, here is the syntax for the filter:</p><pre class="codeinput">lp1data = lowpass(hpdata, 1, info.system.framerate);
+</pre><p><b>Step 2.</b> And for the visualization:</p><pre class="codeinput">PlotMeanPS(lp1data, info, info.system.framerate, params)
+</pre><p><img vspace="5" hspace="5" src="lpf.png" alt=""> </p><p>Here are HPF (left) and LPF1 (right) side-by-side for comparison. You can adjust axes limits, or alternatively use the windows' zoom tool, to better see the filtered domains. There is a small peak near 2 Hz that we can see disappear after LPF1.</p><p><img vspace="5" hspace="5" src="lpf_hpf.png" alt=""> </p><h2>Superficial Signal Regression<a name="86"></a></h2><p>Next is the Superficial Signal Regression step, or SSR. This removes the 'systemic signal', or hemodynamics, which originates from the blood vessels of the scalp. NN1 are the shallowest measurements, so they are the most direct measure of hemodynamics.</p><p><b>Step 1.</b> First, we get the hemodynamics signal by averaging NN1 for each wavelength:</p><pre class="codeinput"><span class="keyword">for</span> wl = 1:2
+    keep = lp1data(info.pairs.NN == 1 &amp; info.pairs.WL == wl &amp; info.MEAS.GI == 1, :);
+    hem(wl, :) = mean(keep);
+<span class="keyword">end</span>
+</pre><p><b>Step 2.</b> Then, we use the pseudoinverse of <tt>hem</tt> to regress it out of <tt>lp1data</tt>:</p><pre class="codeinput"><span class="keyword">for</span> wl = 1:2
+    keep = info.pairs.WL == wl;
+    temp = lp1data(keep, :)';
+    g = hem(wl, :)';
+    gp = pinv(g);
+    beta = gp * temp;
+    SSRdata(keep, :) = (temp - g * beta)';
+<span class="keyword">end</span>
+</pre><p>Let's see what's going on here by visualizing both NN1 and NN2 from before and after.</p><p><b>Step 1.</b> Starting with gray plots, we can edit <tt>params</tt> to show both NN's:</p><pre class="codeinput">params.Nnns = 1:2;
+PlotGray(lp1data, info, params)
+PlotGray(SSRdata, info, params)
+</pre><p><img vspace="5" hspace="5" src="SSR_lpf.png" alt=""> </p><p>Any range of NN's (<tt>3:5</tt>, <tt>2:3</tt>) can be specified in this way. In the plots (LPF1 left, SSR right) we can see NN1 has been filtered out, while NN2 is largely intact.</p><p><b>Step 2.</b> Let's also look at the power spectra:</p><pre class="codeinput">PlotMeanPS(lp1data, info, info.system.framerate, params)
+params.ylimits = [0 5e-8];
+PlotMeanPS(SSRdata, info, info.system.framerate, params)
+</pre><p>The new ylimit is introduced to make the data more visible. Let's make sure to clear it afterward so it doesn't affect our other visualizations!</p><pre class="codeinput">params.ylimits = [];
+params.Nnns = 2;
+</pre><p><img vspace="5" hspace="5" src="SSR_lpf_ps.png" alt=""> </p><p>Here it is much clearer that the NN1 signal (top) has dropped substantially (LPF1 left, SSR right) while the NN2 signal remains (bottom).</p><p>Again, the SSR operation is done more succinctly in two NeuroDOT functions, <tt>gethem</tt> and <tt>regcorr</tt>:</p><pre class="codeinput">hem = gethem(lp1data, info);
+[SSRdata, R] = regcorr(lp1data, info, hem);
+</pre><p><tt>R</tt> is a residuals matrix. Run these commands, and compare their results using the tools you have learned thus far. (Hint: It may be helpful to change variable names to <tt>SSRdata1</tt> and <tt>SSRdata2</tt>, and use <tt>nnz(SSRdata2 - SSRdata1)</tt> to see if there have been any errors in calculation).</p><p>Finally, let's clear some excess variables again:</p><pre class="codeinput">clear <span class="string">beta</span> <span class="string">g</span> <span class="string">gp</span> <span class="string">keep</span> <span class="string">wl</span> <span class="string">temp</span>
+<span class="comment">%</span>
+</pre><h2>Low Pass Filter 2<a name="93"></a></h2><p>The penultimate step is a second lowpass filter, this time at a lower cutoff frequency of 0.5 Hz. This removes the cardiac pulse from the signal, and uses the same NeuroDOT function, <tt>lowpass</tt>, as before.</p><p><b>Step 1.</b> Apply a LPF at 0.5 Hz:</p><pre class="codeinput">lp2data = lowpass(SSRdata, 0.5, info.system.framerate);
+</pre><p><b>Step 2.</b> Plot the mean power spectrum (adjusting the y limits down again):</p><pre class="codeinput">params.ylimits = [0 2.5e-7]; params.Nnns = 1:2;
+PlotMeanPS(lp2data, info, info.system.framerate, params)
+params.ylimits = []; params.Nnns = 2;
+</pre><p><img vspace="5" hspace="5" src="lpf2.png" alt=""> </p><p>Here is a side-by-side of the SSR (left) and LPF2 (right) mean power spectra. Again we see small peaks that have been filtered out.</p><p><img vspace="5" hspace="5" src="lpf2_SSR.png" alt=""> </p><h2>1 Hz Resampling<a name="96"></a></h2><p>The last preprocessing step is to resample the data from ~10 Hz to 1 Hz. We do this because the range of hemodynamic signals is far below 1 Hz, and thus functional neuroimaging is typically done on a 1 Hz time scale. This also has the benefit of reducing data storage requirements, eliminating noise, and providing a benchmark frequency to standardize all stimulus and data acquisitions and analysis to.</p><p><b>Step 1.</b> We first set the resampling frequency and our current framerate:</p><pre class="codeinput">signal = lp2data;
+[Nm, Nt] = size(signal);
+omega_resample = 1;
+framerate = 10.0005;
+</pre><p><b>Step 2.</b> Next, we establish a resampling ratio to within a desired tolerance using the <tt>rat</tt> function:</p><pre class="codeinput">tol = 1e-5;
+[N, D] = rat(omega_resample / framerate, tol);
+</pre><p><b>Step 3.</b> Now we need to remove the linear component of the data. We could do this with <tt>detrend_tts</tt>, but unfortunately we have to reverse this operation later, and thus must save this component:</p><pre class="codeinput">alpha1 = repmat((signal(:, 1) - signal(:, end)) / (Nt-1), 1, Nt);
+beta = repmat(-signal(:, 1), 1, Nt);
+tgv = repmat([0:Nt-1]', 1, Nm)';
+corrsig = signal + alpha1 .* tgv + beta;
+</pre><p><b>Step 4.</b> Resample the corrected signal:</p><pre class="codeinput">rawresamp = resample(corrsig', N, D)';
+</pre><p><b>Step 5.</b> Here is where we add the linear component back in, and output it as rdata:</p><pre class="codeinput">[Nm, Nt] = size(rawresamp);
+beta = repmat(-signal(:, 1), 1, Nt);
+tgv = repmat([0:Nt-1]', 1, Nm)';
+alpha2 = alpha1(:, 1:Nt) * (D / N);
+rdata = (rawresamp - alpha2 .* tgv - beta);
+</pre><p><b>Step 6.</b> Last, let's visualize it and compare to the data before resampling:</p><pre class="codeinput">params.ylimits = [-0.005 0.005];
+PlotMeanTTs(lp2data, info, params)
+PlotMeanTTs(rdata, info, params)
+</pre><p><img vspace="5" hspace="5" src="resampled.png" alt=""> </p><p>We can see on the Time axis that the data has been resampled from ~2000 time points to ~200 - exactly the ~10x factor that we were looking for!</p><p>Let's be sure to clear our y limits:</p><pre class="codeinput">params.ylimits = [];
+</pre><p>And our excess variables:</p><pre class="codeinput">clear <span class="string">alpha1</span> <span class="string">alpha2</span> <span class="string">beta</span> <span class="string">corrsig</span> <span class="string">D</span> <span class="string">framerate</span> <span class="string">N</span> <span class="string">omega_resample</span> <span class="string">rawresamp</span> <span class="string">signal</span> <span class="string">tgv</span> <span class="string">tol</span>
+</pre><p>The NeuroDOT 2 function for this is:</p><pre class="codeinput">[rdata, info] = resample_tts(lp2data, info, info.system.framerate, 1, 1e-5);
+</pre><h2>Block Averaging<a name="105"></a></h2><p>We finally have preprocessed data, with the major interfering signals filtered out, ready for analysis. What's next? The last step is to average the stimulus blocks together. Averaging is a common way to reduce the effect of any remaining systemic noise.</p><p><b>Step 1.</b> First, let's calculate the number of blocks:</p><pre class="codeinput">Nbl = length(info.paradigm.Pulse_2);
+</pre><p><b>Step 2.</b> Next, let's calculate the block length by subtracting the start times of the first two blocks. The time points for all blocks are found in <tt>info.paradigm.synchpts</tt>, and <tt>info.paradigm.Pulse_2</tt> lists which of those points correspond to stimulus 'on' blocks:</p><pre class="codeinput">dt = round(mean(diff(info.paradigm.synchpts(info.paradigm.Pulse_2))));
+</pre><p><b>Step 3.</b> Now, we cut the data into blocks:</p><pre class="codeinput"><span class="keyword">for</span> m = 1:Nbl
+    blstart = info. paradigm.synchpts(info. paradigm.Pulse_2(m));
+    blocks(:, :, m) = rdata(:, blstart:blstart + dt - 1);
+<span class="keyword">end</span>
+</pre><p><b>Step 4.</b> Last, we average the blocks together:</p><pre class="codeinput">badata = mean(blocks, 3);
+</pre><p>To visualize, let's look at a gray plot:</p><pre class="codeinput">params.Nwls = 1:2; params.Nnns = 2;
+PlotGray(badata, info, params)
+</pre><p><img vspace="5" hspace="5" src="ba_grayplot.png" alt=""> </p><p>We see a clear shift in signal intensity at the 15 s mark. We'd also like to see time traces, but due to channel variance, we won't see how light levels change over time in response to the stimulus.</p><p><b>Step 1.</b> So let's subtract the first four seconds' mean from each channel (we call this a deltamean):</p><pre class="codeinput">dmdata = bsxfun(@minus, badata, mean(badata(:, 1:4), 2));
+</pre><p><b>Step 2.</b> Then let's only keep NN2, WL1, through the good indices:</p><pre class="codeinput">keep = info.pairs.WL == 1  &amp;  info.pairs.NN == 2 &amp; info.MEAS.GI == 1;
+keep2 = info.pairs.WL == 2  &amp;  info.pairs.NN == 2 &amp; info.MEAS.GI == 1;
+</pre><p><b>Step 3.</b> And now let's plot these traces:</p><pre class="codeinput">figure
+plot(dmdata(keep, :)')
+xlim([0, Nt+1]); xlabel(<span class="string">'Time (s)'</span>)
+ylabel(<span class="string">'Light Levels (uW)'</span>); title(<span class="string">'NN2, WL1'</span>)
+
+figureplot(dmdata(keep2, :)')
+xlim([0, Nt+1]); xlabel(<span class="string">'Time (s)'</span>)
+ylabel(<span class="string">'Light Levels (uW)'</span>); title(<span class="string">'NN2, WL2'</span>)
+</pre><p><img vspace="5" hspace="5" src="deltamean.png" alt=""> </p><p>Alternatively, we can use built-in NeuroDOT functions to execute and visualize block averaging:</p><pre class="codeinput">badata = BlockAverage(rdata, info);
+PlotDeltaMean(badata, info, params)
+</pre><p><img vspace="5" hspace="5" src="plotdeltamean.png" alt=""> </p><p>We can see that most channels follow a periodic behavior.</p><h2>Conclusion<a name="115"></a></h2><p>Congratulations! You have finished the NeuroDOT 2 Base Edition Preprocessing Pipeline Tutorial.</p><p>For further questions or more information, please consult the NeuroDOT 2 Base User Manual and the various Appendices.</p><p>NeuroDOT 2 Support Team:</p><div><ul><li>Adam Eggebrecht (<a href="mailto:aeggebre@wustl.edu">aeggebre@wustl.edu</a>)</li><li>David Muccigrosso (<a href="mailto:muccigrosso.david@wustl.edu">muccigrosso.david@wustl.edu</a>)</li></ul></div><h2>Appendix: Preprocessing<a name="116"></a></h2><p>Some notes on the block averaging and LPF1 stages: * Because LPF1 filters out the Nyquist frequency of the downsampling stage (see Neuro Photonics 2014 paper), which is not featured here, it really could be featured at any point in this pipeline after the logmean. The point of LPF1 is to remove all signal components at frequencies higher than the one it will be eventually downsampled to, so that they do not affect any of the other stages of the pipeline, and thus it is placed after the logmean and HPF. * Similarly, block averaging can be done at any point after LPF1. Since the raw data after the logmean is technically in a state that can be feasibly reconstructed, pretty much every step afterwards is just clearing up interfering signals. If a different sort of optical data does not have such signals present, there is little need for further preprocessing.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% NeuroDOT 2.2.0 Tutorial - Preprocessing Pipeline
+% 
+% <<logo_fixed.png>>
+% 
+% Welcome to NeuroDOT 2.2.0 Base Edition!
+%
+% <<all_pipelines.png>>
+% 
+% <<preprocessing_diagram.png>>
+% 
+% In the "hearing words" (HW) paradigm, which we will use in this tutorial,
+% a patient quietly listens to auditory stimulus presented through
+% speakers.
+% 
+% <<hearing_words_diagram.png>>
+% 
+% The stimulus is divided into six 30-second blocks (cyan lines on
+% bottom-right), with one spoken word per s for 15 s, followed by 15 s of
+% silence (0 words per s).
+% 
+% <<block_diagram.png>>
+% 
+% These blocks are averaged together and reconstructed into a 3D time
+% series map (a movie) of brain function.
+%
+% This tutorial focuses on the first stage of our research scenario:
+% preprocessing.
+% 
+% Preprocessing involves using a number of digital signal processing and
+% analysis techniques to remove interfering or systemic signals, and
+% isolate the brain activity responses to stimuli (such as the Hearing
+% Words experiment).
+% 
+% We will assess data quality at every step along the way to ensure that we
+% are acquiring high-quality maps of brain activity.
+% 
+% You will be given syntax prompts along the way. Copy and type these into
+% the MATLAB command line, or highlight them and either press F9 or
+% right-click and select "Evaluate Selection" on the pop-up menu.
+% 
+% If you are unfamiliar with NeuroDOT and its data structures at any point,
+% please refer to the Overview Tutorial and User Manual. Also, the
+% <List_of_Files_and_Functions.html List of Files and Functions> provides
+% easy reference to all other help documentation.
+%
+%% Sample Data
+% First, if you haven't already, you need to unzip the NeuroDOT 2.2.0 Base
+% Edition file in your chosen directory and install it on the MATLAB search
+% path:
+% addpath(genpath('your_NeuroDOT_directory_here'))
+%%
+% Next, we need to load up our sample data. There are two sets, one of high
+% quality that has been presented in published papers, and another "noisy"
+% set that was chosen to contrast against the first.
+load('NeuroDOT_Base_HW_Sample_1.mat')
+load('NeuroDOT_Base_HW_Sample_Noisy.mat')
+%%
+% In the workspace, HW Sample 1 is associated with |data|, |info|, and
+% |flags|, while HW Sample Noisy is associated with |data2|, |info2|, and
+% |flags2|.
+% 
+% <<workspace.png>>
+% 
+%%
+% Now, let's take a look at the full Preprocessing Pipeline diagram again:
+%
+% <<pipeline_SD.png>>
+%
+%% S-D Measurements
+% We'll work first from the raw source-detector pair measurements in |data|.
+% 
+% 1. Since |data| is a 2D array (MEASUREMENTS x TIME), let’s display it as
+% a grayscale image, and add a color bar while we’re at it:
+imagesc(data)
+colormap(gray)
+colorbar
+%%
+% 2. The resulting image is very dark, so let’s rescale the color axis:
+caxis([-0.03, 0.03])
+%%
+% *Step 3.* Now let's add some labels:
+xlabel('samples')
+ylabel('measurements')
+%%
+%
+% <<grayplot.png>>
+%
+% Each horizontal line of this gray plot represents a S-D pair, or channel.
+% 
+% We can visualize this same information with |plot|, which we call the "time
+% traces" of each channel.
+% 
+% 1. Create a new figure and plot the data:
+figure
+plot(data')
+%%
+% 2. Calculate x-axis limits from the array’s size:
+[Nm, Nt] = size(data);
+xlim([0, Nt+1])
+%%
+% 3. Label the axes:
+xlabel('samples')
+ylabel('light level')
+%%
+%
+% <<allmeas.png>>
+%
+% If we use MATLAB's magnification tool to zoom in, we can see the signal
+% in more detail. Each line is a single channel's time trace. The fast,
+% periodic, "jaggy" spikes we see are the heart pulse signal. The slower,
+% periodic, sinusoid-like peaks are the respiration signal.
+%
+% <<allmeas_zoomed_in.png>>
+% 
+% The mean value of each channel is relatively consistent, but the channels
+% are spread across several orders of magnitude. We see this in traces
+% bunched at the bottom. 
+%
+% We can alleviate this bunching with a |semilogy| plot.
+% 
+% 1. Create a new figure and plot the data with axis limits and labels as
+% before:
+figure
+semilogy(data')
+xlim([0, Nt+1])
+xlabel('samples')
+ylabel('light level')
+%%
+%
+% <<allmeas_semilog.png>>
+%
+% Another improvement we can make is to convert from samples to time.
+%
+% *Step 1.* Calculate the time length of each sample:
+dt = 1 / info.system.framerate;
+%%
+% *Step 2.* Replot and relabel.
+figure
+semilogy([1:Nt] .* dt, data')
+xlim([0, (Nt+1) * dt])
+xlabel('seconds')
+ylabel('light level')
+%%
+%
+% <<allmeas_seconds.png>>
+%
+% Zooming in again shows the time traces spread more evenly among the orders of magnitude.
+% 
+% <<allmeas_seconds_zoomed_in.png>>
+% 
+% There is a characteristic log-linear relationship between S-D distance
+% and mean light level for light diffusion in biological tissue. Let's
+% explore that by plotting it!
+%
+% *Step 1.* Create a new figure and plot channel means versus S-D distance:
+figure
+semilogy(info.pairs.r2d, mean(data, 2), '*')
+%%
+% *Step 2.* Let's label the axes, noting their units:
+xlabel('Distance [mm]')
+ylabel('Detector Voltage [V]')
+%%
+%
+% <<LLfalloff.png>>
+%
+% Why do the channels all line up vertically in the same 5 distance bands?
+% They represent groups of nearest neighbor pairs on a 3D cap. In this
+% data, the first through fifth nearest neighbors were measured. We can
+% visualize the differences in mean light levels between NN groups with
+% |info.pairs.NN|.
+%
+% *Step 1.* Create a new figure and plot time traces for each of the NN1
+% and NN2 groups:
+figure
+semilogy(data(info.pairs.NN == 1, :)')
+xlim([0, Nt+1]); xlabel('samples');
+ylabel('light level'); title('NN1')
+
+figure
+semilogy(data(info.pairs.NN == 2, :)')
+xlim([0, Nt+1]); xlabel('samples');
+ylabel('light level'); title('NN2')
+%%
+%
+% <<allmeas_nn12.png>>
+%
+% NeuroDOT's visualization functions can automatically separate these plots
+% by wavelength and NN number.
+% 
+% For gray plots:
+params.Nnns = 1; params.Nwls = 2;
+PlotGray(data, info, params)
+%%
+%
+% <<plotgray.png>>
+%
+% where the structure |params| passes visualization parameters on to the
+% function.
+%
+% For |semilogy| time traces:
+PlotAllMeasTTs(data, info, params)
+%%
+% where again the last input selects NN pair(s).
+%
+% *Step 3.* For mean light-levels vs. S-D distance:
+PlotLLFalloff(data, info)
+%%
+%
+% <<allmeas_LLfalloff.png>>
+%
+% The params structure is omitted here to allow PlotLLFalloff's defaults to
+% display all NN's and WL's.
+%
+% To learn more about the params structure, please consult the User Manual
+% or the "params Usage" appendix at the end of the Overview tutorial.
+%
+% Let's run these same visualizations for the Noisy data set:
+PlotGray(data2, info2, params)
+PlotAllMeasTTs(data2, info2, params)
+PlotLLFalloff(data2, info2)
+%%
+% Here are the gray plots side by side, on the same color scale. Notice the
+% lower signal intensities in the middle of the noisy data - this roughly
+% corresponds to the middle of the cap.
+% 
+% <<grayplots_noisy_comparison.png>>
+% 
+% Here are the all-measurements time traces. Again, the mean signal levels
+% in the noisy data are much lower.
+% 
+% <<allmeastts_noisy_comparison.png>>
+% 
+% And here is the light level (LL) falloff. The higher NN's lose their
+% log-linearity in the noisy data, indicating bad cap fit. 
+% 
+% <<llfalloff_noisy_comparison.png>>
+% 
+% Let's visualize the cap's topography now.
+% 
+% 1. We will visualize each source and detector as a square, initialized
+% here:
+l = norm(info.optodes.spos2(1,:) - info.optodes.spos2(2,:)) / 2;
+sqx = [l 0 -l 0];
+sqy = [0 -l 0 l];
+%%
+% *Step 2.* We'll create a figure large enough to house this visualization:
+figure('Position', [20, 200, 1240, 420])
+%%
+% *Step 3.* Calculate source and detector numbers.
+Ns = length(unique(info.pairs.Src));
+Nd = length(unique(info.pairs.Det));
+%%
+% *Step 4.* Now, we'll loop through sources (in light red) and give them
+% number labels:
+for s = 1:Ns
+    patch(info.optodes.spos2(s,1) + sqx, info.optodes.spos2(s,2) + sqy, [1 .75 .75])
+    text(info.optodes.spos2(s,1), info.optodes.spos2(s,2), num2str(s))
+end
+%%
+% *Step 5.* And detectors (in light blue) with their own labels:
+for d = 1:Nd
+    patch(info.optodes.dpos2(d,1) + sqx, info.optodes.dpos2(d,2) + sqy, [.55 .55 1])
+    text(info.optodes.dpos2(d,1), info.optodes.dpos2(d,2), num2str(d))
+end
+%%
+% *Step 6.* And last, to pretty it up, we'll remove and resize the axes.
+axis off
+axis image
+%%
+% (tip: Some users may want to maximize the figure window as well)
+%
+% <<plotcap.png>>
+%
+% Another plot we can make is the mean LL's of each optode on the cap.
+%
+% *Step 1.* Let's average each source's measurements for NN1 and WL2.
+for s = 1:Ns
+    keep = (info.pairs.Src == s) & (info.pairs.NN == 1) & (info.pairs.WL == 2);
+    savg(s) = real(0.25 * (99 * log10(mean(data(keep))) + 301));
+end
+%%
+% *Step 2.* Let's do the same for detectors:
+for d = 1:Nd
+    keep = (info.pairs.Det == d) & (info.pairs.NN == 1) & (info.pairs.WL == 2);
+    davg(d) = real(0.25 * (99 * log10(mean(data(keep))) + 301));
+end
+%%
+% *Step 3.* We can use these to color in the same squares as before. But
+% first we need to apply a colormap:
+M = max([savg(:); davg(:)]); cmap = hot(1000);
+savg = cmap(round((savg ./ M) .* (999) + 1), :);
+davg = cmap(round((davg ./ M) .* (999) + 1), :);
+%%
+% *Step 4.* Now to plot. Sources first:
+figure('Position', [20, 200, 1240, 420])
+for s = 1:Ns
+    patch(info.optodes.spos2(s,1) + sqx, info.optodes.spos2(s,2) + sqy, savg(s, :));
+end
+%%
+% *Step 5.* Detectors next:
+for d = 1:Nd
+    patch(info.optodes.dpos2(d,1) + sqx, info.optodes.dpos2(d,2) + sqy, davg(d, :));
+end
+%%
+% *Step 6.* Remove and resize the axes again. We'll add a title while we're
+% at it, too:
+axis off
+axis image
+title('Cap Mean Light Levels')
+%%
+%
+% <<plotcapmeanll.png>>
+%
+% Now we have a beautiful mapping of mean light levels onto the cap!
+% 
+% Let's also not forget to clear some variables.
+clear cmap d davg dt keep l M s savg sqx sqy
+%%
+%
+% Here are the NeuroDOT functions for these visualizations.
+PlotCap(info, params)
+PlotCapMeanLL(data, info, params)
+%%
+%
+% <<plotcap_and_ll.png>>
+% 
+% Let's also plot the Cap Mean LL's for NN2, WL2. We'll scale the two plots
+% to the same value to see how they correspond to the LL Falloff plots:
+params2 = params; params2.climits = [9.2e-1 9.2e1]; params2.Nnns = 2;
+PlotCapMeanLL(data, info, params2)
+%%
+% 
+% <<plotcapmeanll_NN1_NN2.png>>
+% 
+% Now let's compare this to the Noisy data, for NN1:
+%%
+params2.Nnns = 1;
+PlotCapMeanLL(data2, info2, params2)
+%%
+% 
+% <<plotcapmeanll_noisy_comparison.png>>
+% 
+% These functions also support 3D rendering:
+params2.dimension = '3D';
+params2.climits = [];
+PlotCap(info, params2)
+PlotCapMeanLL(data, info, params2)
+
+%%
+%
+% <<plotcap_and_ll_3d.png>>
+%
+% NeuroDOT's 3D visualizations enable you to inspect the plot from any
+% angle. Try it now by clicking anywhere on the cap and dragging it around!
+%
+%% Logmean Light Levels
+% The first preprocessing step is derived from a linear Rytov
+% approximation, where the change in light absorption at the scalp
+% $\Delta\Phi$ can be approximated by the negative log of the measured
+% light levels $\Phi$ divided by a baseline light level $\Phi_0$ (taken as
+% the mean of the entire time trace, or $<\Phi_0>$).
+% 
+% This approximation, $\Delta\Phi = -ln{\frac{\Phi}{\Phi_0}}$, only applies when $\Phi_0 >> \Delta\Phi$ ?_0 ? ??.
+%
+% *Step 1.* Let's do the logmean:
+normed = bsxfun(@rdivide, data, mean(data, 2));
+logmeaned = -log(normed);
+%%
+% *Step 2.* And then visualize it:
+PlotAllMeasTTs(logmeaned, info, params)
+PlotGray(logmeaned, info, params)
+%%
+%
+% <<logmean_allmeas_plotgray.png>>
+%
+% As you may suspect, NeuroDOT also has a |logmean| function.
+%
+% *Step 1.* Use this function to generate logmean data:
+lmdata = logmean(data);
+%%
+% We can't tell much from the time traces besides that the signal variance
+% has been greatly amplified over that of the raw data. The gray plot shows
+% the effect much better, though. Here we can clearly see significant,
+% periodic patterns in the signal.
+%
+% Showing these side-by-side with the raw data visualizations gives us an
+% even better idea.
+%
+% <<logmean_raw.png>>
+%
+% Next, let's try to clean up these logmean'ed time traces by averaging all
+% channels together.
+%
+% *Step 1.* Average the channels of NN2, WL1 together:
+keep = lmdata(info.pairs.NN == 2 & info.pairs.WL == 1, :);
+meankeep = mean(keep);
+%%
+% *Step 2.* Create a new figure and plot with axis limits:
+figure
+plot(meankeep)
+[Nm, Nt] = size(data);
+xlim([0, Nt+1])
+xlabel('samples'); ylabel('light level')
+%%
+%
+% <<meantts.png>>
+%
+% *Step 1.* NeuroDOT has a function for this as well:
+PlotMeanTTs(lmdata, info, params)
+%%
+% This can be a useful plot for seeing the action of each step on global
+% signal levels.
+%
+% <<plotmeantts.png>>
+%%
+% And let's clear up some variables again:
+clear logmeaned normed keep meankeep
+%
+%% Detect Noisy Channels
+% The next step is detecting noisy channels. Channels that exhibit noise
+% above a certain threshold tend to be less reliable, so we want a way to
+% eliminate them from consideration.
+%
+% The best threshold for ORL systems has been determined to be |0.075|.
+%
+% We will store this information in an "on-the-fly" table called |info.MEAS|.
+%
+% *Step 1.* Calculate noise as the standard deviation of each channel:
+STD = std(lmdata, [], 2);
+%%
+% *Step 2.* Threshold the data (GI stands for Good Indices):
+GI = STD <= 0.075;
+%%
+% *Step 3.* Store it all in a new table.
+info.MEAS = table(STD, GI, 'VariableNames', {'noise', 'GI'});
+%%
+% Now that we've got these good measurements, how can we visualize them?
+% Let's start by creating a cap plot, and marking good measurements with
+% green lines.
+% *Step 1.* Find indices of the good measurements:
+figure
+hold on
+keep = find(info.MEAS.GI == 1);
+%%
+% *Step 2.* Plot the good measurements:
+for m = keep'
+    plot([info.optodes.spos2(info.pairs.Src(m), 1); info.optodes.dpos2(info.pairs.Det(m), 1)], [info.optodes.spos2(info.pairs.Src(m), 2); info.optodes.dpos2(info.pairs.Det(m), 2)], 'g')
+end
+%%
+% *Step 3.* Plot source numbers (in light blue):
+for s = 1:Ns
+    text(info.optodes.spos2(s, 1), info.optodes.spos2(s, 2), num2str(s), 'Color', [1 .75 .75])
+end
+%%
+% *Step 4.* Plot detector numbers:
+for d = 1:Nd
+    text(info.optodes.dpos2(d, 1), info.optodes.dpos2(d, 2), num2str(d), 'Color', [.55 .55 1])
+end
+%%
+% *Step 5.* And one more time, remove and resize the axes.
+axis off
+axis image
+%%
+%
+% <<plotcapgoodmeas.png>>
+%
+% As before, there are corresponding NeuroDOT 2 functions for each of
+% these:
+info = FindGoodMeas(lmdata, info, 0.075);
+PlotCapGoodMeas(info)
+%%
+% And there is a 3D version of the visualization:
+params2.Nnns = [];
+PlotCapGoodMeas(info, params2)
+%%
+%
+% <<plotcapgoodmeas_and_3d.png>
+%
+% There is one more way to visualize the data, by plotting a histogram of the channels by their noise level.
+%
+% *Step 1.* Set number of bins:
+bins = [0:0.5:100];
+%%
+% *Step 2.* Keep noise for NN2, WL1:
+keep = info.pairs.WL == 1 & info.pairs.NN == 2;
+STD = info.MEAS.STD(keep)*100;
+%%
+% *Step 3.* Plot histogram and adjust limits.
+figure
+histogram(STD, bins)
+ylim([0 200])
+xlim([0 50])
+ylabel('Variance (%)')
+xlabel('# Measurements')
+%%
+%
+% <<hist_ex.png>>
+%
+% And again, let's clear some variables:
+clear bins GI STD keep noise m d s
+% The NeuroDOT function for this is:
+PlotNoiseHistogram(info, params, 0.075)
+%%
+%
+% <<plotnoisehist.png>>
+%
+%% Linear Detrending
+% The next step is an easy one! Linear detrending is largely
+% self-explanatory: it removes the linear component of the signal,
+% flattening out long-term drift. This is a largely optional step, but
+% still a part of the toolbox.
+%
+% *Step 1.* We can use MATLAB's |detrend| function on the transpose of
+% data, and take the transpose of that:
+ddata = detrend(lmdata')';
+%%
+% *Step 2.* Let's see what this looks like in the mean time traces:
+PlotMeanTTs(lmdata, info, params)
+PlotMeanTTs(ddata, info, params)
+%%
+% As we see from the red lines, the detrended data clearly shows the
+% removal of a gradual down-slope in the original data.
+%
+% <<detrend.png>>
+%
+% The NeuroDOT 2 function for this step is:
+ddata = detrend_tts(lmdata);
+%% High Pass Filter
+% The next step is a high pass filter (HPF). The cutoff frequency we use
+% for this is 0.02 Hz. The typical block length is 50-60 s, and 1/50 s =
+% 0.02 Hz. Thus, the HPF removes long term signal drift between blocks. We
+% will also need the framerate, which is stored in |info.system.framerate| and
+% has a value of 10.0005 Hz. The filtering requires several steps.
+%
+% *Step 1.* First, let's pad |lmdata| by 100 in the TIME dimension to
+% reduce edge effects:
+padded = padarray(ddata, [0 100]);
+%%
+% *Step 2.* Next, we calculate the Nyquist frequency:
+omegaNy = 0.02 * (2 / info.system.framerate);
+%%
+% *Step 3.* Then, we generate a 5-pole Butterworth highpass filter:
+[b, a] = butter(5, omegaNy, 'high');
+%%
+% *Step 4.* We apply the filter forwards and backwards to each channel's
+% time series:
+for n = 1:size(padded, 1),
+    hpdata(n, :) = filtfilt(b, a, padded(n,:));
+end
+%%
+% *Step 5.* Remove the padding:
+hpdata = hpdata(:, 101:end-100);
+%%
+% *Step 6.* Lastly, we visualize the gray plot and mean time trace:
+PlotGray(hpdata, info, params)
+PlotMeanTTs(hpdata, info, params)
+%%
+%
+% <<hpf_plotgray_meantts.png>>
+%
+% Another way we can visualize the HPF is with a mean power spectrum. To do
+% this, we need to calculate a discrete Fourier Transform with MATLAB's
+% |fft| function, but it needs to be done in a specific way.
+%
+% *Step 1.* First, take the mean of NN2, WL1 channels for the logmean &
+% HPF:
+keep = (info.pairs.NN == 2) & (info.pairs.WL == 1);
+lmkeep = mean(lmdata(keep, :));
+hpkeep = mean(hpdata(keep, :));
+%%
+% *Step 2.* Next, we need to zero pack to the next power of two in the time
+% dimension (this improves calculation speed):
+[Nm, Nt] = size(lmkeep);
+Ndft = pow2(nextpow2(Nt));
+%%
+% *Step 3.* Then, we define the positive half of the frequency domain:
+Nf = 1 + Ndft/2;
+ftdomain = (info.system.framerate/2) * linspace(0, 1, Nf);
+%%
+% *Step 4.* We strip out the 'DC' component, which is simply the mean light
+% levels from before:
+lmkeep = bsxfun(@minus, lmkeep, mean(lmkeep, 2));
+hpkeep = bsxfun(@minus, hpkeep, mean(hpkeep, 2));
+%%
+% *Step 5.* Now we can take the Fourier transform (normalized by the full
+% frequency domain size) and keep the positive frequency domain:
+lmmag = fft(lmkeep) / Ndft;
+lmmag = lmmag(:, 1:Nf);
+
+hpmag = fft(hpkeep) / Ndft;
+hpmag = hpmag(:, 1:Nf);
+%%
+% *Step 6.* |lmmag| and |hpmag| are magnitude ' what we really need is
+% power, the absolute value of magnitude squared:
+lmpower = abs(lmmag) .* 2;
+hppower = abs(hpmag) .* 2;
+%%
+% We're almost done!
+%
+% *Step 7.* Last, we plot the power on a |semilogx| graph with some
+% appropriate labels:
+figure
+semilogx(ftdomain, lmpower)
+ylabel('Power [W]')
+xlabel('Frequency [Hz]')
+title('Logmean data')
+
+figure
+semilogx(ftdomain, hppower)
+ylabel('Power [W]')
+xlabel('Frequency [Hz]')
+title('HPF data')
+%%
+%
+% <<hpf_ps.png>>
+%
+% And of course, NeuroDOT has several functions that can automate these
+% more complex tasks and standardize formatting.
+%
+% *Step 1.* Here is the HPF function, with the last two inputs being the
+% cutoff frequency and frame rate:
+hpdata = highpass(lmdata, 0.02, info.system.framerate);
+%%
+% *Step 2.* And here are corresponding functions to plot the mean and
+% all-measurements power spectra:
+PlotMeanPS(hpdata, info, info.system.framerate, params)
+PlotAllMeasPS(hpdata, info, info.system.framerate, params)
+%%
+% Clearing excess variables:
+clear a b ftdomain hpkeep hpmag hppower keep lmkeep lmmag lmpower n Ndft Nf omegaNy padded
+%%
+%
+% <<hpf_plotps.png>>
+%
+% Here are the logmean (left) and HPF (right) power spectra. We see quite
+% starkly that % the lower frequency components' power is reduced below 0.02 Hz.
+%
+% <<hpf_logmean.png>>
+%
+%% Low Pass Filter 1
+% The next step is a low pass filter (LPF1) at 1 Hz. This is because we
+% typically downsample to a 1 Hz sampling frequency after preprocessing
+% (not featured in this pipeline), so any signals above 1 Hz are
+% irrelevant.
+%
+% *Step 1.* In case you had trouble, here is the syntax for the filter:
+lp1data = lowpass(hpdata, 1, info.system.framerate);
+%%
+% *Step 2.* And for the visualization:
+PlotMeanPS(lp1data, info, info.system.framerate, params)
+%%
+%
+% <<lpf.png>>
+%
+% Here are HPF (left) and LPF1 (right) side-by-side for comparison. You can
+% adjust axes limits, or alternatively use the windows' zoom tool, to
+% better see the filtered domains. There is a small peak near 2 Hz that we
+% can see disappear after LPF1.
+%
+% <<lpf_hpf.png>>
+%
+%% Superficial Signal Regression
+% Next is the Superficial Signal Regression step, or SSR. This removes the
+% 'systemic signal', or hemodynamics, which originates from the blood
+% vessels of the scalp. NN1 are the shallowest measurements, so they are
+% the most direct measure of hemodynamics.
+%
+% *Step 1.* First, we get the hemodynamics signal by averaging NN1 for each
+% wavelength:
+for wl = 1:2
+    keep = lp1data(info.pairs.NN == 1 & info.pairs.WL == wl & info.MEAS.GI == 1, :);
+    hem(wl, :) = mean(keep);
+end
+%%
+% *Step 2.* Then, we use the pseudoinverse of |hem| to regress it out of
+% |lp1data|:
+for wl = 1:2
+    keep = info.pairs.WL == wl;
+    temp = lp1data(keep, :)';
+    g = hem(wl, :)';
+    gp = pinv(g);
+    beta = gp * temp;
+    SSRdata(keep, :) = (temp - g * beta)';
+end
+%%
+% Let's see what's going on here by visualizing both NN1 and NN2 from
+% before and after.
+%
+% *Step 1.* Starting with gray plots, we can edit |params| to show
+% both NN's:
+params.Nnns = 1:2;
+PlotGray(lp1data, info, params)
+PlotGray(SSRdata, info, params)
+%%
+%
+% <<SSR_lpf.png>>
+%
+% Any range of NN's (|3:5|, |2:3|) can be specified in this way. In the
+% plots (LPF1 left, SSR right) we can see NN1 has been filtered out, while
+% NN2 is largely intact.
+%
+% *Step 2.* Let's also look at the power spectra:
+PlotMeanPS(lp1data, info, info.system.framerate, params)
+params.ylimits = [0 5e-8];
+PlotMeanPS(SSRdata, info, info.system.framerate, params)
+%%
+% The new ylimit is introduced to make the data more visible. Let's make
+% sure to clear it afterward so it doesn't affect our other visualizations!
+params.ylimits = [];
+params.Nnns = 2;
+%%
+%
+% <<SSR_lpf_ps.png>>
+%
+% Here it is much clearer that the NN1 signal (top)
+% has dropped substantially (LPF1 left, SSR right) while the NN2 signal
+% remains (bottom).
+%
+% Again, the SSR operation is done more succinctly in two NeuroDOT
+% functions, |gethem| and |regcorr|:
+hem = gethem(lp1data, info);
+[SSRdata, R] = regcorr(lp1data, info, hem);
+%%
+% |R| is a residuals matrix. Run these commands, and compare their results
+% using the tools you have learned thus far. (Hint: It may be helpful to
+% change variable names to |SSRdata1| and |SSRdata2|, and use |nnz(SSRdata2
+% - SSRdata1)| to see if there have been any errors in calculation).
+%
+% Finally, let's clear some excess variables again:
+clear beta g gp keep wl temp
+%
+%% Low Pass Filter 2
+% The penultimate step is a second lowpass filter, this time at a lower
+% cutoff frequency of 0.5 Hz. This removes the cardiac pulse from the
+% signal, and uses the same NeuroDOT function, |lowpass|, as before.
+%
+% *Step 1.* Apply a LPF at 0.5 Hz:
+lp2data = lowpass(SSRdata, 0.5, info.system.framerate);
+%%
+% *Step 2.* Plot the mean power spectrum (adjusting the y limits down
+% again):
+params.ylimits = [0 2.5e-7]; params.Nnns = 1:2;
+PlotMeanPS(lp2data, info, info.system.framerate, params)
+params.ylimits = []; params.Nnns = 2;
+%%
+%
+% <<lpf2.png>>
+%
+% Here is a side-by-side of the SSR (left) and LPF2 (right) mean power
+% spectra. Again we see small peaks that have been filtered out.
+%
+% <<lpf2_SSR.png>>
+%
+%% 1 Hz Resampling
+% The last preprocessing step is to resample the data from ~10 Hz to 1 Hz.
+% We do this because the range of hemodynamic signals is far below 1 Hz,
+% and thus functional neuroimaging is typically done on a 1 Hz time scale.
+% This also has the benefit of reducing data storage requirements,
+% eliminating noise, and providing a benchmark frequency to standardize all
+% stimulus and data acquisitions and analysis to.
+%
+% *Step 1.* We first set the resampling frequency and our current
+% framerate:
+signal = lp2data;
+[Nm, Nt] = size(signal);
+omega_resample = 1;
+framerate = 10.0005;
+%%
+% *Step 2.* Next, we establish a resampling ratio to within a desired
+% tolerance using the |rat| function:
+tol = 1e-5;
+[N, D] = rat(omega_resample / framerate, tol);
+%%
+% *Step 3.* Now we need to remove the linear component of the data. We
+% could do this with |detrend_tts|, but unfortunately we have to reverse
+% this operation later, and thus must save this component:
+alpha1 = repmat((signal(:, 1) - signal(:, end)) / (Nt-1), 1, Nt);
+beta = repmat(-signal(:, 1), 1, Nt);
+tgv = repmat([0:Nt-1]', 1, Nm)';
+corrsig = signal + alpha1 .* tgv + beta;
+%%
+% *Step 4.* Resample the corrected signal:
+rawresamp = resample(corrsig', N, D)';
+%%
+% *Step 5.* Here is where we add the linear component back in, and output
+% it as rdata:
+[Nm, Nt] = size(rawresamp);
+beta = repmat(-signal(:, 1), 1, Nt);
+tgv = repmat([0:Nt-1]', 1, Nm)';
+alpha2 = alpha1(:, 1:Nt) * (D / N);
+rdata = (rawresamp - alpha2 .* tgv - beta);
+%%
+% *Step 6.* Last, let's visualize it and compare to the data before
+% resampling:
+params.ylimits = [-0.005 0.005];
+PlotMeanTTs(lp2data, info, params)
+PlotMeanTTs(rdata, info, params)
+%%
+%
+% <<resampled.png>>
+%
+% We can see on the Time axis that the data has been resampled from ~2000
+% time points to ~200 - exactly the ~10x factor that we were looking for!
+%
+% Let's be sure to clear our y limits:
+params.ylimits = [];
+%%
+% And our excess variables:
+clear alpha1 alpha2 beta corrsig D framerate N omega_resample rawresamp signal tgv tol
+%%
+% The NeuroDOT 2 function for this is:
+[rdata, info] = resample_tts(lp2data, info, info.system.framerate, 1, 1e-5);
+%% Block Averaging
+% We finally have preprocessed data, with the major interfering signals
+% filtered out, ready for analysis. What's next? The last step is to
+% average the stimulus blocks together. Averaging is a common way to reduce
+% the effect of any remaining systemic noise.
+%
+% *Step 1.* First, let's calculate the number of blocks:
+Nbl = length(info.paradigm.Pulse_2);
+%%
+% *Step 2.* Next, let's calculate the block length by subtracting the start
+% times of the first two blocks. The time points for all blocks are found
+% in |info.paradigm.synchpts|, and |info.paradigm.Pulse_2| lists which of those points
+% correspond to stimulus 'on' blocks:
+dt = round(mean(diff(info.paradigm.synchpts(info.paradigm.Pulse_2))));
+%%
+% *Step 3.* Now, we cut the data into blocks:
+for m = 1:Nbl
+    blstart = info. paradigm.synchpts(info. paradigm.Pulse_2(m));
+    blocks(:, :, m) = rdata(:, blstart:blstart + dt - 1);
+end
+%%
+% *Step 4.* Last, we average the blocks together:
+badata = mean(blocks, 3);
+%%
+% To visualize, let's look at a gray plot:
+params.Nwls = 1:2; params.Nnns = 2;
+PlotGray(badata, info, params)
+%%
+%
+% <<ba_grayplot.png>>
+%
+% We see a clear shift in signal intensity at the 15 s mark. We'd also like
+% to see time traces, but due to channel variance, we won't see how light
+% levels change over time in response to the stimulus.
+%
+% *Step 1.* So let's subtract the first four seconds' mean from each
+% channel (we call this a deltamean):
+dmdata = bsxfun(@minus, badata, mean(badata(:, 1:4), 2));
+%%
+% *Step 2.* Then let's only keep NN2, WL1, through the good indices:
+keep = info.pairs.WL == 1  &  info.pairs.NN == 2 & info.MEAS.GI == 1;
+keep2 = info.pairs.WL == 2  &  info.pairs.NN == 2 & info.MEAS.GI == 1;
+%%
+% *Step 3.* And now let's plot these traces:
+figure
+plot(dmdata(keep, :)')
+xlim([0, Nt+1]); xlabel('Time (s)')
+ylabel('Light Levels (uW)'); title('NN2, WL1')
+
+figureplot(dmdata(keep2, :)')
+xlim([0, Nt+1]); xlabel('Time (s)')
+ylabel('Light Levels (uW)'); title('NN2, WL2')
+%%
+%
+% <<deltamean.png>>
+%
+% Alternatively, we can use built-in NeuroDOT functions to execute and
+% visualize block averaging:
+badata = BlockAverage(rdata, info);
+PlotDeltaMean(badata, info, params)
+%%
+%
+% <<plotdeltamean.png>>
+%
+% We can see that most channels follow a periodic behavior.
+%
+%% Conclusion
+% Congratulations! You have finished the NeuroDOT 2 Base Edition
+% Preprocessing Pipeline Tutorial.
+%
+% For further questions or more information, please consult the NeuroDOT 2
+% Base User Manual and the various Appendices.
+%
+% NeuroDOT 2 Support Team:
+%
+% * Adam Eggebrecht (aeggebre@wustl.edu)
+% * David Muccigrosso (muccigrosso.david@wustl.edu)
+%
+%% Appendix: Preprocessing
+% Some notes on the block averaging and LPF1 stages:
+% * Because LPF1 filters out the Nyquist frequency of the downsampling
+% stage (see Neuro Photonics 2014 paper), which is not featured here, it
+% really could be featured at any point in this pipeline after the logmean.
+% The point of LPF1 is to remove all signal components at frequencies
+% higher than the one it will be eventually downsampled to, so that they do
+% not affect any of the other stages of the pipeline, and thus it is placed
+% after the logmean and HPF.
+% * Similarly, block averaging can be done at any point after LPF1. Since
+% the raw data after the logmean is technically in a state that can be
+% feasibly reconstructed, pretty much every step afterwards is just
+% clearing up interfering signals. If a different sort of optical data does
+% not have such signals present, there is little need for further
+% preprocessing.
+
+##### SOURCE END #####
+--></body></html>

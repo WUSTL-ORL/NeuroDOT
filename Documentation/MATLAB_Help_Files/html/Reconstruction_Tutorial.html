@@ -1,0 +1,908 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>NeuroDOT 2.2.0 Tutorial - Reconstruction Pipeline</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-23"><meta name="DC.source" content="Reconstruction_Tutorial.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>NeuroDOT 2.2.0 Tutorial - Reconstruction Pipeline</h1><!--introduction--><p><img vspace="5" hspace="5" src="logo_fixed.png" alt=""> </p><p>Welcome to NeuroDOT 2.2.0 Base Edition!</p><p><img vspace="5" hspace="5" src="all_pipelines.png" alt=""> </p><p><img vspace="5" hspace="5" src="recon_diagram.png" alt=""> </p><p>In the &#8220;hearing words&#8221; (HW) paradigm, which we will use in this tutorial, a patient quietly listens to auditory stimulus presented through speakers.</p><p><img vspace="5" hspace="5" src="hearing_words_diagram.png" alt=""> </p><p>The stimulus is divided into six 30-second blocks (cyan lines on bottom-right), with one spoken word per s for 15 s, followed by 15 s of silence (0 words per s).</p><p><img vspace="5" hspace="5" src="block_diagram.png" alt=""> </p><p>These blocks are averaged together and reconstructed into a 3D time series map (a movie) of brain function.</p><p><img vspace="5" hspace="5" src="cap_nns.png" alt=""> </p><p>After block averaging, we must reconstruct our measurement pairs into an image volume. This is done by applying a Tikhonov inversion to a linear Rytov approximation. What this ultimately means is that in the equation below, our measurements correspond to y, our sensitivity matrix is A, and the desired image volume is x.</p><p><img vspace="5" hspace="5" src="eqn.png" alt=""> </p><p>After the reconstruction, we use the differing extinction coefficients of oxy- and deoxy-hemoglobin (HbO and HbR, respectively) at our two wavelengths (750 and 850 nm) to isolate each concentration from the other and calculate functional neural activity maps.</p><p><img vspace="5" hspace="5" src="absorption.png" alt=""> </p><p>Below is a sensitivity profile for a single source-detector pair (a), and for the entire HD-DOT large cap system (b), which was used to gather the measurements we are using for our examples in this tutorial.</p><p><img vspace="5" hspace="5" src="sensitivity_profile.png" alt=""> </p><p>The summed sensitivity profile in (b) also essentially gives us our field of view (FOV) for the system. Note that this FOV overlaps with tissue superficial to the brain of the underlain atlas, such as scalp and skull.</p><p>This tutorial focuses on our research scenario's second stage after preprocessing: reconstruction. We will learn how to reconstruct functional image volumes from the preprocessed data.</p><p>If you are unfamiliar with NeuroDOT and its data structures at any point, please refer to the Overview Tutorial and User Manual. Also, the <a href="List_of_Files_and_Functions.html">List of Files and Functions</a> provides easy reference to all other help documentation.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Sample Data</a></li><li><a href="#4">Sensitivity A Matrix</a></li><li><a href="#6">Invert A Matrix</a></li><li><a href="#13">Smooth Inverted A Matrix</a></li><li><a href="#18">Reconstruct Image Volume</a></li><li><a href="#48">Spectroscopy</a></li><li><a href="#83">Conclusion</a></li></ul></div><h2>Sample Data<a name="1"></a></h2><p>First, if you haven&#8217;t already, please unzip the NeuroDOT 2.2.0 Base Edition file in your chosen directory and install it on the MATLAB search path: addpath(genpath('[your chosen directory]/NeuroDOT_2.2.0_Base/'))</p><p>Next, we need to preprocess our sample data with the following pre-prepared script:</p><pre class="codeinput">NeuroDOT_Base_Preprocessing_Pipeline_Script
+</pre><p>Now, let's take a look at the pipeline diagram:</p><p><img vspace="5" hspace="5" src="recon_diagram.png" alt=""> </p><h2>Sensitivity A Matrix<a name="4"></a></h2><p><b>Step 1.</b> The first step is to load our pre-calculated sensitivity matrix:</p><pre class="codeinput">load(<span class="string">'A_Adult_96x92.mat'</span>)
+</pre><p>This file is quite large, so depending on your workstation, you may have to wait several minutes for it to load. <b>Step 2.</b> We'll also need to load the spectroscopy matrix, <tt>E</tt>:</p><pre class="codeinput">load(<span class="string">'E.mat'</span>)
+</pre><h2>Invert A Matrix<a name="6"></a></h2><p>The first reconstruction step is to invert the <tt>A</tt> matrix so that it can be used in a linear approximation. ND2 uses a Tikhonov inversion algorithm for this.</p><p>We'll also have to do the processing here along two separate tracks - one for each wavelength. In our examples, we'll do the first wavelength step-by-step, and then calculate the second using our native ND2 functions. We're also only using NN's 1 through 3 and filtering for good measurements.</p><p><b>Step 1.</b> First, let's create our <tt>keep</tt> array:</p><pre class="codeinput">keep1 = (info.pairs.WL == 1) &amp; (info.pairs.NN &lt;= 3) &amp; info.MEAS.GI;
+</pre><p><b>Step 2.</b> Next, let's set some parameters:</p><pre class="codeinput">Akeep = A(keep1, :);
+[Nm, Nvox] = size(Akeep);
+lambda1 = 0.01;
+lambda2 = 0.1;
+iA = zeros(Nvox, Nm, <span class="string">'single'</span>);
+</pre><p><b>Step 3.</b> And construct a regularization matrix:</p><pre class="codeinput">AtA = sum(Akeep .^ 2, 1);
+L = sqrt(AtA + lambda2 * max(AtA));
+</pre><p><b>Step 4.</b> Now, let's spatially normalize <tt>A</tt> by <tt>L</tt>:</p><pre class="codeinput">Akeep = bsxfun(@rdivide, Akeep, L);
+</pre><p><b>Step 5.</b> Now, we take the pseudo-inverse of <tt>A</tt> (warning: this step may take 15-20 minutes or longer depending on your machine!):</p><pre class="codeinput">Att = zeros(Nm, <span class="string">'single'</span>);
+Att = single(Akeep * Akeep');
+ss = norm(Att);
+penalty = sqrt(ss) .* lambda1;
+iA = Akeep' / (Att + penalty .^ 2 .* eye(Nm, <span class="string">'single'</span>));
+</pre><p><b>Step 6.</b> And last, we undo the spatial regularization, and clean up some variables:</p><pre class="codeinput">iA = bsxfun(@rdivide, iA, L');
+clear <span class="string">Att</span> <span class="string">AtA</span> <span class="string">ss</span> <span class="string">penalty</span> <span class="string">L</span> <span class="string">Akeep</span> <span class="string">lambda1</span> <span class="string">lambda2</span>
+</pre><p>Now to do WL2. The NeuroDOT 2 code for this is:</p><pre class="codeinput">keep2 = (info.pairs.WL == 2) &amp; (info.pairs.NN &lt;= 3) &amp; info.MEAS.GI;
+iA2 = Tikhonov_invert_Amat(A(keep2, :), 0.01, 0.1);
+</pre><h2>Smooth Inverted A Matrix<a name="13"></a></h2><p>The next step is to smooth the sensitivity matrix with a Gaussian kernel.</p><p><b>Step 1.</b> First, let's set some parameters:</p><pre class="codeinput">siA = zeros(Nvox, Nm);
+kernel_size = [1, 1, 1];
+gbox = 5; gsigma = 1.2;
+</pre><p><b>Step 2.</b> We'll need to normalize the kernel to our reconstruction space:</p><pre class="codeinput">gbox = round(gbox / dim.sV); gsigma = gsigma / dim.sV;
+</pre><p><b>Step 3.</b> Now, we'll perform the smoothing operation in parallel, so it runs faster. Note that with <tt>dim.Good_Vox</tt>, we're only smoothing a subset (162,143) of the total voxels in the reconstruction space (86 x 89 x 60 = 459,240) - roughly 1/3 of them:</p><pre class="codeinput">parpool
+<span class="keyword">parfor</span> k = 1:Nm
+    iAvox = zeros(dim.nVx, dim.nVy, dim.nVz);
+    iAvox(dim.Good_Vox) = iA(:, k);
+    iAvox = smooth3(iAvox, <span class="string">'gaussian'</span>, gbox * kernel_size, gsigma);
+    siA(:, k) = iAvox(dim.Good_Vox);
+<span class="keyword">end</span>
+</pre><p><b>Step 4.</b> Last, we need to shut down the parallel pool and clear some variables:</p><pre class="codeinput">delete(gcp(<span class="string">'nocreate'</span>))
+clear <span class="string">gbox</span> <span class="string">gsigma</span> <span class="string">kernel_size</span> <span class="string">ans</span>
+</pre><p>We're almost ready to reconstruct the image now! The NeuroDOT 2 function for this is:</p><pre class="codeinput">siA2 = smooth_Amat(iA2, dim, 5, 1.2);
+</pre><h2>Reconstruct Image Volume<a name="18"></a></h2><p>It's finally time to reconstruct the image from our raw data!</p><p><b>Step 1.</b> Let's start by declaring some variables and pre-allocating:</p><pre class="codeinput">prekeep = preprocessed(keep1, :);
+[~, Nt] = size(prekeep);
+units_scaling = 100;
+cortex_mu_a  = zeros(Nvox, Nt, <span class="string">'single'</span>);
+</pre><p><b>Step 2.</b> And now we reconstruct by solving the inverse problem:</p><pre class="codeinput">cortex_mu_a  = siA * prekeep;
+</pre><p><b>Step 3.</b> We'll also need to correct our units, convert to the <tt>single</tt> data format, and clear our lone extra variable:</p><pre class="codeinput">cortex_mu_a = single(cortex_mu_a ./ units_scaling);
+clear <span class="string">units_scaling</span>
+</pre><p>Yes, it was that easy! The hard work was already done in the inversion and smoothing stages, so all that was left was the single line of the inverse problem.</p><p>The NeuroDOT 2 function for WL2 is:</p><pre class="codeinput">cortex_mu_a2 = reconstruct_img(preprocessed(keep2, :), siA2);
+</pre><p>Now we have a VOX x TIME array for each WL that can be reshaped and visualized in 3D.</p><p>Let's start with that reshaping now.</p><p><b>Step 1.</b> Preallocate our new image volume:</p><pre class="codeinput">cortex_mu_a_vol = zeros(dim.nVx * dim.nVy * dim.nVz, Nt);
+</pre><p><b>Step 2.</b> Populate our array into the Good Voxels:</p><pre class="codeinput">cortex_mu_a_vol(dim.Good_Vox, :) = cortex_mu_a;
+</pre><p><b>Step 3.</b> Reshape into the voxel space:</p><pre class="codeinput">cortex_mu_a_vol = reshape(cortex_mu_a_vol, dim.nVx, dim.nVy, dim.nVz, Nt);
+</pre><p>We can do this all for WL2 with a NeuroDOT function:</p><pre class="codeinput">cortex_mu_a_vol2 = Good_Vox2vol(cortex_mu_a2, dim);
+</pre><p>Now it's time to visualize our volume. We'll do this as three slices from each of the cardinal axes - sagittal, coronal, and transverse.</p><p><b>Step 1.</b> We'll select time point T=18, as this is roughly where we should expect to see the peak activation of our block-averaged data.</p><pre class="codeinput">t18 = cortex_mu_a_vol(:, :, :, 18);
+</pre><p><b>Step 2.</b> We'll center our three slices at the middle of each dimension of the volume:</p><pre class="codeinput">slice = [floor(dim.nVx/2), floor(dim.nVy/2), floor(dim.nVz/2)];
+</pre><p><b>Step 3(a).</b> We'll need to apply a colormap to this data, which means setting some parameters:</p><pre class="codeinput">fr = t18(:);
+DR = 1000;
+Cmap = jet(DR);
+scale = 0.9 * max(fr);
+thP = 0.25 * scale;
+thN = -thP;
+</pre><p><b>Step 3(b).</b> Now we can threshold:</p><pre class="codeinput">bg = find(fr == 0);
+bg = union(bg, intersect(find(fr &lt;= thP), find(fr &gt;= thN)));
+</pre><p><b>Step 3(c).</b> And scale the values to the dynamic range:</p><pre class="codeinput">fr = fr/scale * DR/2;
+fr = fr + DR/2;
+</pre><p><b>Step 3(d).</b> Correcting for positive and negative clipping:</p><pre class="codeinput">P = find(fr ~= DR/2);
+fr(fr &lt;= 0) = 1;
+fr(fr &gt;= DR) = DR;
+</pre><p><b>Step 3(e).</b> Coloring in positive values to RGB channels from the colormap:</p><pre class="codeinput">mapped18(P, 1) = Cmap(ceil(fr(P)), 1);
+mapped18(P, 2) = Cmap(ceil(fr(P)), 2);
+mapped18(P, 3) = Cmap(ceil(fr(P)), 3);
+</pre><p><b>Step 3(f).</b> We'll also need add a grayscale background.</p><pre class="codeinput">mapped18(bg, :) = repmat([0.5, 0.5, 0.5], length(bg), 1);
+</pre><p><b>Step 3.(g)</b> Reshape the mapped volume:</p><pre class="codeinput">mapped18 = reshape(mapped18, dim.nVx, dim.nVy, dim.nVz, 3);
+</pre><p><b>Step 4.</b> Finally, we can select the three slices:</p><pre class="codeinput">sagittal = squeeze(mapped18(slice(1), :, :, :));
+coronal = squeeze(mapped18(:, slice(2), :, :));
+transverse = squeeze(mapped18(:, :, slice(3), :));
+</pre><p><b>Step 5.</b> And let's clean up some variables:</p><pre class="codeinput">clear <span class="string">DR</span> <span class="string">bg</span> <span class="string">Cmap</span> <span class="string">fr</span> <span class="string">mapped18</span> <span class="string">P</span> <span class="string">scale</span> <span class="string">thN</span> <span class="string">thP</span>
+</pre><p><b>Step 6.</b> Now, let's create a figure with three subplots so we can see each of these views. We'll also rotate them before displaying so we can see them in their proper orientation, reset the axis size, and give them some labels, too:</p><pre class="codeinput">figure(<span class="string">'Position'</span>, [20, 200, 1240, 420])
+subplot(1, 3, 1); image(imrotate(sagittal, 90)); axis <span class="string">image</span>; title(<span class="string">'Sagittal'</span>)
+subplot(1, 3, 2); image(imrotate(coronal, 90)); axis <span class="string">image</span>; title(<span class="string">'Coronal'</span>)
+subplot(1, 3, 3); image(imrotate(transverse, 90)); axis <span class="string">image</span>; title(<span class="string">'Transverse'</span>)
+</pre><p>Great! Now we've got a plot of the three views.</p><p><img vspace="5" hspace="5" src="slices_diagram.png " alt=""> </p><p>NeuroDOT has a function that does this too, and adds a number of useful features like interactive navigation:</p><pre class="codeinput">PlotSlices(t18)
+</pre><p>With the interactive navigation, try clicking around in <tt>PlotSlices</tt> to explore the volume.</p><p><img vspace="5" hspace="5" src="plotslices_18_WL1.png" alt=""> </p><p>Using the <tt>params.slices</tt> input turns off the navigation.</p><p>See the User Manual for a more detailed description of the parameters used by <tt>PlotSlices</tt>.</p><p>The general form of <tt>PlotSlices</tt> is:</p><p><tt>PlotSlices(underlay, infoVol, params, overlay)</tt></p><p>To look at an activity volume alone, use <tt>underlay</tt>. To view two volumes overlain, the activity volume goes in <tt>overlay</tt>, and the background (such as an atlas) goes in <tt>underlay</tt>.</p><p>Let's try this by loading an atlas and using it as a background. If you are unfamiliar with this concept, please refer to the Atlases appendix.</p><p><b>Step 1.</b> We will load one of several pre-prepared atlases:</p><pre class="codeinput">load(<span class="string">'Atlas_MNI152nl_T1_on_111.mat'</span>)
+</pre><p><b>Step 2.</b> And then visualize it:</p><pre class="codeinput">PlotSlices(atlas, [], [], t18)
+</pre><p>Since this is a Hearing Words paradigm, let's try to find a region of activation in the right superior temporal gyrus (STG for short). (right bottom if you need help)</p><p><img vspace="5" hspace="5" src="plotslices_18_WL1_atlas.png" alt=""> </p><p>This is easier with an anatomical underlay to aid navigation now.</p><p><img vspace="5" hspace="5" src="plotslices_18_WL1_atlas_STG.png" alt=""> </p><p>It was difficult to find any activations in the STG, mainly because the WL1 signal was weak. Let's also take a look at the image we reconstructed from WL2, with and without the atlas:</p><pre class="codeinput">PlotSlices(cortex_mu_a_vol2(:, :, :, 18))
+PlotSlices(atlas, [], [], cortex_mu_a_vol2(:, :, :, 18))
+</pre><p><img vspace="5" hspace="5" src="plotslices_18_WL2.png" alt=""> </p><p><img vspace="5" hspace="5" src="plotslices_18_WL2_atlas.png" alt=""> </p><p>Below, we've navigated to an activation slightly above the STG. It should be noted that, per the cap sensitivity profile shown in Slide 6, some activations may appear slightly superficial to the tissues they occur in.</p><p><img vspace="5" hspace="5" src="plotslices_18_WL2_atlas_STG.png" alt=""> </p><p>It's also important to note that what we're looking at here in <tt>cortex_mu_a2</tt> are absorption values, not actual activations. However, activations are calculated quite directly from these absorption maps, so we should expect significant correlation.</p><p>From now on, we'll navigate directly to the coordinates of the STG that we've identified. <tt>params</tt> provides us an easy way of doing this:</p><pre class="codeinput">params.slices = [10, 60, 31];
+</pre><p>Let's clean up another few variables before moving on:</p><pre class="codeinput">clear <span class="string">coronal</span> <span class="string">sagittal</span> <span class="string">transverse</span>
+</pre><p>Another common technique in neuroscience is to average several seconds of adjacent time points together to improve signal-to-noise ratio. In order to identify an appropriate averaging window, let's look at the delta-mean plots of the block-averaged, preprocessed data.</p><p><b>Step 1.</b> Plot the delta mean of WL2, NN23:</p><pre class="codeinput">params.Nnns = 2:3; params.Nwls = 2;
+PlotDeltaMean(preprocessed, info, params)
+</pre><p><img vspace="5" hspace="5" src="wl2_deltamean.png" alt=""> </p><p>We want the time domain where the signal response is strongest. Accordingly, the best window appears to be somewhere between T=13 and T=21.</p><p><b>Step 2.</b> Average and display T=13:21.</p><pre class="codeinput">t2_13_21 = mean(cortex_mu_a_vol2(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t2_13_21)
+</pre><p>As we can see in T=13:21, the averaging has helped (1) filter out many of the spurious activations distal to the STG, and (2) increased the size and strength of the activations proximal to the STG.</p><p>T=18</p><p><img vspace="5" hspace="5" src="plotslices_18_WL2_atlas_STG.png" alt=""> </p><p>T=13:20</p><p><img vspace="5" hspace="5" src="plotslices_13_21_WL2_atlas_STG.png" alt=""> </p><p>Let's try this averaging with WL1!</p><p>Here's the code, if you were having trouble with it:</p><pre class="codeinput">t_13_21 = mean(cortex_mu_a_vol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t_13_21)
+</pre><p><img vspace="5" hspace="5" src="plotslices_18_WL1_atlas_STG.png" alt=""> </p><p><img vspace="5" hspace="5" src="plotslices_13_21_WL1_atlas_STG.png" alt=""> </p><p>Much improved! We can actually see some activations. The left side is also much stronger now.</p><h2>Spectroscopy<a name="48"></a></h2><p>The last step here is to perform spectroscopy. This allows us to get the HbO and HbR concentrations from our light levels in <tt>cortex_mu_a</tt> and <tt>cortex_mu_a2</tt>.</p><p><b>Step 1.</b> The first step is to reunify <tt>cortex_mu_a</tt> and <tt>cortex_mu_a2</tt> by concatenating them along the third dimension:</p><pre class="codeinput">to_spec = cat(3, cortex_mu_a, cortex_mu_a2);
+</pre><p><b>Step 2.</b> As usual, we define some parameters:</p><pre class="codeinput">Nc = 2;
+[E1, E2] = size(E);
+umol_scale = 1000;
+</pre><p><b>Step 3.</b> The extinction coefficient matrix, <tt>E</tt>, needs to be inverted:</p><pre class="codeinput">iE = inv(E);
+</pre><p><b>Step 4.</b> Now, we multiply the inverted coefficients by their respective wavelength images:</p><pre class="codeinput">specimg = zeros(Nvox, Nt, Nc, <span class="string">'single'</span>);
+<span class="keyword">for</span> k = 1:E2
+    temp = zeros(Nvox, Nt);
+    <span class="keyword">for</span> l = 1:E1
+        temp = temp + squeeze(iE(k, l)) .* squeeze(to_spec(:, :, l));
+    <span class="keyword">end</span>
+    specimg (:, :, k) = temp;
+<span class="keyword">end</span>
+</pre><p><b>Step 5.</b> Finally, we do some more scaling, and clean up extra variables:</p><pre class="codeinput">specimg = specimg .* umol_scale;
+clear <span class="string">umol_scale</span> <span class="string">E1</span> <span class="string">E2</span> <span class="string">k</span> <span class="string">l</span> <span class="string">temp</span>
+</pre><p>Now we have our HbO and HbR images (1 and 2 in the third dimension of <tt>specimg</tt>, respectively)! The NeuroDOT 2 code for this is:</p><pre class="codeinput">specimg = spectroscopy_img(to_spec, E);
+</pre><p>It's important to note that <tt>to_spec</tt> needs to have both wavelengths concatenated along its third dimension.</p><p>Before we image anything, let's separate our results into oxyhemoglobin <tt>HbO</tt>, deoxyhemoglobin <tt>HbR</tt>, and total hemoglobin <tt>HbT</tt>:</p><pre class="codeinput">cortex_HbO = specimg(:, :, 1);
+cortex_HbR = specimg(:, :, 2);
+cortex_HbT = cortex_HbO + cortex_HbR;
+</pre><p>Let's also convert to <tt>dim</tt> space:</p><pre class="codeinput">cortex_HbOvol = Good_Vox2vol(cortex_HbO, dim);
+cortex_HbRvol = Good_Vox2vol(cortex_HbR, dim);
+cortex_HbTvol = Good_Vox2vol(cortex_HbT, dim);
+</pre><p>Let's visualize these now, first for <tt>HbO</tt>:</p><pre class="codeinput">HbO18 = cortex_HbOvol(:, :, :, 18);
+PlotSlices(HbO18, [], params)
+PlotSlices(atlas, [], params, HbO18)
+</pre><p><img vspace="5" hspace="5" src="plotslices_HbO_18_STG.png" alt=""> </p><p><img vspace="5" hspace="5" src="plotslices_HbO_18_atlas_STG.png" alt=""> </p><p>And now for <tt>HbR</tt>:</p><pre class="codeinput">HbR18 = cortex_HbRvol(:, :, :, 18);
+PlotSlices(HbR18, [], params)
+PlotSlices(atlas, [], params, HbR18)
+</pre><p><img vspace="5" hspace="5" src="plotslices_HbR_18_STG.png" alt=""> </p><p><img vspace="5" hspace="5" src="plotslices_HbR_18_atlas_STG.png" alt=""> </p><p>Note that, generally speaking, the peaks of <tt>HbO</tt> correspond to the troughs of <tt>HbR</tt>, and vice versa. These opposing responses are what we should (again, generally) expect.</p><p>Lastly, let's do total hemoglobin, or <tt>HbT</tt>:</p><pre class="codeinput">HbT18 = cortex_HbTvol(:, :, :, 18);
+PlotSlices(HbT18, [], params)
+PlotSlices(atlas, [], params, HbT18)
+</pre><p><img vspace="5" hspace="5" src="plotslices_HbT_18_STG.png" alt=""> </p><p><img vspace="5" hspace="5" src="plotslices_HbT_18_atlas_STG.png" alt=""> </p><p>As the sum of all hemoglobin, <tt>HbT</tt> actually increases during brain stimulation (such as Hearing Words), since more blood volume is being recruited to the activated regions.</p><p>We can probably improve our SNR by doing some averaging again. Let's use the same interval as before. First, <tt>HbO</tt>:</p><pre class="codeinput">HbO13_21 = mean(cortex_HbOvol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, HbO18)
+PlotSlices(atlas, [], params, HbO13_21)
+</pre><p><img vspace="5" hspace="5" src="plotslices_HbO_18_atlas_STG.png" alt=""> </p><p><img vspace="5" hspace="5" src="plotslices_HbO_13_21_atlas_STG.png" alt=""> </p><p>And HbR:</p><pre class="codeinput">HbR13_21 = mean(cortex_HbRvol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, HbR18)
+PlotSlices(atlas, [], params, HbR13_21)
+</pre><p><img vspace="5" hspace="5" src="plotslices_HbR_18_atlas_STG.png" alt=""> </p><p>&lt;&lt;plotslices_HbR_13_21_atlas_STG.png</p><p>Finally, let's see HbT:</p><pre class="codeinput">HbT13_21 = mean(cortex_HbTvol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, HbT18)
+PlotSlices(atlas, [], params, HbT13_21)
+</pre><p>As expected, with all three, SNR has improved greatly with averaging, and we see fewer spurious activations and greater localization of the remaining activations to the STG.</p><p>We can also map these activation volumes onto a surface mesh of the brain. It's easy to miss some activations while navigating three-slice views. Surface mapping avoids this by showing activations on the surface of the brain.</p><p><b>Step 1.</b> First, we need to load a mesh:</p><pre class="codeinput">load(<span class="string">'LR_Meshes_MNI_164k.mat'</span>)
+</pre><p>This file contains two meshes of the <tt>mesh</tt> data type, <tt>MNIl</tt> and <tt>MNIr</tt>, corresponding to the left and right hemispheres of a segmented version of the non-linear MNI 152 atlas we've been using with <tt>PlotSlices</tt>.</p><p>This mesh has nearly 164,000 nodes, corresponding to the "|164k|" in the file name.</p><p><b>Step 2.</b> Set the <tt>params</tt> structure:</p><pre class="codeinput">params.Scale = 0.9 * max(HbO18(:));
+params.Th.P = 0.25 * params.Scale;
+params.Th.N = -params.Th.P;
+</pre><p><b>Step 3.</b> Initialize a display figure and time variable:</p><pre class="codeinput">figure(<span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'Position'</span>, [20, 200, 960, 420])
+Ntime = size(HbO18, 4);
+</pre><p><b>Step 4.</b> Initialize surface maps:</p><pre class="codeinput">NcoordsL = size(MNIl.nodes, 1); mapL = MNIl; mapL.data = zeros(NcoordsL, Ntime);
+NcoordsR = size(MNIr.nodes, 1); mapR = MNIr; mapR.data = zeros(NcoordsR, Ntime);
+</pre><p><b>Step 5.</b> Define the coordinate space of the volume:</p><pre class="codeinput">nVx = dim.nVx; nVy = dim.nVy; nVz = dim.nVz; dr = dim.mmppix; center = dim.center;
+X = (-center(1) + nVx * dr(1):-dr(1):-center(1) + dr(1))';
+Y = (-center(2) + nVy * dr(2):-dr(2):-center(2) + dr(2))';
+Z = (-center(3) + nVz * dr(3):-dr(3):-center(3) + dr(3))';
+</pre><p><b>Step 6.</b> Get the coordinates of the surface mesh:</p><pre class="codeinput">xL = MNIl.nodes(:, 1); yL = MNIl.nodes(:, 2); zL = MNIl.nodes(:, 3);
+xR = MNIr.nodes(:, 1); yR = MNIr.nodes(:, 2); zR = MNIr.nodes(:, 3);
+</pre><p><b>Step 7.</b> Correct for nodes outside of volume:</p><pre class="codeinput">xL(xL &lt; min(X)) = min(X); xL(xL &gt; max(X)) = max(X);
+yL(yL &lt; min(Y)) = min(Y); yL(yL &gt; max(Y)) = max(Y);
+zL(zL &lt; min(Z)) = min(Z); zL(zL &gt; max(Z)) = max(Z);
+
+xR(xR &lt; min(X)) = min(X); xR(xR &gt; max(X)) = max(X);
+yR(yR &lt; min(Y)) = min(Y); yR(yR &gt; max(Y)) = max(Y);
+zR(zR &lt; min(Z)) = min(Z); zR(zR &gt; max(Z)) = max(Z);
+</pre><p><b>Step 8.</b> Interpolate the values of <tt>HbO18</tt> at the surface mesh coordinates:</p><pre class="codeinput"><span class="keyword">for</span> k = 1:Ntime
+    mapL.data(:, k) = interp3(Y, X, Z, squeeze(HbO18(:, :, :, k)), yL, xL, zL, <span class="string">'linear'</span>, 0);
+    mapR.data(:, k) = interp3(Y, X, Z, squeeze(HbO18(:, :, :, k)), yR, xR, zR, <span class="string">'linear'</span>, 0);
+<span class="keyword">end</span>
+</pre><p><b>Step 9.</b> Normalize the nodes of the L and R meshes to their max and min, respectively:</p><pre class="codeinput">mapL.nodes(:, 1) = mapL.nodes(:, 1) - max(mapL.nodes(:, 1));
+mapR.nodes(:, 1) = mapR.nodes(:, 1) - min(mapR.nodes(:, 1));
+</pre><p><b>Step 10.</b> Rotate R mesh to be oriented opposite the L mesh:</p><pre class="codeinput">cmL = mean(mapL.nodes, 1); cmR = mean(mapR.nodes, 1);
+rot = [cos(pi) -sin(pi) 0;<span class="keyword">...</span>
+    sin(pi) cos(pi) 0;<span class="keyword">...</span>
+    0 0 1];
+
+mapR.nodes = (mapR.nodes - (repmat(cmR, size(mapR.nodes, 1), 1))) * rot + (repmat(cmR, size(mapR.nodes, 1), 1));
+mapR.nodes(:, 1) = mapR.nodes(:, 1) + (cmL(:, 1) - cmR(:, 1));
+mapR.nodes(:, 2) = mapR.nodes(:, 2) - max(mapR.nodes(:, 2)) + min(mapL.nodes(:, 2)) - 5;
+</pre><p><b>Step 11.</b> Use <tt>applycmap</tt> to colormap the data:</p><pre class="codeinput">dataL = squeeze(applycmap(mapL.data, [], params));
+dataR = squeeze(applycmap(mapR.data, [], params));
+</pre><p><b>Step 12.</b> Plot the maps using <tt>patch</tt>:</p><pre class="codeinput">patch(<span class="string">'Faces'</span>, mapL.elements(:, 1:3), <span class="string">'Vertices'</span>, mapL.nodes, <span class="string">'EdgeColor'</span>, <span class="string">'none'</span>,<span class="keyword">...</span>
+    <span class="string">'FaceColor'</span>, <span class="string">'interp'</span>, <span class="string">'FaceVertexCData'</span>, dataL, <span class="string">'FaceLighting'</span>, <span class="string">'gouraud'</span>,<span class="keyword">...</span>
+    <span class="string">'AmbientStrength'</span>, 0.25, <span class="string">'DiffuseStrength'</span>, .75, <span class="string">'SpecularStrength'</span>, .1);
+
+patch(<span class="string">'Faces'</span>, mapR.elements(:, 1:3), <span class="string">'Vertices'</span>, mapR.nodes, <span class="string">'EdgeColor'</span>, <span class="string">'none'</span>,<span class="keyword">...</span>
+<span class="string">'FaceColor'</span>, <span class="string">'interp'</span>, <span class="string">'FaceVertexCData'</span>, dataR, <span class="string">'FaceLighting'</span>, <span class="string">'gouraud'</span>,<span class="keyword">...</span>
+    <span class="string">'AmbientStrength'</span>, 0.25, <span class="string">'DiffuseStrength'</span>, .75, <span class="string">'SpecularStrength'</span>, .1);
+</pre><p><b>Step 13.</b> Let's apply some labels:</p><pre class="codeinput">set(gca, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'XColor'</span>, <span class="string">'w'</span>, <span class="string">'YColor'</span>, <span class="string">'w'</span>);
+title(<span class="string">'Volumetric Surface Mapping'</span>, <span class="string">'Color'</span>, <span class="string">'w'</span>, <span class="string">'FontSize'</span>, 12)
+</pre><p><b>Step 14.</b> Finally, we'll need to apply some lighting and set the proper perspective:</p><pre class="codeinput">axis <span class="string">off</span>; axis <span class="string">image</span>; set(gcf, <span class="string">'Units'</span>, <span class="string">'inches'</span>); view([-90, 0]);
+light(<span class="string">'Position'</span>, [-100, 200, 0], <span class="string">'Style'</span>, <span class="string">'local'</span>);
+light(<span class="string">'Position'</span>, [-50, -500, 100], <span class="string">'Style'</span>, <span class="string">'infinite'</span>);
+light(<span class="string">'Position'</span>, [-50, 0, 0], <span class="string">'Style'</span>, <span class="string">'infinite'</span>);
+set(gcf, <span class="string">'Units'</span>, <span class="string">'pixels'</span>);
+</pre><p>Here's the result:</p><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbO_no_cbar.png" alt=""> </p><p>The NeuroDOT function for this visualization is PlotVolMesh. The general syntax of this function is:</p><p><tt>PlotVolMesh(volume, meshL, meshR, dim, params)</tt></p><p>This function contains similar formatting, spatial orientation, and colormapping features to PlotSlices. Please consult the help files for further details!</p><p>Let's re-plot <tt>HbO18</tt> now.</p><pre class="codeinput">PlotVolMesh(HbO18, MNIl, MNIr, dim)
+</pre><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbO18.png" alt=""> </p><p>Let's try using it to visualize <tt>HbR18</tt> and <tt>HbT18</tt> as well!</p><p><tt>HbR18</tt>:</p><pre class="codeinput">PlotVolMesh(HbR18, MNIl, MNIr, dim)
+</pre><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbR18.png" alt=""> </p><p><tt>HbT18</tt>:</p><pre class="codeinput">PlotVolMesh(HbT18, MNIl, MNIr, dim)
+</pre><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbT18.png" alt=""> </p><p><tt>HbO13_21</tt>:</p><pre class="codeinput">PlotVolMesh(HbO13_21, MNIl, MNIr, dim)
+</pre><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbO13_21.png" alt=""> </p><p><tt>HbR13_21</tt>:</p><pre class="codeinput">PlotVolMesh(HbR13_21, MNIl, MNIr, dim)
+</pre><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbR13_21.png" alt=""> </p><p><tt>HbT13_21</tt>:</p><pre class="codeinput">PlotVolMesh(HbT13_21, MNIl, MNIr, dim)
+</pre><p><img vspace="5" hspace="5" src="plotinterpsurfmesh_HbT13_21.png" alt=""> </p><h2>Conclusion<a name="83"></a></h2><p>Congratulations! You have finished the NeuroDOT 2 Base Edition Reconstruction Pipeline Tutorial.</p><p>For further questions or more information, please consult the NeuroDOT 2 Base User Manual and the various Appendices.</p><p>NeuroDOT 2 Support Team:</p><div><ul><li>Adam Eggebrecht (<a href="mailto:aeggebre@wustl.edu">aeggebre@wustl.edu</a>)</li><li>David Muccigrosso (<a href="mailto:muccigrosso.david@wustl.edu">muccigrosso.david@wustl.edu</a>)</li></ul></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% NeuroDOT 2.2.0 Tutorial - Reconstruction Pipeline
+%
+% <<logo_fixed.png>>
+% 
+% Welcome to NeuroDOT 2.2.0 Base Edition!
+%
+% <<all_pipelines.png>>
+%
+% <<recon_diagram.png>>
+%
+% In the “hearing words” (HW) paradigm, which we will use in this tutorial,
+% a patient quietly listens to auditory stimulus presented through
+% speakers.
+%
+% <<hearing_words_diagram.png>>
+%
+% The stimulus is divided into six 30-second blocks (cyan lines on
+% bottom-right), with one spoken word per s for 15 s, followed by 15 s of
+% silence (0 words per s).
+%
+% <<block_diagram.png>>
+%
+% These blocks are averaged together and reconstructed into a 3D time
+% series map (a movie) of brain function.
+%
+% <<cap_nns.png>>
+%
+% After block averaging, we must reconstruct our measurement pairs into an
+% image volume. This is done by applying a Tikhonov inversion to a linear
+% Rytov approximation. What this ultimately means is that in the equation
+% below, our measurements correspond to y, our sensitivity matrix is A,
+% and the desired image volume is x.
+%
+% <<eqn.png>>
+%
+% After the reconstruction, we use the differing extinction coefficients of
+% oxy- and deoxy-hemoglobin (HbO and HbR, respectively) at our two
+% wavelengths (750 and 850 nm) to isolate each concentration from the other
+% and calculate functional neural activity maps.
+%
+% <<absorption.png>>
+%
+% Below is a sensitivity profile for a single source-detector pair
+% (a), and for the entire HD-DOT large cap system (b), which was used to
+% gather the measurements we are using for our examples in this tutorial.
+%
+% <<sensitivity_profile.png>>
+%
+% The summed sensitivity profile in (b) also essentially gives us our field
+% of view (FOV) for the system. Note that this FOV overlaps with tissue
+% superficial to the brain of the underlain atlas, such as scalp and skull.
+%
+% This tutorial focuses on our research scenario's second stage after
+% preprocessing: reconstruction. We will learn how to reconstruct
+% functional image volumes from the preprocessed data.
+%
+% If you are unfamiliar with NeuroDOT and its data structures at any point,
+% please refer to the Overview Tutorial and User Manual. Also, the
+% <List_of_Files_and_Functions.html List of Files and Functions> provides
+% easy reference to all other help documentation.
+%
+%% Sample Data
+% First, if you haven’t already, please unzip the NeuroDOT 2.2.0 Base
+% Edition file in your chosen directory and install it on the MATLAB search
+% path:
+% addpath(genpath('[your chosen directory]/NeuroDOT_2.2.0_Base/'))
+%%
+% Next, we need to preprocess our sample data with the following
+% pre-prepared script:
+NeuroDOT_Base_Preprocessing_Pipeline_Script
+%%
+% Now, let's take a look at the pipeline diagram:
+%
+% <<recon_diagram.png>>
+%
+%% Sensitivity A Matrix
+% *Step 1.* The first step is to load our pre-calculated sensitivity matrix:
+load('A_Adult_96x92.mat')
+%%
+% This file is quite large, so depending on your workstation, you may have to wait several minutes for it to load.
+% *Step 2.* We'll also need to load the spectroscopy matrix, |E|:
+load('E.mat')
+%% Invert A Matrix
+% The first reconstruction step is to invert the |A| matrix so that it can
+% be used in a linear approximation. ND2 uses a Tikhonov inversion
+% algorithm for this.
+%
+% We'll also have to do the processing here along two separate tracks - one
+% for each wavelength. In our examples, we'll do the first wavelength
+% step-by-step, and then calculate the second using our native ND2
+% functions. We're also only using NN's 1 through 3 and filtering for good
+% measurements.
+%
+% *Step 1.* First, let's create our |keep| array:
+keep1 = (info.pairs.WL == 1) & (info.pairs.NN <= 3) & info.MEAS.GI;
+%%
+% *Step 2.* Next, let's set some parameters:
+Akeep = A(keep1, :);
+[Nm, Nvox] = size(Akeep);
+lambda1 = 0.01;
+lambda2 = 0.1;
+iA = zeros(Nvox, Nm, 'single');
+%%
+% *Step 3.* And construct a regularization matrix:
+AtA = sum(Akeep .^ 2, 1);
+L = sqrt(AtA + lambda2 * max(AtA));
+%%
+% *Step 4.* Now, let's spatially normalize |A| by |L|:
+Akeep = bsxfun(@rdivide, Akeep, L);
+%%
+% *Step 5.* Now, we take the pseudo-inverse of |A| (warning: this step may take
+% 15-20 minutes or longer depending on your machine!):
+Att = zeros(Nm, 'single');
+Att = single(Akeep * Akeep');
+ss = norm(Att);
+penalty = sqrt(ss) .* lambda1;
+iA = Akeep' / (Att + penalty .^ 2 .* eye(Nm, 'single'));
+%%
+% *Step 6.* And last, we undo the spatial regularization, and clean up some
+% variables:
+iA = bsxfun(@rdivide, iA, L');
+clear Att AtA ss penalty L Akeep lambda1 lambda2
+%%
+% Now to do WL2. The NeuroDOT 2 code for this is:
+keep2 = (info.pairs.WL == 2) & (info.pairs.NN <= 3) & info.MEAS.GI;
+iA2 = Tikhonov_invert_Amat(A(keep2, :), 0.01, 0.1);
+%% Smooth Inverted A Matrix
+% The next step is to smooth the sensitivity matrix with a Gaussian kernel.
+%
+% *Step 1.* First, let's set some parameters:
+siA = zeros(Nvox, Nm);
+kernel_size = [1, 1, 1];
+gbox = 5; gsigma = 1.2;
+%%
+% *Step 2.* We'll need to normalize the kernel to our reconstruction space:
+gbox = round(gbox / dim.sV); gsigma = gsigma / dim.sV;
+%%
+% *Step 3.* Now, we'll perform the smoothing operation in parallel, so it runs
+% faster. Note that with |dim.Good_Vox|, we're only smoothing a subset
+% (162,143) of the total voxels in the reconstruction space (86 x 89 x 60 =
+% 459,240) - roughly 1/3 of them:
+parpool
+parfor k = 1:Nm
+    iAvox = zeros(dim.nVx, dim.nVy, dim.nVz);
+    iAvox(dim.Good_Vox) = iA(:, k);
+    iAvox = smooth3(iAvox, 'gaussian', gbox * kernel_size, gsigma);
+    siA(:, k) = iAvox(dim.Good_Vox);
+end
+%%
+% *Step 4.* Last, we need to shut down the parallel pool and clear some variables:
+delete(gcp('nocreate'))
+clear gbox gsigma kernel_size ans
+%%
+% We're almost ready to reconstruct the image now! The NeuroDOT 2 function
+% for this is:
+siA2 = smooth_Amat(iA2, dim, 5, 1.2);
+%% Reconstruct Image Volume
+% It's finally time to reconstruct the image from our raw data!
+%
+% *Step 1.* Let's start by declaring some variables and pre-allocating:
+prekeep = preprocessed(keep1, :);
+[~, Nt] = size(prekeep);
+units_scaling = 100;
+cortex_mu_a  = zeros(Nvox, Nt, 'single');
+%%
+% *Step 2.* And now we reconstruct by solving the inverse problem:
+cortex_mu_a  = siA * prekeep;
+%%
+% *Step 3.* We'll also need to correct our units, convert to the |single| data
+% format, and clear our lone extra variable:
+cortex_mu_a = single(cortex_mu_a ./ units_scaling);
+clear units_scaling
+%%
+% Yes, it was that easy! The hard work was already done in the inversion
+% and smoothing stages, so all that was left was the single line of the
+% inverse problem.
+%
+% The NeuroDOT 2 function for WL2 is:
+cortex_mu_a2 = reconstruct_img(preprocessed(keep2, :), siA2);
+%%
+% Now we have a VOX x TIME array for each WL that can be reshaped and
+% visualized in 3D.
+%
+% Let's start with that reshaping now.
+%
+% *Step 1.* Preallocate our new image volume:
+cortex_mu_a_vol = zeros(dim.nVx * dim.nVy * dim.nVz, Nt);
+%%
+% *Step 2.* Populate our array into the Good Voxels:
+cortex_mu_a_vol(dim.Good_Vox, :) = cortex_mu_a;
+%%
+% *Step 3.* Reshape into the voxel space:
+cortex_mu_a_vol = reshape(cortex_mu_a_vol, dim.nVx, dim.nVy, dim.nVz, Nt);
+%%
+% We can do this all for WL2 with a NeuroDOT function:
+cortex_mu_a_vol2 = Good_Vox2vol(cortex_mu_a2, dim);
+%%
+% Now it's time to visualize our volume. We'll do this as three slices from
+% each of the cardinal axes - sagittal, coronal, and transverse.
+%
+% *Step 1.* We'll select time point T=18, as this is roughly where we should
+% expect to see the peak activation of our block-averaged data.
+t18 = cortex_mu_a_vol(:, :, :, 18);
+%%
+% *Step 2.* We'll center our three slices at the middle of each dimension of the
+% volume:
+slice = [floor(dim.nVx/2), floor(dim.nVy/2), floor(dim.nVz/2)];
+%%
+% *Step 3(a).* We'll need to apply a colormap to this data, which means setting
+% some parameters:
+fr = t18(:);
+DR = 1000;
+Cmap = jet(DR);
+scale = 0.9 * max(fr);
+thP = 0.25 * scale;
+thN = -thP;
+%%
+% *Step 3(b).* Now we can threshold:
+bg = find(fr == 0);
+bg = union(bg, intersect(find(fr <= thP), find(fr >= thN)));
+%%
+% *Step 3(c).* And scale the values to the dynamic range:
+fr = fr/scale * DR/2;
+fr = fr + DR/2;
+%%
+% *Step 3(d).* Correcting for positive and negative clipping:
+P = find(fr ~= DR/2);
+fr(fr <= 0) = 1;
+fr(fr >= DR) = DR;
+%%
+% *Step 3(e).* Coloring in positive values to RGB channels from the colormap:
+mapped18(P, 1) = Cmap(ceil(fr(P)), 1);
+mapped18(P, 2) = Cmap(ceil(fr(P)), 2);
+mapped18(P, 3) = Cmap(ceil(fr(P)), 3);
+%%
+% *Step 3(f).* We'll also need add a grayscale background.
+mapped18(bg, :) = repmat([0.5, 0.5, 0.5], length(bg), 1);
+%%
+% *Step 3.(g)* Reshape the mapped volume:
+mapped18 = reshape(mapped18, dim.nVx, dim.nVy, dim.nVz, 3);
+%%
+% *Step 4.* Finally, we can select the three slices:
+sagittal = squeeze(mapped18(slice(1), :, :, :));
+coronal = squeeze(mapped18(:, slice(2), :, :));
+transverse = squeeze(mapped18(:, :, slice(3), :));
+%%
+% *Step 5.* And let's clean up some variables:
+clear DR bg Cmap fr mapped18 P scale thN thP
+%%
+% *Step 6.* Now, let's create a figure with three subplots so we can see each of
+% these views. We'll also rotate them before displaying so we can see them
+% in their proper orientation, reset the axis size, and give them some
+% labels, too:
+figure('Position', [20, 200, 1240, 420])
+subplot(1, 3, 1); image(imrotate(sagittal, 90)); axis image; title('Sagittal')
+subplot(1, 3, 2); image(imrotate(coronal, 90)); axis image; title('Coronal')
+subplot(1, 3, 3); image(imrotate(transverse, 90)); axis image; title('Transverse')
+%%
+% Great! Now we've got a plot of the three views.
+%
+% <<slices_diagram.png >>
+%
+% NeuroDOT has a function that does this too, and adds a number of useful
+% features like interactive navigation:
+PlotSlices(t18)
+%%
+% With the interactive navigation, try clicking around in |PlotSlices| to
+% explore the volume.
+%
+% <<plotslices_18_WL1.png>>
+%
+% Using the |params.slices| input turns off the navigation.
+%
+% See the User Manual for a more detailed description of the parameters
+% used by |PlotSlices|.
+%
+% The general form of |PlotSlices| is:
+%
+% |PlotSlices(underlay, infoVol, params, overlay)|
+%
+% To look at an activity volume alone, use |underlay|. To view two volumes
+% overlain, the activity volume goes in |overlay|, and the background (such
+% as an atlas) goes in |underlay|.
+%
+% Let's try this by loading an atlas and using it as a background. If you
+% are unfamiliar with this concept, please refer to the Atlases appendix.
+%
+% *Step 1.* We will load one of several pre-prepared atlases:
+load('Atlas_MNI152nl_T1_on_111.mat')
+%%
+% *Step 2.* And then visualize it:
+PlotSlices(atlas, [], [], t18)
+%%
+% Since this is a Hearing Words paradigm, let's try to find a region of
+% activation in the right superior temporal gyrus (STG for short). (right
+% bottom if you need help)
+%
+% <<plotslices_18_WL1_atlas.png>>
+%
+% This is easier with an anatomical underlay to aid navigation now.
+%
+% <<plotslices_18_WL1_atlas_STG.png>>
+%
+% It was difficult to find any activations in the STG, mainly because the
+% WL1 signal was weak. Let's also take a look at the image we reconstructed
+% from WL2, with and without the atlas:
+PlotSlices(cortex_mu_a_vol2(:, :, :, 18))
+PlotSlices(atlas, [], [], cortex_mu_a_vol2(:, :, :, 18))
+%%
+%
+% <<plotslices_18_WL2.png>>
+%
+% <<plotslices_18_WL2_atlas.png>>
+%
+% Below, we've navigated to an activation slightly above the STG. It should
+% be noted that, per the cap sensitivity profile shown in Slide 6, some
+% activations may appear slightly superficial to the tissues they occur in.
+%
+% <<plotslices_18_WL2_atlas_STG.png>>
+%
+% It's also important to note that what we're looking at here in
+% |cortex_mu_a2| are absorption values, not actual activations. However,
+% activations are calculated quite directly from these absorption maps, so
+% we should expect significant correlation.
+%
+% From now on, we'll navigate directly to the coordinates of the STG that
+% we've identified. |params| provides us an easy way of doing this:
+params.slices = [10, 60, 31];
+%%
+% Let's clean up another few variables before moving on:
+clear coronal sagittal transverse
+%%
+% Another common technique in neuroscience is to average several seconds of
+% adjacent time points together to improve signal-to-noise ratio. In order
+% to identify an appropriate averaging window, let's look at the delta-mean
+% plots of the block-averaged, preprocessed data.
+%
+% *Step 1.* Plot the delta mean of WL2, NN23:
+params.Nnns = 2:3; params.Nwls = 2;
+PlotDeltaMean(preprocessed, info, params)
+%%
+%
+% <<wl2_deltamean.png>>
+%
+% We want the time domain where the signal response is strongest.
+% Accordingly, the best window appears to be somewhere between T=13 and
+% T=21.
+%
+% *Step 2.* Average and display T=13:21.
+t2_13_21 = mean(cortex_mu_a_vol2(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t2_13_21)
+%%
+% As we can see in T=13:21, the averaging has helped (1) filter out many of
+% the spurious activations distal to the STG, and (2) increased the size
+% and strength of the activations proximal to the STG.
+%
+% T=18
+%
+% <<plotslices_18_WL2_atlas_STG.png>>
+%
+% T=13:20
+%
+% <<plotslices_13_21_WL2_atlas_STG.png>>
+%
+% Let's try this averaging with WL1!
+%
+% Here's the code, if you were having trouble with it:
+t_13_21 = mean(cortex_mu_a_vol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, t_13_21)
+%%
+%
+% <<plotslices_18_WL1_atlas_STG.png>>
+%
+% <<plotslices_13_21_WL1_atlas_STG.png>>
+%
+% Much improved! We can actually see some activations. The left side is
+% also much stronger now.
+%
+%% Spectroscopy
+% The last step here is to perform spectroscopy. This allows us to get the
+% HbO and HbR concentrations from our light levels in |cortex_mu_a| and
+% |cortex_mu_a2|.
+%
+% *Step 1.* The first step is to reunify |cortex_mu_a| and |cortex_mu_a2| by
+% concatenating them along the third dimension:
+to_spec = cat(3, cortex_mu_a, cortex_mu_a2);
+%%
+% *Step 2.* As usual, we define some parameters:
+Nc = 2;
+[E1, E2] = size(E);
+umol_scale = 1000;
+%%
+% *Step 3.* The extinction coefficient matrix, |E|, needs to be inverted:
+iE = inv(E);
+%%
+% *Step 4.* Now, we multiply the inverted coefficients by their respective
+% wavelength images:
+specimg = zeros(Nvox, Nt, Nc, 'single');
+for k = 1:E2
+    temp = zeros(Nvox, Nt);
+    for l = 1:E1
+        temp = temp + squeeze(iE(k, l)) .* squeeze(to_spec(:, :, l));
+    end
+    specimg (:, :, k) = temp;
+end
+%%
+% *Step 5.* Finally, we do some more scaling, and clean up extra variables:
+specimg = specimg .* umol_scale;
+clear umol_scale E1 E2 k l temp
+%%
+% Now we have our HbO and HbR images (1 and 2 in the third dimension of
+% |specimg|, respectively)! The NeuroDOT 2 code for this is:
+specimg = spectroscopy_img(to_spec, E);
+%%
+% It's important to note that |to_spec| needs to have both wavelengths
+% concatenated along its third dimension.
+%
+% Before we image anything, let's separate our results into oxyhemoglobin
+% |HbO|, deoxyhemoglobin |HbR|, and total hemoglobin |HbT|:
+cortex_HbO = specimg(:, :, 1);
+cortex_HbR = specimg(:, :, 2);
+cortex_HbT = cortex_HbO + cortex_HbR;
+%%
+% Let's also convert to |dim| space:
+cortex_HbOvol = Good_Vox2vol(cortex_HbO, dim);
+cortex_HbRvol = Good_Vox2vol(cortex_HbR, dim);
+cortex_HbTvol = Good_Vox2vol(cortex_HbT, dim);
+%%
+% Let's visualize these now, first for |HbO|:
+HbO18 = cortex_HbOvol(:, :, :, 18);
+PlotSlices(HbO18, [], params)
+PlotSlices(atlas, [], params, HbO18)
+%%
+%
+% <<plotslices_HbO_18_STG.png>>
+%
+% <<plotslices_HbO_18_atlas_STG.png>>
+%
+% And now for |HbR|:
+HbR18 = cortex_HbRvol(:, :, :, 18);
+PlotSlices(HbR18, [], params)
+PlotSlices(atlas, [], params, HbR18)
+%%
+%
+% <<plotslices_HbR_18_STG.png>>
+%
+% <<plotslices_HbR_18_atlas_STG.png>>
+%
+% Note that, generally speaking, the peaks of |HbO| correspond to the
+% troughs of |HbR|, and vice versa. These opposing responses are what we
+% should (again, generally) expect.
+%
+% Lastly, let's do total hemoglobin, or |HbT|:
+HbT18 = cortex_HbTvol(:, :, :, 18);
+PlotSlices(HbT18, [], params)
+PlotSlices(atlas, [], params, HbT18)
+%%
+%
+% <<plotslices_HbT_18_STG.png>>
+%
+% <<plotslices_HbT_18_atlas_STG.png>>
+%
+% As the sum of all hemoglobin, |HbT| actually increases during brain
+% stimulation (such as Hearing Words), since more blood volume is being
+% recruited to the activated regions.
+%
+% We can probably improve our SNR by doing some averaging again. Let's use
+% the same interval as before. First, |HbO|:
+HbO13_21 = mean(cortex_HbOvol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, HbO18)
+PlotSlices(atlas, [], params, HbO13_21)
+%%
+%
+% <<plotslices_HbO_18_atlas_STG.png>>
+%
+% <<plotslices_HbO_13_21_atlas_STG.png>>
+%
+% And HbR:
+HbR13_21 = mean(cortex_HbRvol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, HbR18)
+PlotSlices(atlas, [], params, HbR13_21)
+%%
+%
+% <<plotslices_HbR_18_atlas_STG.png>>
+%
+% <<plotslices_HbR_13_21_atlas_STG.png
+%
+% Finally, let's see HbT:
+HbT13_21 = mean(cortex_HbTvol(:, :, :, 13:21), 4);
+PlotSlices(atlas, [], params, HbT18)
+PlotSlices(atlas, [], params, HbT13_21)
+%%
+% As expected, with all three, SNR has improved greatly with averaging, and
+% we see fewer spurious activations and greater localization of the
+% remaining activations to the STG.
+% 
+% We can also map these activation volumes onto a surface mesh of the
+% brain. It's easy to miss some activations while navigating three-slice
+% views. Surface mapping avoids this by showing activations on the surface
+% of the brain.
+% 
+% *Step 1.* First, we need to load a mesh:
+load('LR_Meshes_MNI_164k.mat')
+%%
+% This file contains two meshes of the |mesh| data type, |MNIl| and |MNIr|,
+% corresponding to the left and right hemispheres of a segmented version of
+% the non-linear MNI 152 atlas we've been using with |PlotSlices|.
+% 
+% This mesh has nearly 164,000 nodes, corresponding to the "|164k|" in the
+% file name.
+% 
+% *Step 2.* Set the |params| structure:
+params.Scale = 0.9 * max(HbO18(:));
+params.Th.P = 0.25 * params.Scale;
+params.Th.N = -params.Th.P;
+%%
+% *Step 3.* Initialize a display figure and time variable:
+figure('Color', 'k', 'Position', [20, 200, 960, 420])
+Ntime = size(HbO18, 4);
+%%
+% *Step 4.* Initialize surface maps:
+NcoordsL = size(MNIl.nodes, 1); mapL = MNIl; mapL.data = zeros(NcoordsL, Ntime);
+NcoordsR = size(MNIr.nodes, 1); mapR = MNIr; mapR.data = zeros(NcoordsR, Ntime);
+%%
+% *Step 5.* Define the coordinate space of the volume:
+nVx = dim.nVx; nVy = dim.nVy; nVz = dim.nVz; dr = dim.mmppix; center = dim.center;
+X = (-center(1) + nVx * dr(1):-dr(1):-center(1) + dr(1))';
+Y = (-center(2) + nVy * dr(2):-dr(2):-center(2) + dr(2))';
+Z = (-center(3) + nVz * dr(3):-dr(3):-center(3) + dr(3))';
+%%
+% *Step 6.* Get the coordinates of the surface mesh:
+xL = MNIl.nodes(:, 1); yL = MNIl.nodes(:, 2); zL = MNIl.nodes(:, 3);
+xR = MNIr.nodes(:, 1); yR = MNIr.nodes(:, 2); zR = MNIr.nodes(:, 3);
+%%
+% *Step 7.* Correct for nodes outside of volume:
+xL(xL < min(X)) = min(X); xL(xL > max(X)) = max(X);
+yL(yL < min(Y)) = min(Y); yL(yL > max(Y)) = max(Y);
+zL(zL < min(Z)) = min(Z); zL(zL > max(Z)) = max(Z);
+
+xR(xR < min(X)) = min(X); xR(xR > max(X)) = max(X);
+yR(yR < min(Y)) = min(Y); yR(yR > max(Y)) = max(Y);
+zR(zR < min(Z)) = min(Z); zR(zR > max(Z)) = max(Z);
+%%
+% *Step 8.* Interpolate the values of |HbO18| at the surface mesh coordinates:
+for k = 1:Ntime
+    mapL.data(:, k) = interp3(Y, X, Z, squeeze(HbO18(:, :, :, k)), yL, xL, zL, 'linear', 0);
+    mapR.data(:, k) = interp3(Y, X, Z, squeeze(HbO18(:, :, :, k)), yR, xR, zR, 'linear', 0);
+end
+%%
+% *Step 9.* Normalize the nodes of the L and R meshes to their max and min,
+% respectively:
+mapL.nodes(:, 1) = mapL.nodes(:, 1) - max(mapL.nodes(:, 1));
+mapR.nodes(:, 1) = mapR.nodes(:, 1) - min(mapR.nodes(:, 1));
+%%
+% *Step 10.* Rotate R mesh to be oriented opposite the L mesh:
+cmL = mean(mapL.nodes, 1); cmR = mean(mapR.nodes, 1);
+rot = [cos(pi) -sin(pi) 0;...
+    sin(pi) cos(pi) 0;...
+    0 0 1];
+
+mapR.nodes = (mapR.nodes - (repmat(cmR, size(mapR.nodes, 1), 1))) * rot + (repmat(cmR, size(mapR.nodes, 1), 1));
+mapR.nodes(:, 1) = mapR.nodes(:, 1) + (cmL(:, 1) - cmR(:, 1));
+mapR.nodes(:, 2) = mapR.nodes(:, 2) - max(mapR.nodes(:, 2)) + min(mapL.nodes(:, 2)) - 5;
+%%
+% *Step 11.* Use |applycmap| to colormap the data:
+dataL = squeeze(applycmap(mapL.data, [], params));
+dataR = squeeze(applycmap(mapR.data, [], params));
+%%
+% *Step 12.* Plot the maps using |patch|:
+patch('Faces', mapL.elements(:, 1:3), 'Vertices', mapL.nodes, 'EdgeColor', 'none',...
+    'FaceColor', 'interp', 'FaceVertexCData', dataL, 'FaceLighting', 'gouraud',...
+    'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+
+patch('Faces', mapR.elements(:, 1:3), 'Vertices', mapR.nodes, 'EdgeColor', 'none',...
+'FaceColor', 'interp', 'FaceVertexCData', dataR, 'FaceLighting', 'gouraud',...
+    'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+%%
+% *Step 13.* Let's apply some labels:
+set(gca, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
+title('Volumetric Surface Mapping', 'Color', 'w', 'FontSize', 12)
+%%
+% *Step 14.* Finally, we'll need to apply some lighting and set the proper
+% perspective:
+axis off; axis image; set(gcf, 'Units', 'inches'); view([-90, 0]);
+light('Position', [-100, 200, 0], 'Style', 'local');
+light('Position', [-50, -500, 100], 'Style', 'infinite');
+light('Position', [-50, 0, 0], 'Style', 'infinite');
+set(gcf, 'Units', 'pixels');
+%%
+% Here's the result:
+% 
+% <<plotinterpsurfmesh_HbO_no_cbar.png>>
+% 
+% The NeuroDOT function for this visualization is PlotVolMesh. The general syntax of this function is:
+% 
+% |PlotVolMesh(volume, meshL, meshR, dim, params)|
+% 
+% This function contains similar formatting, spatial orientation, and
+% colormapping features to PlotSlices. Please consult the help files for
+% further details!
+% 
+% Let's re-plot |HbO18| now.
+PlotVolMesh(HbO18, MNIl, MNIr, dim)
+%%
+% 
+% <<plotinterpsurfmesh_HbO18.png>>
+% 
+% Let's try using it to visualize |HbR18| and |HbT18| as well!
+% 
+% |HbR18|:
+PlotVolMesh(HbR18, MNIl, MNIr, dim)
+%%
+% 
+% <<plotinterpsurfmesh_HbR18.png>>
+% 
+% |HbT18|:
+PlotVolMesh(HbT18, MNIl, MNIr, dim)
+%%
+% 
+% <<plotinterpsurfmesh_HbT18.png>>
+% 
+% |HbO13_21|:
+PlotVolMesh(HbO13_21, MNIl, MNIr, dim)
+%%
+% 
+% <<plotinterpsurfmesh_HbO13_21.png>>
+% 
+% |HbR13_21|:
+PlotVolMesh(HbR13_21, MNIl, MNIr, dim)
+%%
+% 
+% <<plotinterpsurfmesh_HbR13_21.png>>
+% 
+% |HbT13_21|:
+PlotVolMesh(HbT13_21, MNIl, MNIr, dim)
+%%
+% 
+% <<plotinterpsurfmesh_HbT13_21.png>>
+% 
+%% Conclusion
+% Congratulations! You have finished the NeuroDOT 2 Base Edition
+% Reconstruction Pipeline Tutorial.
+%
+% For further questions or more information, please consult the NeuroDOT 2
+% Base User Manual and the various Appendices.
+%
+% NeuroDOT 2 Support Team:
+%
+% * Adam Eggebrecht (aeggebre@wustl.edu)
+% * David Muccigrosso (muccigrosso.david@wustl.edu)
+%
+##### SOURCE END #####
+--></body></html>

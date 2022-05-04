@@ -1,0 +1,167 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PlotSlices</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-05-18"><meta name="DC.source" content="PlotSlices_help.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>PlotSlices</h1><!--introduction--><p>Creates an interactive three-slice plot.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Description</a></li><li><a href="#2">Visualization Parameters</a></li><li><a href="#3">Dependencies</a></li><li><a href="#4">See Also</a></li></ul></div><h2>Description<a name="1"></a></h2><p><tt>PlotSlices(underlay)</tt> takes a 3D voxel space image <tt>underlay</tt> and generates views along the three canonical axes.</p><p>In interactive mode, left-click on any point to move to those slices. To reset to the middle of the volume, right-click anywhere. To cancel interactive mode, press <tt>Q</tt>, <tt>Esc</tt>, or the middle mouse button.</p><p><tt>PlotSlices(underlay, infoVol)</tt> uses the volumetric data in <tt>infoVol</tt> to display spatial coordinates of the slices in question.</p><p><tt>PlotSlices(underlay, infoVol, params)</tt> allows the user to specify parameters for plot creation.</p><p><tt>PlotSlices(underlay, infoVol, params, overlay)</tt> overlays the image provided by <tt>overlay</tt>. When this is done, all color mapping is applied to the overlay image, and the underlay is rendered as a grayscale image times the RGB triplet in <tt>params.BG</tt>.</p><h2>Visualization Parameters<a name="2"></a></h2><p><tt>params</tt> fields that apply to this function (and their defaults):</p><p>
+<table border = 1>
+<tr><td>Name</td><td>Default</td><td>Effect</td></tr>
+<tr><td>fig_size</td><td>[20, 200, 1240, 420]</td><td>Default figure
+position vector.</td></tr>
+<tr><td>fig_handle</td><td>(none)</td><td>Specifies a figure to target.
+If empty, spawns a new figure.</td></tr>
+<tr><td>CH</td><td>1</td><td>Turns crosshairs on (1) and off
+(0).</td></tr>
+<tr><td>Scale</td><td>(90% max)</td><td>Maximum value to which image is
+scaled</td></tr>
+<tr><td>PD</td><td>0</td><td>Declares that input image is positive
+definite.</td></tr>
+<tr><td>cbmode</td><td>0</td><td>Specifies whether to use custom colorbar
+axis labels.</td></tr>
+<tr><td>clabels</td><td>([-90% max,  90% max])</td><td>Colorbar axis
+labels. When cbmode==1, min defaults to 0 if PD==1, both default to +/-
+Scale if supplied. When cbmode==0, then cblabels dictates colorbar axis
+limits.</td></tr>
+<tr><td>cbticks</td><td>(none)</td><td>When cbmode==1, specifies
+positions of tick marks on colorbar axis.</td></tr>
+<tr><td>slices</td><td>(center frames)</td><td>Select which slices are
+displayed. If empty, activates interactive navigation.</td></tr>
+<tr><td>slices_type</td><td>'idx'</td><td>Use MATLAB indexing ('idx') for
+slices, or spatial coordinates ('coord') as provided by
+invoVol.</td></tr>
+<tr><td>orientation</td><td>'t'</td><td>Select orientation of volume.
+'t' for transverse, 's' for sagittal.</td></tr>
+</table></p><p>Note: <tt>applycmap</tt> has further options for using <tt>params</tt> to specify parameters for the fusion, scaling, and colormapping process.</p><h2>Dependencies<a name="3"></a></h2><p><a href="applycmap_help.html">applycmap</a></p><h2>See Also<a name="4"></a></h2><p><a href="PlotInterpSurfMesh_help.html">PlotInterpSurfMesh</a> | <a href="PlotSlicesMov_help.html">PlotSlicesMov</a> | <a href="PlotSlicesTimeTrace_help.html">PlotSlicesTimeTrace</a></p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% PlotSlices
+% Creates an interactive three-slice plot.
+%
+%% Description
+% |PlotSlices(underlay)| takes a 3D voxel space image |underlay| and
+% generates views along the three canonical axes.
+%
+% In interactive mode, left-click on any point to move to those slices. To
+% reset to the middle of the volume, right-click anywhere. To cancel
+% interactive mode, press |Q|, |Esc|, or the middle mouse button.
+%
+% |PlotSlices(underlay, infoVol)| uses the volumetric data in |infoVol| to
+% display spatial coordinates of the slices in question.
+%
+% |PlotSlices(underlay, infoVol, params)| allows the user to specify
+% parameters for plot creation.
+%
+% |PlotSlices(underlay, infoVol, params, overlay)| overlays the image
+% provided by |overlay|. When this is done, all color mapping is applied to
+% the overlay image, and the underlay is rendered as a grayscale image
+% times the RGB triplet in |params.BG|.
+% 
+%% Visualization Parameters
+% |params| fields that apply to this function (and their defaults):
+%
+% <html>
+% <table border = 1>
+% <tr><td>Name</td><td>Default</td><td>Effect</td></tr>
+% <tr><td>fig_size</td><td>[20, 200, 1240, 420]</td><td>Default figure
+% position vector.</td></tr>
+% <tr><td>fig_handle</td><td>(none)</td><td>Specifies a figure to target.
+% If empty, spawns a new figure.</td></tr>
+% <tr><td>CH</td><td>1</td><td>Turns crosshairs on (1) and off
+% (0).</td></tr>
+% <tr><td>Scale</td><td>(90% max)</td><td>Maximum value to which image is
+% scaled</td></tr>
+% <tr><td>PD</td><td>0</td><td>Declares that input image is positive
+% definite.</td></tr>
+% <tr><td>cbmode</td><td>0</td><td>Specifies whether to use custom colorbar
+% axis labels.</td></tr>
+% <tr><td>clabels</td><td>([-90% max,  90% max])</td><td>Colorbar axis
+% labels. When cbmode==1, min defaults to 0 if PD==1, both default to +/-
+% Scale if supplied. When cbmode==0, then cblabels dictates colorbar axis
+% limits.</td></tr>
+% <tr><td>cbticks</td><td>(none)</td><td>When cbmode==1, specifies
+% positions of tick marks on colorbar axis.</td></tr>
+% <tr><td>slices</td><td>(center frames)</td><td>Select which slices are
+% displayed. If empty, activates interactive navigation.</td></tr>
+% <tr><td>slices_type</td><td>'idx'</td><td>Use MATLAB indexing ('idx') for
+% slices, or spatial coordinates ('coord') as provided by
+% invoVol.</td></tr>
+% <tr><td>orientation</td><td>'t'</td><td>Select orientation of volume.
+% 't' for transverse, 's' for sagittal.</td></tr>
+% </table></html>
+%
+% Note: |applycmap| has further options for using |params| to specify
+% parameters for the fusion, scaling, and colormapping process.
+%
+%% Dependencies
+% <applycmap_help.html applycmap>
+% 
+%% See Also
+% <PlotInterpSurfMesh_help.html PlotInterpSurfMesh> |
+% <PlotSlicesMov_help.html PlotSlicesMov> | <PlotSlicesTimeTrace_help.html
+% PlotSlicesTimeTrace>
+
+
+##### SOURCE END #####
+--></body></html>

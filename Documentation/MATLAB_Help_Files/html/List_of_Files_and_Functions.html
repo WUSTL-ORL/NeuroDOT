@@ -1,0 +1,632 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>NeuroDOT 2.2.0 Base Edition</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-05-18"><meta name="DC.source" content="List_of_Files_and_Functions.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>NeuroDOT 2.2.0 Base Edition</h1><!--introduction--><p><b>List of Files and Functions</b></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Tutorials</a></li><li><a href="#2">Data</a></li><li><a href="#3">Functions</a></li><li><a href="#4"><i>Analysis</i></a></li><li><a href="#5"><i>File IO</i></a></li><li><a href="#6"><i>Reconstruction</i></a></li><li><a href="#7"><i>Spatial Transforms</i></a></li><li><a href="#8"><i>Support</i></a></li><li><a href="#9"><i>Temporal Transforms</i></a></li><li><a href="#10"><i>Visualization</i></a></li><li><a href="#11">Support Files</a></li></ul></div><h2>Tutorials<a name="1"></a></h2><p><table border=0>
+<tr><td><a href='DOT_Processing_Tutorial.html'>DOT Processing
+Tutorial</a></td><td>Covers the DOT Processing pipeline.</td></tr>
+</table></p><h2>Data<a name="2"></a></h2><p><table border=0>
+<tr><td>/NeuroDOT_Base_AC_Sample.mat</td><td>Based on the data set from
+subject 1409, date 161110, acquisition AC002.</td></tr>
+<tr><td>/NeuroDOT_Base_CCW_Sample.mat</td><td>Based on the data set from
+subject 0813, date 101019, acquisition CCW.</td></tr>
+<tr><td>/NeuroDOT_Base_CW_Sample.mat</td><td>Based on the data set from
+subject 0813, date 101019, acquisition CW.</td></tr>
+<tr><td>/NeuroDOT_Base_GV_Sample.mat</td><td>Based on the data set from
+subject 1106, date 121023, acquisition GV.</td></tr>
+<tr><td>/NeuroDOT_Base_HW_Sample_1.mat</td><td>Based on the data set from
+subject 1106, date 120702, acquisition HW.</td></tr>
+<tr><td>/NeuroDOT_Base_HW_Sample_2.mat</td><td>Based on the data set from
+subject 1205, date 120626, acquisition HW.</td></tr>
+<tr><td>/NeuroDOT_Base_HW_Sample_Noisy.mat</td><td>Based on the data set
+from subject 1531, date 150810, acquisition HW001.</td></tr>
+<tr><td>/NeuroDOT_Base_IN_Sample.mat</td><td>Based on the data set from
+subject 0813, date 101019, acquisition IN.</td></tr>
+<tr><td>/NeuroDOT_Base_OUT_Sample.mat</td><td>Based on the data set from
+subject 0813, date 101019, acquisition OUT.</td></tr>
+<tr><td>/NeuroDOT_Base_RW_Sample.mat</td><td>Based on the data set from
+subject 1106, date 120702, acquisition RW.</td></tr>
+<tr><td>/NeuroDOT_Base_Converter_Sample.mat</td><td>This sample is
+provided for use in the File IO tutorial appendix, based on HW Sample
+1.</td></tr>
+<tr><td>/test_homer2.nirs</td><td>This sample is provided for use in the
+File IO tutorial appendix. It was derived from the introductory sample
+used in the HOMER2 beginners’ guide.</td></tr>
+</table></p><h2>Functions<a name="3"></a></h2><h2><i>Analysis</i><a name="4"></a></h2><p><table border=0>
+<tr><td><a
+href='BlockAverage_help.html'>BlockAverage</a></td><td>Averaging of
+stimulus blocks.</td></tr>
+<tr><td><a href='FindGoodMeas_help.html'>FindGoodMeas</a></td><td>Filter
+out noisy channels.</td></tr>
+</table></p><h2><i>File IO</i><a name="5"></a></h2><p><table border=0>
+<tr><td><a
+href='Check4MissingData_help.html'>Check4MissingData</a></td><td>
+Validates framesynch file against key file info.</td></tr>
+<tr><td><a
+href='converter_data_help.html'>converter_data</a></td><td>Reshapes data
+from ND1 to ND2 format.</td></tr>
+<tr><td><a
+href='converter_HOMER_to_ND2_help.html'>converter_HOMER_to_ND2</a></td><td>Converts
+workspace from HOMER to ND2.</td></tr>
+<tr><td><a
+href='converter_info_help.html'>converter_info</a></td><td>Converts the
+ND1 info structure to ND2 format.</td></tr>
+<tr><td><a
+href='converter_ND1_to_ND2_help.html'>converter_ND1_to_ND2</a></td><td>Converts
+both data and info from ND1 format to ND2.</td></tr>
+<tr><td><a
+href='converter_ND2_to_HOMER_help.html'>converter_ND2_to_HOMER</a></td><td>Converts
+workspace from ND2 to HOMER.</td></tr>
+<tr><td><a
+href='converter_ND2_to_ND1_help.html'>converter_ND2_to_ND1</a></td><td>Converts
+both data and info from ND2 format to ND1.</td></tr>
+<tr><td><a href='Crop2Synch_help.html'>Crop2Synch</a></td><td>Crops data
+to synch points.</td></tr>
+<tr><td><a
+href='InterpretPulses_help.html'>InterpretPulses</a></td><td>Reads the
+synch pulses into an experiment paradigm.</td></tr>
+<tr><td><a
+href='InterpretStimSynch_help.html'>InterpretStimSynch</a></td><td>Reads
+stimulus from frame synch file.</td></tr>
+<tr><td><a
+href='InterpretSynchBeeps_help.html'>InterpretSynchBeeps</a></td><td>Automated
+synch file analysis.</td></tr>
+<tr><td><a
+href='Load_AcqDecode_Data_help.html'>Load_AcqDecode_Data</a></td><td>Loads
+a single AcqDecode file.</td></tr>
+<tr><td><a href='Load_HOMER_help.html'>Load_HOMER</a></td><td>Converts
+and loads a HOMER2 ".nirs" file into ND2.</td></tr>
+<tr><td><a
+href='LoadMulti_AcqDecode_Data_help.html'>LoadMulti_AcqDecode_Data</a></td><td>Loads
+and combines data from multiple AcqDecode files for a single
+scan.</td></tr>
+<tr><td><a
+href='LoadVolumetricData_help.html'>LoadVolumetricData</a></td><td>Loads
+a volumetric data file.</td></tr>
+<tr><td><a
+href='Make_NativeSpace_4dfp_help.html'>Make_NativeSpace_4dfp</a></td><td>Calculates
+native space of incomplete 4dfp header.</td></tr>
+<tr><td><a
+href='Read_4dfp_Header_help.html'>Read_4dfp_Header</a></td><td>Read the
+.ifh header of a 4dfp file.</td></tr>
+<tr><td><a
+href='Read_AcqDecode_Header_help.html'>Read_AcqDecode_Header</a></td><td>Interprets
+the header of an AcqDecode generated data file.</td></tr>
+<tr><td><a
+href='Read_NIFTI_Header_help.html'>Read_NIFTI_Header</a></td><td>Reads a
+NIFTI file header.</td></tr>
+<tr><td><a href='ReadAux_help.html'>ReadAux</a></td><td>Reads auxiliary
+channel files.</td></tr>
+<tr><td><a href='ReadInfoTxt_help.html'>ReadInfoTxt</a></td><td>Reads a
+key file.</td></tr>
+<tr><td><a href='Save_HOMER_help.html'>Save_HOMER</a></td><td>Converts an
+ND2 workspace to HOMER2 ".nirs" format to save.</td></tr>
+<tr><td><a
+href='SaveVolumetricData_help.html'>SaveVolumetricData</a></td><td>Saves
+volumetric data in supported formats.</td></tr>
+<tr><td><a
+href='Write_4dfp_Header_help.html'>Write_4dfp_Header</a></td><td>Writes a
+4dfp header.</td></tr>
+<tr><td><a href='Write_NIFTI_help.html'>Write_NIFTI</a></td><td>Prepares
+a "nii" structure to be written to file.</td></tr>
+</table></p><h2><i>Reconstruction</i><a name="6"></a></h2><p><table border=0>
+<tr><td><a
+href='reconstruct_img_help.html'>reconstruct_img</a></td><td>Performs
+image reconstruction by wavelength using inverted A-matrix.</td></tr>
+<tr><td><a href='smooth_Amat_help.html'>smooth_Amat</a></td><td>Performs
+Gaussian smoothing on a sensitivity matrix.</td></tr>
+<tr><td><a
+href='spectroscopy_img_help.html'>spectroscopy_img</a></td><td>Completes
+the Beer-Lambert law from a reconstructed image.</td></tr>
+<tr><td><a
+href='Tikhonov_invert_Amat_help.html'>Tikhonov_invert_Amat</a></td><td>Inverts
+a sensitivity matrix.</td></tr>
+</table></p><h2><i>Spatial Transforms</i><a name="7"></a></h2><p><table border=0>
+<tr><td><a
+href='affine3d_img_help.html'>affine3d_img</a></td><td>Transforms a 3D
+data set to a new space.</td></tr>
+<tr><td><a
+href='change_space_coords_help.html'>change_space_coords</a></td><td>Applies
+a look up to change 3D coordinates into a new space.</td></tr>
+<tr><td><a href='Good_Vox2vol_help.html'>Good_Vox2vol</a></td><td>Turns a
+Good Voxels data stream into a volume.</td></tr>
+<tr><td><a href='rotate_cap_help.html'>rotate_cap</a></td><td>Rotates the
+cap in space.</td></tr>
+<tr><td><a
+href='rotation_matrix_help.html'>rotation_matrix</a></td><td>Creates a
+rotation matrix.</td></tr>
+</table></p><h2><i>Support</i><a name="8"></a></h2><p><table border=0>
+<tr><td><a
+href='CheckOrientation_help.html'>CheckOrientation</a></td><td>Interprets
+3D orientation information.</td></tr>
+<tr><td><a href='istablevar_help.html'>istablevar</a></td><td>Same
+operation as "isfield" for tables.</td></tr>
+</table></p><h2><i>Temporal Transforms</i><a name="9"></a></h2><p><table border=0>
+<tr><td><a href='detrend_tts_help.html'>detrend_tts</a></td><td>Performs
+linear detrending.</td></td>
+<tr><td><a href='fft_tts_help.html'>fft_tts</a></td><td>Fast Fourier
+Transform function with normalization and multiple outputs.</td></tr>
+<tr><td><a href='gethem_help.html'>gethem</a></td><td>Generate
+hemodynamics for SSR.</td></tr>
+<tr><td><a href='highpass_help.html'>highpass</a></td><td>High pass
+filter.</td></tr>
+<tr><td><a href='logmean_help.html'>logmean</a></td><td>Negative ln of
+each channel divided by its mean.</td></tr>
+<tr><td><a href='lowpass_help.html'>lowpass</a></td><td>Low pass
+filter.</td></tr>
+<tr><td><a
+href='normalize2range_tts_help.html'>normalize2range_tts</a></td><td>Normalizes
+time traces to average of a range.</td></tr>
+<tr><td><a href='regcorr_help.html'>regcorr</a></td><td>SSR to remove
+hemodynamics from data.</td></tr>
+<tr><td><a
+href='resample_tts_help.html'>resample_tts</a></td><td>Resample data
+while maintaining linear signal component.</td></tr>
+</table></p><h2><i>Visualization</i><a name="10"></a></h2><p><table border=0>
+<tr><td><a
+href='adjust_brain_pos_help.html'>adjust_brain_pos</a></td><td>Repositions
+mesh orientations for display.</td></tr>
+<tr><td><a href='applycmap_help.html'>applycmap</a></td><td>Performs
+color mapping and fuses images with anatomical models.</td></tr>
+<tr><td><a href='PlotCap_help.html'>PlotCap</a></td><td>A visualization
+of the cap grid.</td></tr>
+<tr><td><a href='PlotCapData_help.html'>PlotCapData</a></td><td>A basic
+plotting function for generating and labeling cap grids.</td></tr>
+<tr><td><a
+href='PlotCapGoodMeas_help.html'>PlotCapGoodMeas</a></td><td>A Good
+Measurements visualization overlaid on a cap grid.</td></tr>
+<tr><td><a href='PlotCapMeanLL_help.html'>PlotCapMeanLL</a></td><td>A
+visualization of mean light levels overlaid on a cap grid.</td></tr>
+<tr><td><a href='PlotFalloffData_help.html'>PlotFalloffData</a></td><td>A
+basic falloff plotting function.</td></tr>
+<tr><td><a href='PlotFalloffLL_help.html'>PlotFalloffLL</a></td><td>A
+light-level falloff visualization.</td></tr>
+<tr><td><a href='PlotGray_help.html'>PlotGray</a></td><td>A visualization
+of data as a scaled image.</td></tr>
+<tr><td><a href='PlotGrayData_help.html'>PlotGrayData</a></td><td>A basic
+scaled image plotting function.</td></tr>
+<tr><td><a
+href='PlotHistogramData_help.html'>PlotHistogramData</a></td><td>A basic
+histogram plotting function.</td></tr>
+<tr><td><a
+href='PlotHistogramSTD_help.html'>PlotHistogramSTD</a></td><td>A
+histogram of channel standard deviations.</td></tr>
+<tr><td><a
+href='PlotInterpSurfMesh_help.html'>PlotInterpSurfMesh</a></td><td>Interpolates
+volumetric data onto hemispheric meshes for display.</td></tr>
+<tr><td><a href='PlotLRMeshes_help.html'>PlotLRMeshes</a></td><td>Renders
+a pair of hemispheric meshes.</td></tr>
+<tr><td><a
+href='PlotMeshSurface_help.html'>PlotMeshSurface</a></td><td>Shows a head
+mesh model's outer surface.</td></tr>
+<tr><td><a
+href='PlotPowerSpectrumAllMeas_help.html'>PlotPowerSpectrumAllMeas</a></td><td>An
+all-measurements frequency-domain time trace visualization.</td></tr>
+<tr><td><a
+href='PlotPowerSpectrumData_help.html'>PlotPowerSpectrumData</a></td><td>A
+basic frequency-domain time traces plotting function.</td></tr>
+<tr><td><a
+href='PlotPowerSpectrumMean_help.html'>PlotPowerSpectrumMean</a></td><td>A
+mean frequency-domain time trace visualization.</td></tr>
+<tr><td><a href='PlotSlices_help.html'>PlotSlices</a></td><td>Creates an
+interactive three-slice plot.</td></tr>
+<tr><td><a
+href='PlotSlicesMov_help.html'>PlotSlicesMov</a></td><td>Creates a video
+file from a volumetric data set.</td></tr>
+<tr><td><a
+href='PlotSlicesTimeTrace_help.html'>PlotSlicesTimeTrace</a></td><td>Creates
+an interactive 4D plot.</td></tr>
+<tr><td><a
+href='PlotTimeTraceAllMeas_help.html'>PlotTimeTraceAllMeas</a></td><td>An
+all-measurements time trace visualization.</td></tr>
+<tr><td><a
+href='PlotTimeTraceData_help.html'>PlotTimeTraceData</a></td><td>A basic
+time traces plotting function.</td></tr>
+<tr><td><a
+href='PlotTimeTraceMean_help.html'>PlotTimeTraceMean</a></td><td>A mean
+time traces visualization.</td></tr>
+<tr><td><a
+href='vol2surf_mesh_help.html'>vol2surf_mesh</a></td><td>Interpolates
+volumetric data onto a surface mesh.</td></tr>
+</table></p><h2>Support Files<a name="11"></a></h2><p><table border=0>
+<tr><td>/Raw_Support_Files/Spectroscopy/E.mat</td><td>Contains an “E”
+matrix of spectroscopy coefficients that relate the light intensity to
+HbO and HbR concentrations via the modified Beer-Lambert law.</td></tr>
+<tr><td>/A_Adult_96x92.mat</td><td>Contains several variables required
+for image reconstruction with the ORL’s adult scanning cap: an “A” matrix
+for cap sensitivity, a “dim” structure describing the DOT space, and an
+“infoA” structure describing the atlas space.</td></tr>
+<tr><td>/Atlas_MNI152nl_T1_on_111.mat</td><td>This file contains a
+version of the MNI 152 non-linear T1 111 atlas that has been transformed
+into the DOT space. It is saved as a variable “atlas”.</td></tr>
+<tr><td>/Atlas_MNI152nl_T1_on_333.mat</td><td>This file contains a
+version of the MNI 152 non-linear T1 333 atlas that has been transformed
+into the DOT space. It is saved as a variable “atlas”.</td></tr>
+<tr><td>/Atlas_Segmented_MNI152nl_T1_on_111.mat</td><td>This file
+contains a version of the MNI 152 non-linear T1 111 atlas segmentation
+that has been transformed into the DOT space. It is saved as a variable
+“atlas”.</td></tr>
+<tr><td>/Atlas_Segmented_MNI152nl_T1_on_333.mat</td><td>This file
+contains a version of the MNI 152 non-linear T1 333 atlas segmentation
+that has been transformed into the DOT space. It is saved as a variable
+“atlas”.</td></tr>
+<tr><td>/Cap_Fitter_Mesh_Sample.mat</td><td>A full-head sample mesh
+provided for use with the Cap_Fitter GUI.</td></tr>
+<tr><td>/LR_Meshes_MNI_164k.mat</td><td>Contains two meshes, "MNIl" and
+"MNIr", corresponding to the left and right halves of the segmented MNI
+152 non-linear T1 111 atlas.</td></tr>
+<tr><td>/Pad_Adult_96x92.mat</td><td>Contains an “info” structure with
+the “optodes”, “pairs”, and “tissue” substructures corresponding to the
+ORL’s adult scanning cap, with 96 sources and 92 detectors.</td></tr>
+<tr><td>/Pad_AdultV24x28.mat</td><td>Contains an “info” structure with
+the “optodes”, “pairs”, and “tissue” substructures corresponding to the
+ORL’s adult visual cortex cap, with 24 sources and 28
+detectors.</td></tr>
+<tr><td>/Pad_Baby32x34.mat</td><td>Contains an “info” structure with the
+“optodes”, “pairs”, and “tissue” substructures corresponding to the ORL’s
+infant scanning cap, with 32 sources and 34 detectors.</td></tr>
+</table></p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% NeuroDOT 2.2.0 Base Edition
+% *List of Files and Functions*
+
+%% Tutorials
+% <html><table border=0>
+% <tr><td><a href='DOT_Processing_Tutorial.html'>DOT Processing
+% Tutorial</a></td><td>Covers the DOT Processing pipeline.</td></tr>
+% </table></html>
+
+%% Data
+% <html><table border=0>
+% <tr><td>/NeuroDOT_Base_AC_Sample.mat</td><td>Based on the data set from
+% subject 1409, date 161110, acquisition AC002.</td></tr>
+% <tr><td>/NeuroDOT_Base_CCW_Sample.mat</td><td>Based on the data set from
+% subject 0813, date 101019, acquisition CCW.</td></tr>
+% <tr><td>/NeuroDOT_Base_CW_Sample.mat</td><td>Based on the data set from
+% subject 0813, date 101019, acquisition CW.</td></tr>
+% <tr><td>/NeuroDOT_Base_GV_Sample.mat</td><td>Based on the data set from
+% subject 1106, date 121023, acquisition GV.</td></tr>
+% <tr><td>/NeuroDOT_Base_HW_Sample_1.mat</td><td>Based on the data set from
+% subject 1106, date 120702, acquisition HW.</td></tr>
+% <tr><td>/NeuroDOT_Base_HW_Sample_2.mat</td><td>Based on the data set from
+% subject 1205, date 120626, acquisition HW.</td></tr>
+% <tr><td>/NeuroDOT_Base_HW_Sample_Noisy.mat</td><td>Based on the data set
+% from subject 1531, date 150810, acquisition HW001.</td></tr>
+% <tr><td>/NeuroDOT_Base_IN_Sample.mat</td><td>Based on the data set from
+% subject 0813, date 101019, acquisition IN.</td></tr>
+% <tr><td>/NeuroDOT_Base_OUT_Sample.mat</td><td>Based on the data set from
+% subject 0813, date 101019, acquisition OUT.</td></tr>
+% <tr><td>/NeuroDOT_Base_RW_Sample.mat</td><td>Based on the data set from
+% subject 1106, date 120702, acquisition RW.</td></tr>
+% <tr><td>/NeuroDOT_Base_Converter_Sample.mat</td><td>This sample is
+% provided for use in the File IO tutorial appendix, based on HW Sample
+% 1.</td></tr>
+% <tr><td>/test_homer2.nirs</td><td>This sample is provided for use in the
+% File IO tutorial appendix. It was derived from the introductory sample
+% used in the HOMER2 beginners’ guide.</td></tr>
+% </table></html>
+
+%% Functions
+%%% _Analysis_
+% <html><table border=0>
+% <tr><td><a
+% href='BlockAverage_help.html'>BlockAverage</a></td><td>Averaging of
+% stimulus blocks.</td></tr>
+% <tr><td><a href='FindGoodMeas_help.html'>FindGoodMeas</a></td><td>Filter
+% out noisy channels.</td></tr>
+% </table></html>
+
+%%% _File IO_
+% <html><table border=0>
+% <tr><td><a
+% href='Check4MissingData_help.html'>Check4MissingData</a></td><td>
+% Validates framesynch file against key file info.</td></tr>
+% <tr><td><a
+% href='converter_data_help.html'>converter_data</a></td><td>Reshapes data
+% from ND1 to ND2 format.</td></tr>
+% <tr><td><a
+% href='converter_HOMER_to_ND2_help.html'>converter_HOMER_to_ND2</a></td><td>Converts
+% workspace from HOMER to ND2.</td></tr>
+% <tr><td><a
+% href='converter_info_help.html'>converter_info</a></td><td>Converts the
+% ND1 info structure to ND2 format.</td></tr>
+% <tr><td><a
+% href='converter_ND1_to_ND2_help.html'>converter_ND1_to_ND2</a></td><td>Converts
+% both data and info from ND1 format to ND2.</td></tr>
+% <tr><td><a
+% href='converter_ND2_to_HOMER_help.html'>converter_ND2_to_HOMER</a></td><td>Converts
+% workspace from ND2 to HOMER.</td></tr>
+% <tr><td><a
+% href='converter_ND2_to_ND1_help.html'>converter_ND2_to_ND1</a></td><td>Converts
+% both data and info from ND2 format to ND1.</td></tr>
+% <tr><td><a href='Crop2Synch_help.html'>Crop2Synch</a></td><td>Crops data
+% to synch points.</td></tr>
+% <tr><td><a
+% href='InterpretPulses_help.html'>InterpretPulses</a></td><td>Reads the
+% synch pulses into an experiment paradigm.</td></tr>
+% <tr><td><a
+% href='InterpretStimSynch_help.html'>InterpretStimSynch</a></td><td>Reads
+% stimulus from frame synch file.</td></tr>
+% <tr><td><a
+% href='InterpretSynchBeeps_help.html'>InterpretSynchBeeps</a></td><td>Automated
+% synch file analysis.</td></tr>
+% <tr><td><a
+% href='Load_AcqDecode_Data_help.html'>Load_AcqDecode_Data</a></td><td>Loads
+% a single AcqDecode file.</td></tr>
+% <tr><td><a href='Load_HOMER_help.html'>Load_HOMER</a></td><td>Converts
+% and loads a HOMER2 ".nirs" file into ND2.</td></tr>
+% <tr><td><a
+% href='LoadMulti_AcqDecode_Data_help.html'>LoadMulti_AcqDecode_Data</a></td><td>Loads
+% and combines data from multiple AcqDecode files for a single
+% scan.</td></tr>
+% <tr><td><a
+% href='LoadVolumetricData_help.html'>LoadVolumetricData</a></td><td>Loads
+% a volumetric data file.</td></tr>
+% <tr><td><a
+% href='Make_NativeSpace_4dfp_help.html'>Make_NativeSpace_4dfp</a></td><td>Calculates
+% native space of incomplete 4dfp header.</td></tr>
+% <tr><td><a
+% href='Read_4dfp_Header_help.html'>Read_4dfp_Header</a></td><td>Read the
+% .ifh header of a 4dfp file.</td></tr>
+% <tr><td><a
+% href='Read_AcqDecode_Header_help.html'>Read_AcqDecode_Header</a></td><td>Interprets
+% the header of an AcqDecode generated data file.</td></tr>
+% <tr><td><a
+% href='Read_NIFTI_Header_help.html'>Read_NIFTI_Header</a></td><td>Reads a
+% NIFTI file header.</td></tr>
+% <tr><td><a href='ReadAux_help.html'>ReadAux</a></td><td>Reads auxiliary
+% channel files.</td></tr>
+% <tr><td><a href='ReadInfoTxt_help.html'>ReadInfoTxt</a></td><td>Reads a
+% key file.</td></tr>
+% <tr><td><a href='Save_HOMER_help.html'>Save_HOMER</a></td><td>Converts an
+% ND2 workspace to HOMER2 ".nirs" format to save.</td></tr>
+% <tr><td><a
+% href='SaveVolumetricData_help.html'>SaveVolumetricData</a></td><td>Saves
+% volumetric data in supported formats.</td></tr>
+% <tr><td><a
+% href='Write_4dfp_Header_help.html'>Write_4dfp_Header</a></td><td>Writes a
+% 4dfp header.</td></tr>
+% <tr><td><a href='Write_NIFTI_help.html'>Write_NIFTI</a></td><td>Prepares
+% a "nii" structure to be written to file.</td></tr>
+% </table></html>
+
+%%% _Reconstruction_
+% <html><table border=0>
+% <tr><td><a
+% href='reconstruct_img_help.html'>reconstruct_img</a></td><td>Performs
+% image reconstruction by wavelength using inverted A-matrix.</td></tr>
+% <tr><td><a href='smooth_Amat_help.html'>smooth_Amat</a></td><td>Performs
+% Gaussian smoothing on a sensitivity matrix.</td></tr>
+% <tr><td><a
+% href='spectroscopy_img_help.html'>spectroscopy_img</a></td><td>Completes
+% the Beer-Lambert law from a reconstructed image.</td></tr>
+% <tr><td><a
+% href='Tikhonov_invert_Amat_help.html'>Tikhonov_invert_Amat</a></td><td>Inverts
+% a sensitivity matrix.</td></tr>
+% </table></html>
+
+%%% _Spatial Transforms_
+% <html><table border=0>
+% <tr><td><a
+% href='affine3d_img_help.html'>affine3d_img</a></td><td>Transforms a 3D
+% data set to a new space.</td></tr>
+% <tr><td><a
+% href='change_space_coords_help.html'>change_space_coords</a></td><td>Applies
+% a look up to change 3D coordinates into a new space.</td></tr>
+% <tr><td><a href='Good_Vox2vol_help.html'>Good_Vox2vol</a></td><td>Turns a
+% Good Voxels data stream into a volume.</td></tr>
+% <tr><td><a href='rotate_cap_help.html'>rotate_cap</a></td><td>Rotates the
+% cap in space.</td></tr>
+% <tr><td><a
+% href='rotation_matrix_help.html'>rotation_matrix</a></td><td>Creates a
+% rotation matrix.</td></tr>
+% </table></html>
+
+%%% _Support_
+% <html><table border=0>
+% <tr><td><a
+% href='CheckOrientation_help.html'>CheckOrientation</a></td><td>Interprets
+% 3D orientation information.</td></tr>
+% <tr><td><a href='istablevar_help.html'>istablevar</a></td><td>Same
+% operation as "isfield" for tables.</td></tr>
+% </table></html>
+
+%%% _Temporal Transforms_
+% <html><table border=0>
+% <tr><td><a href='detrend_tts_help.html'>detrend_tts</a></td><td>Performs
+% linear detrending.</td></td>
+% <tr><td><a href='fft_tts_help.html'>fft_tts</a></td><td>Fast Fourier
+% Transform function with normalization and multiple outputs.</td></tr>
+% <tr><td><a href='gethem_help.html'>gethem</a></td><td>Generate
+% hemodynamics for SSR.</td></tr>
+% <tr><td><a href='highpass_help.html'>highpass</a></td><td>High pass
+% filter.</td></tr>
+% <tr><td><a href='logmean_help.html'>logmean</a></td><td>Negative ln of
+% each channel divided by its mean.</td></tr>
+% <tr><td><a href='lowpass_help.html'>lowpass</a></td><td>Low pass
+% filter.</td></tr>
+% <tr><td><a
+% href='normalize2range_tts_help.html'>normalize2range_tts</a></td><td>Normalizes
+% time traces to average of a range.</td></tr>
+% <tr><td><a href='regcorr_help.html'>regcorr</a></td><td>SSR to remove
+% hemodynamics from data.</td></tr>
+% <tr><td><a
+% href='resample_tts_help.html'>resample_tts</a></td><td>Resample data
+% while maintaining linear signal component.</td></tr>
+% </table></html>
+
+%%% _Visualization_
+% <html><table border=0>
+% <tr><td><a
+% href='adjust_brain_pos_help.html'>adjust_brain_pos</a></td><td>Repositions
+% mesh orientations for display.</td></tr>
+% <tr><td><a href='applycmap_help.html'>applycmap</a></td><td>Performs
+% color mapping and fuses images with anatomical models.</td></tr>
+% <tr><td><a href='PlotCap_help.html'>PlotCap</a></td><td>A visualization
+% of the cap grid.</td></tr>
+% <tr><td><a href='PlotCapData_help.html'>PlotCapData</a></td><td>A basic
+% plotting function for generating and labeling cap grids.</td></tr>
+% <tr><td><a
+% href='PlotCapGoodMeas_help.html'>PlotCapGoodMeas</a></td><td>A Good
+% Measurements visualization overlaid on a cap grid.</td></tr>
+% <tr><td><a href='PlotCapMeanLL_help.html'>PlotCapMeanLL</a></td><td>A
+% visualization of mean light levels overlaid on a cap grid.</td></tr>
+% <tr><td><a href='PlotFalloffData_help.html'>PlotFalloffData</a></td><td>A
+% basic falloff plotting function.</td></tr>
+% <tr><td><a href='PlotFalloffLL_help.html'>PlotFalloffLL</a></td><td>A
+% light-level falloff visualization.</td></tr>
+% <tr><td><a href='PlotGray_help.html'>PlotGray</a></td><td>A visualization
+% of data as a scaled image.</td></tr>
+% <tr><td><a href='PlotGrayData_help.html'>PlotGrayData</a></td><td>A basic
+% scaled image plotting function.</td></tr>
+% <tr><td><a
+% href='PlotHistogramData_help.html'>PlotHistogramData</a></td><td>A basic
+% histogram plotting function.</td></tr>
+% <tr><td><a
+% href='PlotHistogramSTD_help.html'>PlotHistogramSTD</a></td><td>A
+% histogram of channel standard deviations.</td></tr>
+% <tr><td><a
+% href='PlotInterpSurfMesh_help.html'>PlotInterpSurfMesh</a></td><td>Interpolates
+% volumetric data onto hemispheric meshes for display.</td></tr>
+% <tr><td><a href='PlotLRMeshes_help.html'>PlotLRMeshes</a></td><td>Renders
+% a pair of hemispheric meshes.</td></tr>
+% <tr><td><a
+% href='PlotMeshSurface_help.html'>PlotMeshSurface</a></td><td>Shows a head
+% mesh model's outer surface.</td></tr>
+% <tr><td><a
+% href='PlotPowerSpectrumAllMeas_help.html'>PlotPowerSpectrumAllMeas</a></td><td>An
+% all-measurements frequency-domain time trace visualization.</td></tr>
+% <tr><td><a
+% href='PlotPowerSpectrumData_help.html'>PlotPowerSpectrumData</a></td><td>A
+% basic frequency-domain time traces plotting function.</td></tr>
+% <tr><td><a
+% href='PlotPowerSpectrumMean_help.html'>PlotPowerSpectrumMean</a></td><td>A
+% mean frequency-domain time trace visualization.</td></tr>
+% <tr><td><a href='PlotSlices_help.html'>PlotSlices</a></td><td>Creates an
+% interactive three-slice plot.</td></tr>
+% <tr><td><a
+% href='PlotSlicesMov_help.html'>PlotSlicesMov</a></td><td>Creates a video
+% file from a volumetric data set.</td></tr>
+% <tr><td><a
+% href='PlotSlicesTimeTrace_help.html'>PlotSlicesTimeTrace</a></td><td>Creates
+% an interactive 4D plot.</td></tr>
+% <tr><td><a
+% href='PlotTimeTraceAllMeas_help.html'>PlotTimeTraceAllMeas</a></td><td>An
+% all-measurements time trace visualization.</td></tr>
+% <tr><td><a
+% href='PlotTimeTraceData_help.html'>PlotTimeTraceData</a></td><td>A basic
+% time traces plotting function.</td></tr>
+% <tr><td><a
+% href='PlotTimeTraceMean_help.html'>PlotTimeTraceMean</a></td><td>A mean
+% time traces visualization.</td></tr>
+% <tr><td><a
+% href='vol2surf_mesh_help.html'>vol2surf_mesh</a></td><td>Interpolates
+% volumetric data onto a surface mesh.</td></tr>
+% </table></html>
+
+%% Support Files
+% <html><table border=0>
+% <tr><td>/Raw_Support_Files/Spectroscopy/E.mat</td><td>Contains an “E”
+% matrix of spectroscopy coefficients that relate the light intensity to
+% HbO and HbR concentrations via the modified Beer-Lambert law.</td></tr>
+% <tr><td>/A_Adult_96x92.mat</td><td>Contains several variables required
+% for image reconstruction with the ORL’s adult scanning cap: an “A” matrix
+% for cap sensitivity, a “dim” structure describing the DOT space, and an
+% “infoA” structure describing the atlas space.</td></tr>
+% <tr><td>/Atlas_MNI152nl_T1_on_111.mat</td><td>This file contains a
+% version of the MNI 152 non-linear T1 111 atlas that has been transformed
+% into the DOT space. It is saved as a variable “atlas”.</td></tr>
+% <tr><td>/Atlas_MNI152nl_T1_on_333.mat</td><td>This file contains a
+% version of the MNI 152 non-linear T1 333 atlas that has been transformed
+% into the DOT space. It is saved as a variable “atlas”.</td></tr>
+% <tr><td>/Atlas_Segmented_MNI152nl_T1_on_111.mat</td><td>This file
+% contains a version of the MNI 152 non-linear T1 111 atlas segmentation
+% that has been transformed into the DOT space. It is saved as a variable
+% “atlas”.</td></tr>
+% <tr><td>/Atlas_Segmented_MNI152nl_T1_on_333.mat</td><td>This file
+% contains a version of the MNI 152 non-linear T1 333 atlas segmentation
+% that has been transformed into the DOT space. It is saved as a variable
+% “atlas”.</td></tr>
+% <tr><td>/Cap_Fitter_Mesh_Sample.mat</td><td>A full-head sample mesh
+% provided for use with the Cap_Fitter GUI.</td></tr>
+% <tr><td>/LR_Meshes_MNI_164k.mat</td><td>Contains two meshes, "MNIl" and
+% "MNIr", corresponding to the left and right halves of the segmented MNI
+% 152 non-linear T1 111 atlas.</td></tr>
+% <tr><td>/Pad_Adult_96x92.mat</td><td>Contains an “info” structure with
+% the “optodes”, “pairs”, and “tissue” substructures corresponding to the
+% ORL’s adult scanning cap, with 96 sources and 92 detectors.</td></tr>
+% <tr><td>/Pad_AdultV24x28.mat</td><td>Contains an “info” structure with
+% the “optodes”, “pairs”, and “tissue” substructures corresponding to the
+% ORL’s adult visual cortex cap, with 24 sources and 28
+% detectors.</td></tr>
+% <tr><td>/Pad_Baby32x34.mat</td><td>Contains an “info” structure with the
+% “optodes”, “pairs”, and “tissue” substructures corresponding to the ORL’s
+% infant scanning cap, with 32 sources and 34 detectors.</td></tr>
+% </table></html>
+
+##### SOURCE END #####
+--></body></html>
