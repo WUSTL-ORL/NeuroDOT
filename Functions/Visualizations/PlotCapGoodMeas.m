@@ -66,7 +66,7 @@ SMarkerColor = [1, .75, .75];
 DMarkerColor = [.55, .55, 1];
 use_NNx_RxD = 'RxD';
 
-Nm = height(info.pairs);
+Nm = length(info.pairs.Src);
 Ns = numel(unique(info.pairs.Src));
 Nd = numel(unique(info.pairs.Det));
 cs = unique(info.pairs.WL);
