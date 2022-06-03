@@ -98,6 +98,8 @@ elseif isfield(info_out.paradigm, 'synchpts')
     end
     STD = std(data(:, t0:tF), [], 2); % Calculate STD
 else
+    tF = size(data, 2);
+    t0 = 1;
     STD = std(data, [], 2);
 end
 
