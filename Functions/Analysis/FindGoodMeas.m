@@ -114,7 +114,7 @@ else
     info_out.MEAS.STD=STD;
     info_out.MEAS.GI=STD <= bthresh;
 end
-if istablevar(info_out.MEAS,'Clipped')
+if isfield(info_out.MEAS,'Clipped')
     info_out.MEAS.GI=info_out.MEAS.GI & ~info_out.MEAS.Clipped;
 end
 
