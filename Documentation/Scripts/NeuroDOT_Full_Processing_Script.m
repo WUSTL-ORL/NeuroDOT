@@ -4,13 +4,11 @@
 % For each data set, there is an example *.pptx with selected
 % visualizations. The NeuroDOT_Tutorial_Full_Data_Processing.pptx uses
 % NeuroDOT_Data_Sample_CCW1.mat. 
-%
 
 
-%% PREPROCESSING PIPELINE
 
 %% Load Measurement data
-dataset='GV1'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
+dataset='CCW1'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
 load(['NeuroDOT_Data_Sample_',dataset,'.mat']); % data, info, flags
 
 % Set parameters for A and block length for quick processing examples
@@ -32,13 +30,39 @@ switch dataset
         
 end
 
+
 %% General data QC with synchpts if present
 Plot_RawData_Time_Traces_Overview(data,info);           % Time traces
 Plot_RawData_Cap_DQC(data,info);                        % Cap-relevant views
 Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data quality figs
 
 
+%% View data before filtering
+lmdata_b4_filt = logmean(data);                                           % Logmean Light Levels
+info_b4_filt  = FindGoodMeas(lmdata_b4_filt , info, 0.075);               % Detect Noisy Channels
+lmdata_b4_filt  = detrend_tts(lmdata_b4_filt );                           % Detrend Data
+
+% Measurements to include
+keep = info_b4_filt.pairs.WL==2 & info_b4_filt.pairs.r2d < 40 & info_b4_filt.MEAS.GI; 
+
+% Visualize
+figure('Position',[100 100 550 780])
+subplot(3,1,1); plot(lmdata_b4_filt(keep,:)'); 
+set(gca,'XLimSpec','tight'), xlabel('Time (samples)'), 
+ylabel('log(\phi/\phi_0)') 
+m=max(max(abs(lmdata_b4_filt(keep,:))));
+subplot(3,1,2); imagesc(lmdata_b4_filt(keep,:),[-1,1].*m); 
+colorbar('Location','northoutside');
+xlabel('Time (samples)');ylabel('Measurement #')
+[ftmag,ftdomain] = fft_tts(squeeze(mean(lmdata_b4_filt(keep,:),1)),info_b4_filt.system.framerate); % Generate average spectrum
+subplot(3,1,3); semilogx(ftdomain,ftmag);
+xlabel('Frequency (Hz)');ylabel('|X(f)|');xlim([1e-3 1])
+
+nlrGrayPlots_180818(lmdata_b4_filt,info_b4_filt); % Gray Plot with synch points
+
+
 %% PRE-PREOCESSING PIPELINE
+% Note: the first 3 lines are repeated from above but with changed variable names
 lmdata = logmean(data);                                 % Logmean Light Levels
 info = FindGoodMeas(lmdata, info, 0.075);               % Detect Noisy Channels
 lmdata = detrend_tts(lmdata);                           % Detrend Data
@@ -65,9 +89,11 @@ xlabel('Time (samples)');ylabel('Measurement #')
 subplot(3,1,3); semilogx(ftdomain,ftmag);
 xlabel('Frequency (Hz)');ylabel('|X(f)|');xlim([1e-3 1])
 
-Plot_TimeTrace_With_PowerSpectrum(lmdata,info); % As above, but now automated with all wavelengths
 nlrGrayPlots_180818(lmdata,info); % Gray Plot with synch points
+
+Plot_TimeTrace_With_PowerSpectrum(lmdata,info); % As above, but now automated with all wavelengths
 GrayPlots_Rsd_by_Wavelength(lmdata,info); % As above but now with all wavelengths
+
 
 %% Block Averaging the measurement data and view
 badata = BlockAverage(lmdata, info.paradigm.synchpts(info.paradigm.Pulse_2), dt);
@@ -81,7 +107,8 @@ ylabel('log(\phi/\phi_0)')
 m=max(max(abs(badata(keep,:))));
 subplot(2,1,2); imagesc(badata(keep,:),[-1,1].*m); 
 colorbar('Location','northoutside');
-xlabel('Time (samples)');ylabel('Measurement #')
+xlabel('Time (samples)');
+ylabel('Measurement #')
 
 
 %% RECONSTRUCTION PIPELINE
@@ -115,25 +142,30 @@ cortex_HbT = cortex_HbO + cortex_HbR;
 
 %% Select Volumetric visualizations of block averaged data
 if ~exist('MNI', 'var')
-[MNI,infoB]=LoadVolumetricData('Segmented_MNI152nl_on_MNI111',[],'4dfp'); % load MRI (same data set as in A matrix dim)
+[MNI,infoB]=LoadVolumetricData('Segmented_MNI152nl_on_MNI111',[],'4dfp'); % Load MRI (same data set as in A matrix dim)
 end
-MNI_dim = affine3d_img(MNI,infoB,A.info.tissue.dim,eye(4),'nearest'); % transform to DOT volume space 
+MNI_dim = affine3d_img(MNI,infoB,A.info.tissue.dim,eye(4),'nearest'); % Transform to DOT volume space
 
+% Block Average Data
 badata_HbO = BlockAverage(cortex_HbO, info.paradigm.synchpts(info.paradigm.Pulse_2), dt);
 badata_HbO=bsxfun(@minus,badata_HbO,badata_HbO(:,1));
 badata_HbOvol = Good_Vox2vol(badata_HbO,A.info.tissue.dim);
-
 tp_Eg=squeeze(badata_HbOvol(:,:,:,tp));
-PlotSlices(tp_Eg,A.info.tissue.dim); % data by itself
-PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % data with anatomical underlay
 
+% Explore PlotSlices - The basics
+PlotSlices(MNI_dim)                             % Anatomy only
+PlotSlices(MNI_dim,A.info.tissue.dim)           % Anatomy + volumetric data
+PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Anatomy + volumetric data + functional data
 
+% Visualize the data
+PlotSlices(tp_Eg,A.info.tissue.dim);            % Data by itself
+PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Data with anatomical underlay
 % Set parameters to visualize more specific aspects of data
-Params.Scale=0.8*max(abs(tp_Eg(:)));
-Params.Th.P=0.5*Params.Scale;
-Params.Th.N=-Params.Th.P;
+Params.Scale=0.8*max(abs(tp_Eg(:)));     % Scale wrt/max of data
+Params.Th.P=0.5*Params.Scale;            % Threshold to see strong activations
+Params.Th.N=-Params.Th.P;                % Thresholds go both ways
 Params.Cmap='jet';
-PlotSlices(MNI_dim,A.info.tissue.dim,Params,tp_Eg); 
+PlotSlices(MNI_dim,A.info.tissue.dim,Params,tp_Eg);
 
 % Explore the block-averaged data a bit more interactively
 Params.Scale=0.8*max(abs(badata_HbOvol(:)));
@@ -151,12 +183,11 @@ PlotSlicesTimeTrace(MNI_dim,A.info.tissue.dim,Params,HbOvol,info)
 
 %% Select Surface visualizations
 if ~exist('MNIl', 'var'),load(['MNI164k_big.mat']);end
-
 HbO_atlas = affine3d_img(badata_HbOvol,A.info.tissue.dim,infoB,eye(4));
 tp_Eg_atlas=squeeze(HbO_atlas(:,:,:,tp));
-
 pS=Params;
 pS.view='post';
+
 pS.ctx='std'; % Standard pial cortical view
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 
@@ -166,80 +197,3 @@ PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 pS.ctx='vinf';% Very Inflated pial cortical view
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 
-
-
-
-
-%% Other visualizations to vet
-
-
-
-% Raw data and cap viz.
-params.rlimits = [10, 16];
-params.Nwls = 2;
-params.yscale='log';
-
-PlotTimeTraceAllMeas(data, info, params)
-PlotFalloffLL(data, info)
-
-PlotCap(info)
-
-params.mode = [];
-PlotCapMeanLL(data, info, params)
-
-params2 = params;
-params2.rlimits = [27, 33];
-PlotCapMeanLL(data, info, params2)
-
-% Logmean, time traces and gray plots.
-params.yscale = 'linear';
-params.ylimits = 'auto';
-PlotTimeTraceAllMeas(lmdata, info, params)
-
-PlotGray(lmdata, info, params)
-
-nlrGrayPlots_180818(lmdata,info);
-
-params.ylimits = [];
-params.yscale = [];
-
-% Noisy channels.
-PlotHistogramSTD(info, params)
-
-params.mode = 'good';
-params.rlimits = [10, 16; 27, 33; 36, 42; 44, 50];
-PlotCapGoodMeas(info, params)
-
-params.mode ='bad';
-params.rlimits = [10, 16; 27, 33; 36, 42];
-PlotCapGoodMeas(info, params)
-
-params.mode = [];
-params.rlimits = [10, 16];
-
-% Mean time trace for first 4 signal processing steps.
-params.fig_handle = figure('Color', 'k');
-PlotTimeTraceMean(lmdata, info, params)
-params.rlimits = [16, 33];
-PlotTimeTraceMean(lmdata, info, params)
-
-
-% Power spectrum 
-params.fig_handle = figure('Color', 'k');
-params.ylimits = [];
-PlotPowerSpectrumMean(lmdata, info, params)
-legend({'detrended', 'HPF', 'LPF1'}, 'Color', [0.1, 0.1, 0.1], 'TextColor', 'w')
-title('r \in [10, 16], 850 nm')
-
-% Showing superficial and cortical layers for before and after SSR.
-params.rlimits = [10, 16; 27, 33];
-params.fig_handle = figure('Color', 'k');
-PlotPowerSpectrumMean(lmdata, info, params)
-title('LPF1')
-
-
-
-
-
-
-%
