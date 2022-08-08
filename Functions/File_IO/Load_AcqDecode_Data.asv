@@ -225,8 +225,8 @@ if exist([fn,'.clipping'],'file')
     fclose(fid);
     clipping=reshape(clipping,[],size(clipping,3));
     clipped=sum(clipping,2);
-    info.MEAS= struct;
-    info.MEAS.Clipped = cat(1,clipped(:),clipped(:))>0;
+    info.MEAS= struct;table(cat(1,clipped(:),clipped(:))>0,...
+            'VariableNames', {'Clipped'});
 end
 % clipping=(sum(data==realmax,2) ~= 0) ;
 % info.MEAS=table(cat(1,clipping(:),clipping(:))>0,...
