@@ -42,6 +42,16 @@ datafile=[dateA,'-',subj,'-',suf]; % Data file name
 
 if exist([datafile2save,'.mat'],'file') && ~params.overwrite
     load([datafile2save,'.mat'])
+    if isfield(info, 'MEAS')
+        if istable(info.MEAS)
+            info.MEAS = table2struct(info.MEAS, 'ToScalar', true)
+        end
+    end
+    if isfield(info, 'pairs')
+        if istable(info.pairs)
+            info.pairs = table2struct(info.pairs, 'ToScalar', true)
+        end
+    end
 else % do all of decoding...
     
 if ~isfield(params,'decode_type') % options: 'IQ','FFT'
@@ -101,6 +111,12 @@ fn_base=[dateA,'-run00',num2str(info.run),'-ch'];
 fn_base=[dateA,'-run0',num2str(info.run),'-ch'];
 end
 
+
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true)
+    end
+end
 if ~isfield(params,'FSchan')
 switch info.pad % These must show the max A/D channel for each system
     case 'Adult_96x92a'
