@@ -99,7 +99,7 @@ switch conversion
         info_out.optodes.plot3orientation.k = 'D2V';
         
         %% Build "info.pairs" table.
-        info_out.pairs = table;
+        info_out.pairs = struct;
         
         % Check for iRad and its subfields. Cannot do this without that!
         rname = 'iRad';
@@ -161,7 +161,7 @@ switch conversion
         tf = strcmp('goodindex', inames);
         if any(tf)
             H = height(info_out.pairs);
-            info_out.MEAS = table(false(H, 1), 'VariableNames', {'GI'});
+            info_out.MEAS = struct;
             info_out.MEAS.GI(info_in.goodindex.c1) = true;
             info_out.MEAS.GI(info_in.goodindex.c2 + H/2) = true;
             inames(tf) = [];
@@ -278,9 +278,9 @@ switch conversion
         %% Create info2.goodindex from info.meas.
         % NOTE: Must be done before iRad, which pares down info.pairs.
         tf = strcmp('MEAS', inames);
-        if any(tf)  &&  istablevar(info_in.MEAS, 'GI')
+        if any(tf)  &&  isfield(info_in.MEAS, 'GI')
             info_out.goodindex.c1 = find((info_in.MEAS.GI == 1)  &  (info_in.pairs.WL == 1));
-            info_out.goodindex.c2 = find((info_in.MEAS.GI == 1)  &  (info_in.pairs.WL == 2)) - height(info_in.pairs);
+            info_out.goodindex.c2 = find((info_in.MEAS.GI == 1)  &  (info_in.pairs.WL == 2)) - size(info_in.pairs,1);
             inames(tf) = [];
         end
         
@@ -305,7 +305,7 @@ switch conversion
                 info_out.iRad.meas(:, 1) = info_in.pairs.Src;
                 info_out.iRad.meas(:, 2) = info_in.pairs.Det;
                 
-                if istablevar(info_in.pairs, 'r2d')
+                if isfield(info_in.pairs, 'r2d')
                     info_out.iRad.ir = info_in.pairs.r2d;
                     info_out.iRad.r = info_out.iRad.ir;
                 end
