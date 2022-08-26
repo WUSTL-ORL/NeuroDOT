@@ -33,7 +33,7 @@ end
 
 %% General data QC with synchpts if present
 Plot_RawData_Time_Traces_Overview(data,info);           % Time traces
-Plot_RawData_Cap_DQC(data,info);                        % Cap-relevant views
+Plot_RawData_Cap_DQC(data, info);                % Cap-relevant views
 Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data quality figs
 
 
@@ -41,6 +41,7 @@ Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data quality figs
 lmdata_b4_filt = logmean(data);                                           % Logmean Light Levels
 info_b4_filt  = FindGoodMeas(lmdata_b4_filt , info, 0.075);               % Detect Noisy Channels
 lmdata_b4_filt  = detrend_tts(lmdata_b4_filt );                           % Detrend Data
+info_b4_filt.GVTD = CalcGVTD(lmdata_b4_filt(info_b4_filt.MEAS.GI & info_b4_filt.pairs.r2d<20,:));         % Calculate GVTD
 
 % Measurements to include
 keep = info_b4_filt.pairs.WL==2 & info_b4_filt.pairs.r2d < 40 & info_b4_filt.MEAS.GI; 
@@ -63,15 +64,16 @@ nlrGrayPlots_180818(lmdata_b4_filt,info_b4_filt); % Gray Plot with synch points
 
 %% PRE-PREOCESSING PIPELINE
 % Note: the first 3 lines are repeated from above but with changed variable names
-lmdata = logmean(data);                                 % Logmean Light Levels
-info = FindGoodMeas(lmdata, info, 0.075);               % Detect Noisy Channels
-lmdata = detrend_tts(lmdata);                           % Detrend Data
-lmdata = highpass(lmdata, .02, info.system.framerate);  % High Pass Filter (0.02 Hz)
-lmdata = lowpass(lmdata, 1, info.system.framerate);     % Low Pass Filter 1 (1.0 Hz)
-hem = gethem(lmdata, info);                             % Superficial Signal Regression
+lmdata = logmean(data);                                                   % Logmean Light Levels
+info = FindGoodMeas(lmdata, info, 0.075);                                 % Detect Noisy Channels
+lmdata = detrend_tts(lmdata);                                             % Detrend Data
+lmdata = highpass(lmdata, .02, info.system.framerate);                    % High Pass Filter (0.02 Hz)
+lmdata = lowpass(lmdata, 1, info.system.framerate);                       % Low Pass Filter 1 (1.0 Hz)
+hem = gethem(lmdata, info);                                               % Superficial Signal Regression
 [lmdata, ~] = regcorr(lmdata, info, hem);
-lmdata = lowpass(lmdata, 0.5, info.system.framerate);   % Low Pass Filter 2 (0.5 Hz)
-[lmdata, info] = resample_tts(lmdata, info, 1, 1e-5);   % 1 Hz Resampling (1 Hz)
+lmdata = lowpass(lmdata, 0.5, info.system.framerate);                     % Low Pass Filter 2 (0.5 Hz)
+[lmdata, info] = resample_tts(lmdata, info, 1, 1e-5);                     % 1 Hz Resampling (1 Hz)
+info.GVTD = CalcGVTD(lmdata(info.MEAS.GI & info.pairs.r2d<20,:));         % Calculate GVTD
 
 
 %% View pre-processed data
@@ -152,12 +154,12 @@ badata_HbO=bsxfun(@minus,badata_HbO,badata_HbO(:,1));
 badata_HbOvol = Good_Vox2vol(badata_HbO,A.info.tissue.dim);
 tp_Eg=squeeze(badata_HbOvol(:,:,:,tp));
 
-% Explore PlotSlices - The basics
+% Explore PlotSlices - The basics (Slide 21 in ppt)
 PlotSlices(MNI_dim)                             % Anatomy only
 PlotSlices(MNI_dim,A.info.tissue.dim)           % Anatomy + volumetric data
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Anatomy + volumetric data + functional data
 
-% Visualize the data
+% Visualize the data (Slide 22 in ppt)
 PlotSlices(tp_Eg,A.info.tissue.dim);            % Data by itself
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Data with anatomical underlay
 % Set parameters to visualize more specific aspects of data
@@ -167,13 +169,13 @@ Params.Th.N=-Params.Th.P;                % Thresholds go both ways
 Params.Cmap='jet';
 PlotSlices(MNI_dim,A.info.tissue.dim,Params,tp_Eg);
 
-% Explore the block-averaged data a bit more interactively
+% Explore the block-averaged data a bit more interactively (slide 23 in ppt)
 Params.Scale=0.8*max(abs(badata_HbOvol(:)));
 Params.Th.P=0;
 Params.Th.N=-Params.Th.P;
 PlotSlicesTimeTrace(MNI_dim,A.info.tissue.dim,Params,badata_HbOvol,info)
 
-% Explore the not-block-averaged data a bit more interactively
+% Explore the not-block-averaged data a bit more interactively (slide 23 in ppt)
 HbOvol = Good_Vox2vol(cortex_HbO,A.info.tissue.dim);
 Params.Scale=4e-3;
 Params.Th.P=1e-3;
