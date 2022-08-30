@@ -359,6 +359,24 @@ switch conversion
                 info_out.(str{1}) = info_in.(str{1});
             end
         end
+        %Store all units
+        if ~isfield(info_in, 'units')
+            info_out.units = struct;
+            info_out.units.dpos2 = 'mm';
+            info_out.units.dpos3 = 'mm';
+            info_out.units.spos3 = 'mm';
+            info_out.units.spos2 = 'mm';
+            info_out.units.lambda = 'nm';
+            info_out.units.Mod = 'MHz';
+            info_out.units.r2d = 'mm';
+            info_out.units.r3d = 'mm';
+            info_out.units.framerate = 'Hz';
+            info_out.units.init_framerate = 'Hz';
+            info_out.units.mua = 'mm^-1';
+            info_out.units.musp = 'mm^-1';
+            info_out.units.cortex_mu_a = 'mm^-1';
+            info_out.units.cortex_Hb = 'micro_mol';
+        end
         
         %% Reorder fields.
         info_out = orderfields(info_out);

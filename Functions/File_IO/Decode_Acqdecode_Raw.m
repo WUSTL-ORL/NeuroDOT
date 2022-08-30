@@ -706,11 +706,27 @@ if params.ND2 % Output data in newer format 181217)
 end
 
 
+%Store all units
+if ~isfield(info, 'units')
+    info.units = struct;
+    info.units.dpos2 = 'mm';
+    info.units.dpos3 = 'mm';
+    info.units.spos3 = 'mm';
+    info.units.spos2 = 'mm';
+    info.units.lambda = 'nm';
+    info.units.Mod = 'MHz';
+    info.units.r2d = 'mm';
+    info.units.r3d = 'mm';
+    info.units.framerate = 'Hz';
+    info.units.init_framerate = 'Hz';
+    info.units.mua = 'mm^-1';
+    info.units.musp = 'mm^-1';
+    info.units.cortex_mu_a = 'mm^-1';
+    info.units.cortex_Hb = 'micro_mol';
+end
+
 if ( ~params.noMatFile )
 save([datafile2save,'.mat'],'M','info','I','Q','clipping','-v7.3')
 end
 end
-
-
-
 
