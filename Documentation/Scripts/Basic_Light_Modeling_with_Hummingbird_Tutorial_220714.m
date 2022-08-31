@@ -227,9 +227,9 @@ flags.gridname=gridname;
 flags.meshname=meshname;
 flags.head='info';
 flags.info=infoT1;                  % Your T1 info file
-flags.gthresh=1e-3;                 % Voxelation threshold in G
+flags.gthresh=1e-5;                 % Voxelation threshold in G
 flags.voxmm=2;                      % Voxelation resolution (mm)
-flags.labels.r1='csf';             % Regions for optical properties
+flags.labels.r1='csf';              % Regions for optical properties
 flags.labels.r2='white';
 flags.labels.r3='gray';
 flags.labels.r4='bone';
@@ -278,9 +278,11 @@ info.tissue.infoT1=infoT1;
 info.tissue.affine_target='MNI';
 info.tissue.flags=flags;
 
-% Get A with only 1st to 5th Nearest Neighbors (takes up less space than full A)
-keep=info.pairs.NN<=5;
-temp=table;
+save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
+
+% Get A with all SD separations within 6cm
+keep=info.pairs.r3d<=60; % for sparse density pad, only save measurements where SD separation is within 60mm (6cm)
+temp=struct;
 temp.Src=info.pairs.Src(keep);
 temp.Det=info.pairs.Det(keep);
 temp.NN=info.pairs.NN(keep);
@@ -290,10 +292,9 @@ temp.Mod=info.pairs.Mod(keep);
 temp.r2d=info.pairs.r2d(keep);
 temp.r3d=info.pairs.r3d(keep);
 info.pairs=temp;
-A_1t5NN=A(keep,:); %A with only 1st to 5th NN
+A=A(keep,:); %A with all SD within 6cm
 
-save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
-save(['A_first_to_fifth_NN_',flags.tag,'.mat'],'A_1t5NN','info','-v7.3') %save A with only 1st to 5th NN
+save(['A_r3d_lth_60_',flags.tag,'.mat'],'A','info','-v7.3') %save A with all SD within 6cm
 
 
 %% Visualize aspects of sensitivity profile
