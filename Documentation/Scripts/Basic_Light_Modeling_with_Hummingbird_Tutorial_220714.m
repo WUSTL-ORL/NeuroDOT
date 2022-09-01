@@ -278,6 +278,17 @@ info.tissue.infoT1=infoT1;
 info.tissue.affine_target='MNI';
 info.tissue.flags=flags;
 
+temp_pairs=struct;
+temp_pairs.Src=info.pairs.Src;
+temp_pairs.Det=info.pairs.Det;
+temp_pairs.NN=info.pairs.NN;
+temp_pairs.WL=info.pairs.WL;
+temp_pairs.lambda=info.pairs.lambda;
+temp_pairs.Mod=info.pairs.Mod;
+temp_pairs.r2d=info.pairs.r2d;
+temp_pairs.r3d=info.pairs.r3d;
+info.pairs=temp_pairs;
+
 save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
 
 % Get A with all SD separations within 6cm

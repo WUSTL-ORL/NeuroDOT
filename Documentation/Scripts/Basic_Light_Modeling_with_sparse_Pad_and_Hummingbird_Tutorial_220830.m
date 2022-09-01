@@ -1,4 +1,3 @@
-%% OVERVIEW
 % 1. start with Mask and Pad
 % 2. make a Low Density mesh of the mask
 % 3. use Hummingbird to place the Pad on the LD mesh
@@ -17,7 +16,7 @@
 %% Pathing and Parameters
 %Set Output Directory
 %Change the path on the following line to whatever output directory you want to use
-outputdir = '/data/eggebrecht/data1/Ari/AAOutputs/mesh_testing/Sparse_pad_testing/test3_220830'; % put path to directory in between quotes
+outputdir = ''; % put path to directory in between quotes
 cd(outputdir)
 
 % Are your pad's 2D optode positions shorter for visualization purposes
@@ -290,8 +289,18 @@ info.tissue.infoT1=infoT1;
 info.tissue.affine_target='MNI';
 info.tissue.flags=flags;
 
-save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
+temp_pairs=struct;
+temp_pairs.Src=info.pairs.Src;
+temp_pairs.Det=info.pairs.Det;
+temp_pairs.NN=info.pairs.NN;
+temp_pairs.WL=info.pairs.WL;
+temp_pairs.lambda=info.pairs.lambda;
+temp_pairs.Mod=info.pairs.Mod;
+temp_pairs.r2d=info.pairs.r2d;
+temp_pairs.r3d=info.pairs.r3d;
+info.pairs=temp_pairs;
 
+save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
 
 % Get A with all SD separations within 5cm
 keep=info.pairs.r3d<=50; % for sparse density pad, only save measurements where SD separation is within 50mm (5cm)
