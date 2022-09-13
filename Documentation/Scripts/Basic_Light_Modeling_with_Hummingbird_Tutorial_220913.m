@@ -149,7 +149,6 @@ PlotMeshSurface(visMeshHD,pM);view([70,60]) %Visualize in index space
 %view should be as if you're looking at the mesh from above and on the right side
 %mesh will also be angled so that the top left corner is in the top center of the plot
 
-
 % Put coordinates back in coordinate space
 meshHD.nodes=change_space_coords(meshHD.nodes,infoT1,'coord'); %for actual mesh
 visMeshHD.nodes=change_space_coords(visMeshHD.nodes,infoT1,'coord'); %for mesh that's visualized
@@ -332,7 +331,7 @@ pA.PD=1;pA.Scale=1;pA.Th.P=1e-2;pA.Th.N=-pA.Th.P;
 PlotSlices(t1,dim,pA,fooV)
 
 
-%% Visualize alighnment of LD mesh, HD mesh, array, and cortices
+%% Visualize alignment of LD mesh, HD mesh, array, and cortices
 %  View alignment
 Cortical_mesh = load(['MNI164k_big.mat']);
 Anat.CtxL = Cortical_mesh.MNIl;
