@@ -39,8 +39,8 @@ subplot(3,1,3); semilogx(ftdomain,ftmag), xlabel('Frequency (Hz)'), ylabel('|X(f
 xlim([1e-3 10])
 
 %% Show nn1, nn2, nn3 (plots)
-
-% nlrGrayPlots_180818(lmdata,info)
+info.GVTD = CalcGVTD(lmdata);
+nlrGrayPlots_180818(lmdata,info)
 
 keepd1=info.MEAS.GI & info.pairs.r2d<20 & info.pairs.WL==2;
 keepd2=info.MEAS.GI & info.pairs.r2d>=20 & info.pairs.r2d<30 & info.pairs.WL==2;
