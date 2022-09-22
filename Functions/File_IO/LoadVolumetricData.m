@@ -80,68 +80,71 @@ switch lower(file_type)
             case 'sagittal'
                 volume = flip(volume, 1);
                 volume = flip(volume, 2);
-                volume = flip(volume, 3);  % Is this wrong???
+                volume = flip(volume, 3);  
         end
         
     case {'nifti', 'nii'}
+
         %% Call NIFTI_Reader function.
         %%% NOTE: When passing file types, if you have the ".nii" file
         %%% extension, you must use that as both the "ext" input AND add it
         %%% as an extension on the "filename" input.
-        nii = load_nii(fullfile(pn, [filename, '.', file_type]));
-        volume = flip(nii.img, 1); % NIFTI loads in RAS orientation. We want LAS, so we flip first dim.
-        
-        % Convert nifti header to 4dfp/ND_Beta style info metadata
-        header.version_of_keys = '3.3'; 
-        header.format = class(nii.img);
-        header.conversion_program = 'NeuroDOT_LoadVolumetricData';
-        header.filename = [filename,'.nii'];
-        header.bytes_per_pixel = nii.hdr.dime.bitpix / 8;
-        
-        switch nii.machine
-            case 'ieee-le'
-                header.byte = 'l';
-            case 'ieee-be'
-                header.byte = 'b';
-        end        
-        header.acq = 'transverse';
-        
-        header.nDim = nii.hdr.dime.dim(1);
-        header.nVx = nii.hdr.dime.dim(2);
-        header.nVy = nii.hdr.dime.dim(3);
-        header.nVz = nii.hdr.dime.dim(4);
-        header.nVt = nii.hdr.dime.dim(5);
-        
-        header.mmx = nii.hdr.dime.pixdim(2); 
-        header.mmy = nii.hdr.dime.pixdim(3);
-        header.mmz = nii.hdr.dime.pixdim(4);        
-        
-        if ~isempty(nii.hdr.hist.flip_orient)
-            if nii.hdr.hist.flip_orient(1)
-                header.mmppix(1) = header.mmx;
+            nii = load_nii(fullfile(pn, [filename, '.', file_type]));
+            volume = flip(nii.img, 1); % NIFTI loads in RAS orientation. We want LAS, so we flip first dim.
+
+            % Convert nifti header to 4dfp/NeuroDOT style info metadata
+            header.version_of_keys = '3.3'; 
+            header.format = class(nii.img);
+            header.conversion_program = 'NeuroDOT_LoadVolumetricData';
+            header.filename = [filename,'.nii'];
+            header.bytes_per_pixel = nii.hdr.dime.bitpix / 8;
+
+            switch nii.machine
+                case 'ieee-le'
+                    header.byte = 'l';
+                case 'ieee-be'
+                    header.byte = 'b';
+            end        
+            header.acq = 'transverse';
+
+            header.nDim = nii.hdr.dime.dim(1);
+            header.nVx = nii.hdr.dime.dim(2);
+            header.nVy = nii.hdr.dime.dim(3);
+            header.nVz = nii.hdr.dime.dim(4);
+            header.nVt = nii.hdr.dime.dim(5);
+
+            header.mmx = nii.hdr.dime.pixdim(2); 
+            header.mmy = nii.hdr.dime.pixdim(3);
+            header.mmz = nii.hdr.dime.pixdim(4);        
+
+            if ~isempty(nii.hdr.hist.flip_orient)
+                if nii.hdr.hist.flip_orient(1)
+                    header.mmppix(1) = header.mmx;
+                else
+                    header.mmppix(1) = -header.mmx;
+                end
+                if nii.hdr.hist.flip_orient(2)
+                    header.mmppix(2) = header.mmy;
+                else
+                    header.mmppix(2) = -header.mmy;
+                end
+                if nii.hdr.hist.flip_orient(3)
+                    header.mmppix(3) = header.mmz;
+                else
+                    header.mmppix(3) = -header.mmz;
+                end
             else
-                header.mmppix(1) = -header.mmx;
+                % If we have no information, we default to the "+ - -" convention.
+                header.mmppix = [header.mmx, -header.mmy, -header.mmz];
             end
-            if nii.hdr.hist.flip_orient(2)
-                header.mmppix(2) = header.mmy;
-            else
-                header.mmppix(2) = -header.mmy;
-            end
-            if nii.hdr.hist.flip_orient(3)
-                header.mmppix(3) = header.mmz;
-            else
-                header.mmppix(3) = -header.mmz;
-            end
-        else
-            % If we have no information, we default to the "+ - -" convention.
-            header.mmppix = [header.mmx, -header.mmy, -header.mmz];
-        end
-        
-        header.center=header.mmppix.*([header.nVx,header.nVy,header.nVz]./2 ...
-                        + [0,1,1]);
-        
-        header.original_header=rmfield(nii,'img');
-        
+
+            % Calculate Center values (updated 9/21/22)
+            header.center(1) = -nii.hdr.hist.srow_x(4) + nii.hdr.dime.pixdim(2);
+            header.center(2) = -nii.hdr.hist.srow_y(4)+ nii.hdr.dime.pixdim(3)*header.nVy*(-1);
+            header.center(3) = -nii.hdr.hist.srow_z(4)+ nii.hdr.dime.pixdim(4)*header.nVz*(-1); 
+
+            header.original_header=rmfield(nii,'img');
+%         end
 end
 volume=double(volume);
 
