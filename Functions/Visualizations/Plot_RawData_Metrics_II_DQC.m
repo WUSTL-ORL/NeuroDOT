@@ -193,7 +193,9 @@ if sum(keep)
 semilogy([ti:tf]./fr,squeeze(data(keep,ti:tf)))
 end
 set(gca,'XColor','w','YColor','w','Color','k')
-axis([[ti,tf]./fr,1e-2,1e-1])
+ttmin = 1*10^(floor(log10(mean(Phi_0)))); % Adjust y-axis limits based on input data
+ttmax = 1*10^(floor(log10(mean(Phi_0)))+1);
+axis([[ti,tf]./fr,ttmin,ttmax])
 title(['\Phi(t) ',num2str(wls(2)),' nm, GI: Rsd from ',...
     num2str(min(params.rlimits(:))),' - ',...
     num2str(max(params.rlimits(:))),' mm'],'Color','w')

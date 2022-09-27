@@ -54,6 +54,15 @@ if ~isfield(info_out,'paradigm'),info_out.paradigm=struct;end
 if ~exist('bthresh', 'var')
     bthresh = 0.075; % Empirically derived threshold value.
 end
+
+omega_lp1 = 1;
+
+if info_in.system.framerate/2 < omega_lp1 
+    % Adjust Lowpass filter cutoff
+    % frequency for systems with lower framerates
+    omega_lp1 = (info_in.system.framerate/2)*0.90;
+end
+
 dims = size(data);
 Nt = dims(end); % Assumes time is always the last dimension.
 NDtf = (ndims(data) > 2);
@@ -69,7 +78,7 @@ end
 keep=info_in.pairs.r2d<20 & info_in.pairs.WL==2;
 foo=squeeze(data(keep,:)); 
 foo=highpass(foo,0.02,info_in.system.framerate);% bandpass filter, omega_hp=0.02;    
-foo=lowpass(foo,1,info_in.system.framerate);% bandpass filter, omega_lp=1;    
+foo=lowpass(foo,omega_lp1,info_in.system.framerate);% bandpass filter, omega_lp=1;    
 foo=foo-circshift(foo,1,2);
 foo(:,1)=0;
 foob=rms(foo,1);
