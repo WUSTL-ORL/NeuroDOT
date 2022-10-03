@@ -154,12 +154,12 @@ badata_HbO=bsxfun(@minus,badata_HbO,badata_HbO(:,1));
 badata_HbOvol = Good_Vox2vol(badata_HbO,A.info.tissue.dim);
 tp_Eg=squeeze(badata_HbOvol(:,:,:,tp));
 
-% Explore PlotSlices - The basics (Slide 21 in ppt)
+% Explore PlotSlices - The basics (Slide 22 in ppt)
 PlotSlices(MNI_dim)                             % Anatomy only
 PlotSlices(MNI_dim,A.info.tissue.dim)           % Anatomy + volumetric data
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Anatomy + volumetric data + functional data
 
-% Visualize the data (Slide 22 in ppt)
+% Visualize the data (Slide 23 in ppt)
 PlotSlices(tp_Eg,A.info.tissue.dim);            % Data by itself
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Data with anatomical underlay
 % Set parameters to visualize more specific aspects of data
@@ -169,13 +169,13 @@ Params.Th.N=-Params.Th.P;                % Thresholds go both ways
 Params.Cmap='jet';
 PlotSlices(MNI_dim,A.info.tissue.dim,Params,tp_Eg);
 
-% Explore the block-averaged data a bit more interactively (slide 23 in ppt)
+% Explore the block-averaged data a bit more interactively (slide 24 in ppt)
 Params.Scale=0.8*max(abs(badata_HbOvol(:)));
 Params.Th.P=0;
 Params.Th.N=-Params.Th.P;
 PlotSlicesTimeTrace(MNI_dim,A.info.tissue.dim,Params,badata_HbOvol,info)
 
-% Explore the not-block-averaged data a bit more interactively (slide 23 in ppt)
+% Explore the not-block-averaged data a bit more interactively (slide 24 in ppt)
 HbOvol = Good_Vox2vol(cortex_HbO,A.info.tissue.dim);
 Params.Scale=4e-3;
 Params.Th.P=1e-3;

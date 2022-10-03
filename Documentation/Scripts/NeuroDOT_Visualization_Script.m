@@ -167,10 +167,10 @@ PlotSlices(MNI_dim)                             % Anatomy only
 PlotSlices(MNI_dim,A.info.tissue.dim)           % Anatomy + volumetric data
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Anatomy + volumetric data + functional data
 
-% Match your view of PlotSlices to the images in the tutorial PPT
+% Match your view of PlotSlices to the images in the tutorial PPT (slide 27)
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg);
 
-% Explore PlotSlices - in depth
+% Explore PlotSlices - in depth (Slides 28-31)
 % Defaults only, no params structure as input
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg);
 % Params 1
@@ -214,7 +214,7 @@ Params9.Th.N = -0.004;
 PlotSlices(MNI_dim,A.info.tissue.dim,Params9,tp_Eg);
 
 
-% Visualize the data
+% Visualize the data (slide 32)
 PlotSlices(tp_Eg,A.info.tissue.dim);            % Data by itself
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Data with anatomical underlay
 % Set parameters to visualize more specific aspects of data
@@ -245,11 +245,11 @@ tp_Eg_atlas=squeeze(HbO_atlas(:,:,:,tp));
 pS=Params;
 pS.view='post'; % Posterior view
 pS.ctx='std'; % Standard pial cortical view
-PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
+PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS); %(Slide 34)
 
 
 % Play around with visualization parameters
-% View
+% View (Slide 35)
 % Dorsal view
 pS.view = 'dorsal';
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
@@ -257,7 +257,7 @@ PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 pS.view = 'lat';
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 
-% Inflation
+% Inflation (Slide 35)
 pS.view='post'; %reset to posterior view before visualizing
 % Standard pial cortical view
 pS.ctx='std'; 
@@ -269,7 +269,7 @@ PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 pS.ctx='vinf';
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 
-% Thresholds
+% Thresholds (Slide 36)
 pS.ctx='std'; %reset to standard inflation before visualizing
 % Set to 0
 pS.Th.P = 0;
@@ -288,7 +288,7 @@ pS.Th.P = 1e-2;
 pS.Th.N = -pS.Th.P;
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 
-% Scale
+% Scale (Slide 37)
 pS.Th.P = 0;
 pS.Th.N = -pS.Th.P; %reset thresholds first
 % Set to 4e-3
@@ -301,7 +301,7 @@ PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 pS.Scale = 9e-3;
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
 
-% Colormaps
+% Colormaps (Slide 38)
 % reset scale and thresholds first
 pS.Scale = 4e-3; 
 pS.Th.P = 1e-3;
@@ -324,7 +324,7 @@ tp_Eg_atlas_2=squeeze(HbO_atlas(:,:,:,tp+9)); %adding 9 to tp gets us data when 
 % Make mask of timepoint = 16 data
 mask_temp_1 = tp_Eg_atlas;
 mask1 = zeros(size(mask_temp_1));
-mask1(mask_temp > pS.Th.P) = 1; %set tp1 positive activations to 1
+mask1(mask_temp_1 > pS.Th.P) = 1; %set tp1 positive activations to 1
 PlotInterpSurfMesh(mask1, MNIl,MNIr, infoB, pS);
 mask_temp_2 = tp_Eg_atlas_2;
 mask2 = zeros(size(mask_temp_2));
@@ -332,10 +332,10 @@ mask2(mask_temp_2 > pS.Th.P) = 1; %set tp2 positive activations to 1
 PlotInterpSurfMesh(mask2, MNIl,MNIr, infoB, pS);
 
 % Combine masks to plot
-mask3 = zeros(size(mask_temp));
+mask3 = zeros(size(mask_temp_1));
 mask3(mask1 == 1 & mask2 == 1) = 3;
 mask3(mask1 == 1 & mask3 ~= 3) = 1;
-mask3(mask2 == 1 & mask3 ~= 3) = 2S;
+mask3(mask2 == 1 & mask3 ~= 3) = 2;
 
 % Set parameters
 pS_TC = pS;
