@@ -36,52 +36,80 @@ function info=Plot_RawData_Cap_DQC(data,info,params)
 %% Parameters and Initialization
 if ~exist('params','var'), params=struct;end
 if ~isfield(params,'bthresh'),params.bthresh=0.075;end
-if ~isfield(params,'rlimits')
-    params.rlimits=[1,20;21,35;36,43];
-elseif size(params.rlimits,1)==1
-    params.rlimits=cat(1,params.rlimits,[21,35;36,43]);
-elseif size(params.rlimits,1)==2
-    params.rlimits=cat(1,params.rlimits,[36,43]);
+
+
+% Check if there is more than one NN - for determining rlimits and suplots
+if length(unique(info.pairs.NN)) < 2
+    numNNs = 1;
+    if ~isfield(params,'rlimits')
+        params.rlimits = [1,30];
+    end
+else
+    numNNs = 2;
+    if ~isfield(params,'rlimits')
+        params.rlimits=[1,20;21,35;36,43];
+    elseif size(params.rlimits,1)==1
+        params.rlimits=cat(1,params.rlimits,[21,35;36,43]);
+    elseif size(params.rlimits,1)==2
+        params.rlimits=cat(1,params.rlimits,[36,43]);
+    end
 end
+
 Rlimits=params.rlimits;
 if ~isfield(params, 'mode'),params.mode = 'good';end
 if ~isfield(params, 'useGM'),params.useGM = 1;end
 if ~isreal(data),data=abs(data);end
 
 params.fig_handle=figure('Units','Normalized',...
-    'Position',[0.1,0.1,0.75,0.8],'Color','k');
+    'Position',[0.1,0.1,0.75,0.4],'Color','k');
 
 %% Check for good measurements
 if  ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
-    info = FindGoodMeas(logmean(data), info, params.bthresh);
+    info = FindGoodMeas(logmean(data), info, params.bthresh,params);
+end
+
+%% Mean signal level at each optode
+if numNNs == 2
+    subplot(4,2,1);
+    params.rlimits=Rlimits(1,:);
+    info.MEAS.Phi_o=PlotCapMeanLL(data, info, params);
+
+    subplot(4,2,2);
+    params.rlimits=Rlimits(2,:);
+    PlotCapMeanLL(data, info, params);
+else
+    subplot(1,3,1)
+    params.rlimits = Rlimits(1,:);
+    info.MEAS.Phi_o= PlotCapMeanLL(data,info,params);
 end
 
 
-%% Mean signal level at each optode
-subplot(4,2,1);
-params.rlimits=Rlimits(1,:);
-info.MEAS.Phi_o=PlotCapMeanLL(data, info, params);
-
-subplot(4,2,2);
-params.rlimits=Rlimits(2,:);
-PlotCapMeanLL(data, info, params);
-
-
 %% Good (and maybe bad) measurements
-subplot(4,2,[5:8]);
-params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
-PlotCapGoodMeas(info, params);
-
+if numNNs == 2
+    subplot(4,2,[5:8]);
+    params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
+    PlotCapGoodMeas(info, params);
+else
+    subplot(1,3,3);
+    params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
+    PlotCapGoodMeas(info, params);
+end
 
 %% Cap Physiology Plot
 params=rmfield(params,'mode');
-subplot(4,2,3);                             % Close neighborgood
-params.rlimits=Rlimits(1,:);
-info.MEAS.Pulse_SNR_R1=PlotCapPhysiologyPower(data, info, params);
+if numNNs == 2
+    subplot(4,2,3);                             % Close neighborhood
+    params.rlimits=Rlimits(1,:);
+    info.MEAS.Pulse_SNR_R1=PlotCapPhysiologyPower(data, info, params);
 
-subplot(4,2,4);                             % 2nd neighborgood
-params.rlimits=Rlimits(2,:);
-info.MEAS.Pulse_SNR_R2=PlotCapPhysiologyPower(data, info, params);
+    subplot(4,2,4);                             % 2nd neighborhood
+    params.rlimits=Rlimits(2,:);
+    info.MEAS.Pulse_SNR_R2=PlotCapPhysiologyPower(data, info, params);
+else
+    subplot(1,3,2);                             % Close neighborhood
+    params.rlimits=Rlimits(1,:);
+    info.MEAS.Pulse_SNR_R1=PlotCapPhysiologyPower(data, info, params);
+end
 
 
 

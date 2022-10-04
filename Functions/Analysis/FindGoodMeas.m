@@ -1,4 +1,4 @@
-function info_out = FindGoodMeas(data, info_in, bthresh)
+function info_out = FindGoodMeas(data, info_in, bthresh, params)
 
 % FINDGOODMEAS Performs "Good Measurements" analysis.
 %
@@ -63,6 +63,17 @@ if info_in.system.framerate/2 < omega_lp1
     omega_lp1 = (info_in.system.framerate/2)*0.90;
 end
 
+if ~exist('params','var')
+    params = struct;
+end
+
+if ~isfield(params, 'r2d_dist')
+    params.r2d_dist = 20;
+end
+
+if ~isfield(params, 'WL')
+    params.WL = 2;
+end
 dims = size(data);
 Nt = dims(end); % Assumes time is always the last dimension.
 NDtf = (ndims(data) > 2);
@@ -75,7 +86,7 @@ if NDtf
 end
 
 %% Crop data to synchpts if necessary.
-keep=info_in.pairs.r2d<20 & info_in.pairs.WL==2;
+keep=info_in.pairs.r2d<params.r2d_dist & info_in.pairs.WL==params.WL;
 foo=squeeze(data(keep,:)); 
 foo=highpass(foo,0.02,info_in.system.framerate);% bandpass filter, omega_hp=0.02;    
 foo=lowpass(foo,omega_lp1,info_in.system.framerate);% bandpass filter, omega_lp=1;    

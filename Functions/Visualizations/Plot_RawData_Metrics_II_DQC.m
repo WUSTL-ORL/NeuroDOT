@@ -78,7 +78,7 @@ end
 
 %% Check for good measurements
 if ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
-    info = FindGoodMeas(logmean(data), info, params.bthresh);
+    info = FindGoodMeas(logmean(data), info, params.bthresh,params);
 end
 
 

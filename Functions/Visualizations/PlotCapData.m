@@ -63,7 +63,7 @@ Dets = [1:Nd];%unique(info.pairs.Det);
 BkgdColor = [0, 0, 0]; % KEEP THESE LIKE THIS!
 % LineColor = [1, 1, 1]; % They are read as RGB triplets by later functions.
 
-box_buffer = 5;
+box_buffer = max(info.pairs.r2d)/10;
 new_fig = 0;
 
 if ~exist('params', 'var')
@@ -139,6 +139,11 @@ switch params.mode
         switch params.dimension
             case '2D'
                 TextSize = 10;
+                if params.eeg_style == 1
+                    STextColor(:, :) = STextColor(:, :)*0.6;
+                    DTextColor(:, :)= DTextColor(:, :)*0.6;
+                    TextSize = TextSize*0.8;
+                end
             case '3D'
                 TextSize = 8;
         end
@@ -159,6 +164,7 @@ switch params.mode
                 TextSize = 8;
                 STextColor = repmat(params.LineColor, Ns, 1);
                 DTextColor = repmat(params.LineColor, Nd, 1);
+                
             case '3D'
                 TextSize = 6;
                 MarkerSize = 9;
@@ -219,6 +225,7 @@ switch params.dimension
             % Reshape input before drawing - this is crucial for patch.
             SrcRGB = reshape(SrcRGB, [], 1, 3);
             DetRGB = reshape(DetRGB, [], 1, 3);
+            
             
             % Srcs
             patch([repmat(spos(:, 1), 1, size(xsq,2)) + repmat(xsq, Ns, 1)]',...

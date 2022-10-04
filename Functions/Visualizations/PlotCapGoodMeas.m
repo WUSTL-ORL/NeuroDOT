@@ -257,7 +257,7 @@ end
 % tcell{1} = [upper(params.mode(1)), params.mode(2:end), ' Measurements'];
 % tcell{end+1} = '';
 for l = lvar
-    tcell{end} = [tcell{end}, num2str(N_GMs(l)), '/', num2str(N_Tots(l)),...
+    tcell{end} = [tcell{end},num2str(N_GMs(l)), '/', num2str(N_Tots(l)),...
         ' (', num2str(100 * (N_GMs(l) / N_Tots(l)), '%2.0f'), '%) '];
     switch use_NNx_RxD
         case 'NNx'
