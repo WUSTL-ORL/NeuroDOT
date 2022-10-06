@@ -43,12 +43,9 @@ Nkeep=sum(keep);
 elementList=elements(t(keep),:);
 
 % Interpolate
-for n=1:Nm                                % For each measurement
-    Jam = zeros(Nkeep,4);
-    for j = 1:Nkeep                         % For each good voxel
-        Jam(j,:) = M2(n,elementList(j,:));
-    end
-    Mout(n,keep) = sum(p(keep,:).*Jam,2);
-end
+
+temp_Jam=double(reshape(M2(:,elementList(1:Nkeep,:)),Nm,[],4));
+Mout(:,keep) = sum(temp_Jam.*permute(repmat(p(keep,:),[1,1,Nm]),[3,1,2]),3);
+
 
 Mout=reshape(Mout,[dims(1:(end-1)),Nvox]);
