@@ -234,8 +234,27 @@ if type == 'snirf'
             end
         end
       
-        fields = fieldnames(snf.nirs); 
-        fieldlist = [];
+        if isfield(snf.nirs, 'stim')
+            Total_synchs = [];
+            Total_synchtypes = [];
+            Npulses = length(snf.nirs.stim);
+            for i = 1:length(snf.nirs.stim)
+                Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
+                Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
+            end
+            [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
+            info.paradigm.synchtype = Total_synchtypes(sortedIdx);
+            for j = 1:Npulses
+                info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
+            end
+            info.paradigm.synchtimes = info.paradigm.synchpts;
+            for j = 1: length(info.paradigm.synchpts)
+                [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+            end
+        
+        else
+            fields = fieldnames(snf.nirs); 
+            fieldlist = [];
         for j = 1:length(fields)
             if strlength(fields(j)) >= 4
                 fieldlist = [fieldlist, fields(j)];
@@ -243,8 +262,8 @@ if type == 'snirf'
                 fieldlist = [fieldlist, 'not_stim'];
             end
         end
-        idxPulse = ismember(cellfun(@(x) x(1:4), fieldlist, 'UniformOutput', false), 'stim');
-        pulses = fields(idxPulse);
+            idxPulse = ismember(cellfun(@(x) x(1:4), fieldlist, 'UniformOutput', false), 'stim');
+            pulses = fields(idxPulse);
         if any(idxPulse) 
             Total_synchs = [];
             Total_synchtypes = [];
@@ -266,6 +285,8 @@ if type == 'snirf'
             end      
         end
         end
+    end
+    
         
         if ~isfield(snf.nirs.metaDataTags, 'SubjectID')
             info.misc.subject_id = 'default'; %required snirf field
