@@ -26,4 +26,4 @@ The toolbox contains 4 folders: Data, Documentation, Functions, and Support_File
 Also within the "Documentation" folder are several other tutorial appendices for beginner and advanced users, function reference files, and extended versions of each tutorial that can be viewed in the MATLAB Help Viewer. Additionally, for any function in NeuroDOT, you can type "help [function name]" into the MATLAB command line and view the function reference that way.
 
 
-4. We are still adding to the toolbox, so please do not hesitate to reach out if you have questions.
+4. We are still adding to the toolbox, so please do not hesitate to reach out if you have questions. (Emma Speh: espeh@wustl.edu, Ari Segel: ari@wustl.edu, Adam Eggebrecht: aeggebre@wustl.edu)
