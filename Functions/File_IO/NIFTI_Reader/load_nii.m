@@ -127,8 +127,10 @@ function nii = load_nii(filename, img_idx, dim5_idx, dim6_idx, dim7_idx, ...
 
    %  Read the dataset body
    %
+   if ~exist([filename, '.img'])
    [nii.img,nii.hdr] = load_nii_img(nii.hdr,nii.filetype,nii.fileprefix, ...
 		nii.machine,img_idx,dim5_idx,dim6_idx,dim7_idx,old_RGB);
+   end
 
    %  Perform some of sform/qform transform
    %

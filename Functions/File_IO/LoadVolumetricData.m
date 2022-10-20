@@ -54,6 +54,7 @@ if ~exist('file_type', 'var')  &&  ~exist('pn', 'var')
     file_type = file_type(2:end);
 end
 
+
 switch lower(file_type)
     case '4dfp'
         %% Read 4dfp file.
@@ -89,12 +90,22 @@ switch lower(file_type)
         %%% NOTE: When passing file types, if you have the ".nii" file
         %%% extension, you must use that as both the "ext" input AND add it
         %%% as an extension on the "filename" input.
-            nii = load_nii(fullfile(pn, [filename, '.', file_type]));
+            if strcmp(file_type, 'gz')
+               nii = load_nii(fullfile([filename, '.nii.gz']));
+            else
+                nii = load_nii(fullfile([filename, '.', file_type]));
+            end
+            if isfield(nii, 'img')
             volume = flip(nii.img, 1); % NIFTI loads in RAS orientation. We want LAS, so we flip first dim.
-
+            else
+                nii.img = niftiread(fullfile([filename, '.', file_type]));
+                volume = flip(nii.img, 1); 
+            end
             % Convert nifti header to 4dfp/NeuroDOT style info metadata
             header.version_of_keys = '3.3'; 
-            header.format = class(nii.img);
+            if isfield(nii, 'img')
+                header.format = class(nii.img);
+            end
             header.conversion_program = 'NeuroDOT_LoadVolumetricData';
             header.filename = [filename,'.nii'];
             header.bytes_per_pixel = nii.hdr.dime.bitpix / 8;
@@ -142,11 +153,70 @@ switch lower(file_type)
             header.center(1) = -nii.hdr.hist.srow_x(4) + nii.hdr.dime.pixdim(2);
             header.center(2) = -nii.hdr.hist.srow_y(4)+ nii.hdr.dime.pixdim(3)*header.nVy*(-1);
             header.center(3) = -nii.hdr.hist.srow_z(4)+ nii.hdr.dime.pixdim(4)*header.nVz*(-1); 
-
-            header.original_header=rmfield(nii,'img');
+            if isfield(nii, 'img')
+                header.original_header=rmfield(nii,'img');
+            end
 %         end
-end
-volume=double(volume);
+    case 'gz'
+        fullhdr = niftiinfo(fullfile([filename, '.nii.gz']));
+        nii = fullhdr.raw;
+        nii.img = niftiread(fullfile([filename, '.nii.gz']));
+        
+        volume = flip(nii.img, 1); % NIFTI loads in RAS orientation. We want LAS, so we flip first dim.
+            % Convert nifti header to 4dfp/NeuroDOT style info metadata
+            header.version_of_keys = '3.3'; 
+            if isfield(nii, 'img')
+                header.format = class(nii.img);
+            end
+            header.conversion_program = 'NeuroDOT_LoadVolumetricData';
+            header.filename = [filename,'.nii'];
+            header.bytes_per_pixel = nii.bitpix / 8;
+     
+            header.acq = 'transverse';
 
+            header.nDim = nii.dim(1);
+            header.nVx = nii.dim(2);
+            header.nVy = nii.dim(3);
+            header.nVz = nii.dim(4);
+            header.nVt = nii.dim(5);
+
+            header.mmx = nii.pixdim(2); 
+            header.mmy = nii.pixdim(3);
+            header.mmz = nii.pixdim(4);        
+
+            if isfield(nii, 'flip_orient')
+                if nii.flip_orient(1)
+                    header.mmppix(1) = header.mmx;
+                else
+                    header.mmppix(1) = -header.mmx;
+                end
+                if nii.flip_orient(2)
+                    header.mmppix(2) = header.mmy;
+                else
+                    header.mmppix(2) = -header.mmy;
+                end
+                if nii.flip_orient(3)
+                    header.mmppix(3) = header.mmz;
+                else
+                    header.mmppix(3) = -header.mmz;
+                end
+            else
+                % If we have no information, we default to the "+ - -" convention.
+                header.mmppix = [header.mmx, -header.mmy, -header.mmz];
+            end
+
+            % Calculate Center values (updated 9/21/22)
+            header.center(1) = -nii.srow_x(4) + nii.pixdim(2);
+            header.center(2) = -nii.srow_y(4)+ nii.pixdim(3)*header.nVy*(-1);
+            header.center(3) = -nii.srow_z(4)+ nii.pixdim(4)*header.nVz*(-1); 
+            if isfield(nii, 'img')
+                header.original_header=rmfield(nii,'img');
+            end
+
+end
+if ~isempty(volume)
+volume=double(volume);end
+
+end
 
 %

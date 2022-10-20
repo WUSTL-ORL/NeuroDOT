@@ -51,9 +51,11 @@ function [hdr, filetype, fileprefix, machine] = load_nii_hdr(fileprefix)
    machine = 'ieee-le';
    new_ext = 0;
 
-   if findstr('.nii',fileprefix)
+   if findstr('.nii',fileprefix)  & isempty(findstr(fileprefix, '.gz'))
       new_ext = 1;
       fileprefix = strrep(fileprefix,'.nii','');
+   else
+       new_ext = 0;
    end
 
    if findstr('.hdr',fileprefix)
@@ -71,10 +73,13 @@ function [hdr, filetype, fileprefix, machine] = load_nii_hdr(fileprefix)
          msg = sprintf('Cannot find file "%s.nii".', fileprefix);
          error(msg);
       end
+   elseif findstr('.gz', fileprefix)
+       fn = fileprefix
    else
+       
       fn = sprintf('%s.hdr',fileprefix);
 
-      if ~exist(fn)
+      if ~exist(fn) 
          msg = sprintf('Cannot find file "%s.hdr".', fileprefix);
          error(msg);
       end
@@ -109,7 +114,7 @@ function [hdr, filetype, fileprefix, machine] = load_nii_hdr(fileprefix)
          else
             fseek(fid,0,'bof');
 
-            if fread(fid,1,'int32') ~= 348
+            if fread(fid,1,'int32') ~= 348 & ~findstr('.gz', fileprefix)
 
                %  Now throw an error
                %
