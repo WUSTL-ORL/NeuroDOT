@@ -1,4 +1,4 @@
-function [hPatchesL,hPatchesR,params2] = PlotLRMeshes(meshL, meshR, params)
+function [hPatchesL,hPatchesR,params2,hF] = PlotLRMeshes(meshL, meshR, params)
 
 % PLOTLRMESHES Renders a pair of hemispheric meshes.
 %
@@ -239,6 +239,6 @@ if params.CBar_on
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
     end
 end
-
+hF = params.fig_handle;
 
 %

@@ -701,7 +701,7 @@ if params.ND2 % Output data in newer format 181217)
     info = converter_info(info, 'ND1 to ND2');
     clipping=cat(1,clipping,clipping);
     clipped=sum(clipping,2);
-        info.MEAS= struct;%table(clipped(:)>0,'VariableNames', {'Clipped'});
+        info.MEAS= struct;
         info.MEAS.Clipped = clipped(:)>0;
 end
 
