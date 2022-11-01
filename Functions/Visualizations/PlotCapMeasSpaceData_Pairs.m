@@ -26,13 +26,17 @@ function PlotCapMeasSpaceData_Pairs(data, info, params)
 %                                           plot rendering.
 %       rlimits     (all R2D)               Limits of pair radii displayed.
 %       Nnns        (all NNs)               Number of NNs displayed.
-%       Nwls        (all WLs)               Number of WLs averaged and
+%       WLs         (all WLs)               Wavelengths averaged and
 %                                           displayed.
+%       WLs_type    'idx'                   'idx' or 'nm', tells whether
+%                                           wavelengths in WLs are WL ID
+%                                           numbers (indices) or physical
+%                                           values in nm.
 %       mode        'good'                  Display mode. 'good' displays
 %                                           channels above noise threhsold,
 %                                           'bad' below.
 %
-% Dependencies: PLOTCAPDATA, ISTABLEVAR.
+% Dependencies: PLOTCAPDATA.
 % 
 % See Also: FINDGOODMEAS, PLOTCAP, PLOTCAPMEANLL.
 % 
@@ -188,6 +192,46 @@ else
     end
 end
 
+%% Restrict to and average over desired wavelengths.
+
+WLs_nm_to_idx_key = unique([info.pairs.WL, info.pairs.lambda], 'rows');
+if isfield(params,'WLs')
+    params.WLs = unique(params.WLs);
+    if isfield(params,'WLs_type') && strcmp(params.WLs_type,'nm')
+        WLsToUse_idx = WLs_nm_to_idx_key(ismember(WLs_nm_to_idx_key(:,2), params.WLs), 1);
+    else
+        WLsToUse_idx = params.WLs;
+    end
+else
+    params.WLs = Nc;  % Use highest wavelength by default.
+    WLsToUse_idx = params.WLs;
+end
+WLsToUse_nm = WLs_nm_to_idx_key(WLsToUse_idx, 2);
+
+% Check whether measurements are ordered in such a way that they can be
+% reshaped into a SD pairs x wavelengths array.  If so, then use a
+% vectorized method for averaging over wavelengths; otherwise, use a for
+% loop.
+infoPairsWLIndDiff = diff(info.pairs.WL);
+data_afterAvg = data;
+data_afterAvg(~modeGM) = NaN;
+if sum(infoPairsWLIndDiff) == (Nc-1)
+    data_afterAvg = reshape(data_afterAvg, [], Nc);
+    data_afterAvg(:, ~ismember(1:Nc,WLsToUse_idx)) = NaN;
+    data_afterAvg = mean(data_afterAvg, 2, 'omitnan');
+    data_afterAvg = repmat(data_afterAvg, 1, Nc);
+    data_afterAvg = reshape(data_afterAvg, [], 1);
+else
+    data_afterAvg(~ismember(1:Nc,WLsToUse_idx)) = NaN;
+    SDPairs_in_info = unique([info.pairs.Src, info.pairs.Det], 'rows');
+    for SDPairNum = 1:size(SDPairs_in_info,1)
+        srcID = SDPairs_in_info(SDPairNum,1);
+        detID = SDPairs_in_info(SDPairNum,2);
+        data_afterAvg(info.pairs.Src == srcID & info.pairs.Det == detID) = mean(data_afterAvg(info.pairs.Src == srcID & info.pairs.Det == detID), 'omitnan');
+    end
+end
+
+
 %% Plot Src and Det #s.
 hold on
 params2 = params; params2.mode = 'text';
@@ -216,7 +260,7 @@ end
 
 %% Plot GM Lines.
 
-[dataRGB, CMAP, params] = applycmap(data, [], params);
+[dataRGB, CMAP, params] = applycmap(data_afterAvg, [], params);
 
 for l = lvar
     % Ignore WLs.
@@ -232,7 +276,7 @@ for l = lvar
             keep_NNx_RxD = ones(Nm, 1);
     end
     
-    keep = keep_NNx_RxD  &  modeGM;
+    keep = keep_NNx_RxD  &  modeGM  &  ismember(info.pairs.WL, WLsToUse_idx);
     keep_idx = find(keep); % NEED THIS FOR THE NEXT SECTION
     
     nMeasKeep = size(keep_idx,1);
@@ -253,7 +297,7 @@ for l = lvar
     end
     
     N_GMs(l) = nnz(keep);
-    N_Tots(l) = nnz(keep_NNx_RxD);
+    N_Tots(l) = nnz(keep_NNx_RxD & ismember(info.pairs.WL, WLsToUse_idx));
     
 end
 
@@ -327,6 +371,7 @@ for l = lvar
         tcell{end} = [tcell{end}, ', '];
     end
 end
+tcell{end} = [tcell{end} ' WL \in [' strjoin(strsplit(num2str(reshape(WLsToUse_nm,1,[]))), ', ') '] nm'];
 if params.markBadOptodes
 %     tcell{end+1} = [num2str(N_bad_SD), ' Srcs or Dets have >', ...
 %         num2str(100 * thr), '% Bad Measurements'];
