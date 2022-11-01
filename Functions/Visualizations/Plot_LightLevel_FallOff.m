@@ -5,6 +5,12 @@ function Plot_LightLevel_FallOff(data,info,params)
 % info.pairs.r3d.
 
 %% Parameters and Initialization
+if ~exist('params', 'var')
+    params = [];
+end
+
+BkgdColor = 'k';
+params.fig_size = [200, 200, 560, 420];
 if ~isfield(params, 'fig_handle')  ||  isempty(params.fig_handle)
     params.fig_handle = figure('Color', BkgdColor, 'Position', params.fig_size);
     new_fig = 1;
