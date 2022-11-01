@@ -1,7 +1,8 @@
 function GrayPlot_TimeTrace_Rsd_by_WL(data,info,params)
 %
 % This function plots time traces of data that has already been log-meaned
-% using plot with different rows corresponding to different .
+% using plot with different rows corresponding to different Source-Detector
+% separations.
 %
 
 
