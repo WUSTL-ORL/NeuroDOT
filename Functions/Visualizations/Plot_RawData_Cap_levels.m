@@ -85,7 +85,7 @@ sdFull=nan(Ns,Nd);
 
 NNrIgnore=min(info.pairs.NN(info.pairs.r2d>35));
 
-cMap=cat(1,[0,0,0],hot(1000));colormap(gca,cMap);
+cMap=jet(1000);
 
 %% N-D Input.
 if NDtf
@@ -100,28 +100,45 @@ stdYcf=stdY;
 stdYcf(info.pairs.NN>=NNrIgnore)=0;
 
 %% std(Y) WL 1
+if isfield(info,'paradigm')
+    if isfield(info.paradigm, 'synchpts')
+        NsynchPts = length(info.paradigm.synchpts); % set timing of data
+        if NsynchPts > 2
+            tF = info.paradigm.synchpts(end);
+            t0 = info.paradigm.synchpts(2);
+        elseif NsynchPts == 2
+            tF = info.paradigm.synchpts(2);
+            t0 = info.paradigm.synchpts(1);
+        else
+            tF = size(data, 2);
+            t0 = 1;
+        end
+        stdY=std(Y(:, t0:tF),[],2);
+    else
+        stdY=std(Y,[],2);
+    end
+else
+    stdY=std(Y,[],2);
+end
+sdFull(Ia)=stdY(Ib);
 subplot(2,3,1,'Units','Normalized','Position',[0.025,0.55,0.3,0.4]) 
-sdFull(Ia)=stdYcf(Ib);      
-imagesc(sdFull,[0,cmThreshMult*params.bthresh]);axis square;
+imagesc(sdFull,[0,0.2]);
 colormap(gca,cMap);
-title(['\sigma (Y_r_<_3_0_m_m) ',num2str(wls(1)),' nm'],...
-    'Color','w');xlabel('Detector')
-ylabel('Source');set(gca,'XColor','w','YColor','w');
+title(['\sigma (Y) ',num2str(wls(1)),' nm'],'Color','w');xlabel('Detector')
+ylabel('Source');set(gca,'XColor','w','YColor','w');axis square;
 
 
 %% std(Y) WL 2
+sdFull(Ia)=stdY(Ib+Nm);
 subplot(2,3,2,'Position',[0.30,0.55,0.3,0.4])
-sdFull(Ia)=stdYcf(Ib+Nm);       
-imagesc(sdFull,[0,cmThreshMult*params.bthresh]);
+imagesc(sdFull,[0,0.2]);
 p0=get(gca,'Position');
-title(['\sigma (Y_r_<_3_0_m_m) ',num2str(wls(2)),' nm'],...
-    'Color','w');xlabel('Detector')
-colormap(gca,cMap);axis square;
-cb=colorbar('Ticks',[0,params.bthresh,cmThreshMult*params.bthresh],...
-    'TickLabels',...
-    {'0',num2str(params.bthresh),num2str(params.bthresh*cmThreshMult)},...
-    'Color','w','Position',[[p0(1)+p0(3)-0.015,p0(2)+0.075,0.005,0.2]]);
-set(gca,'XColor','w','YColor','w','YTickLabel','');
+title(['\sigma (Y) ',num2str(wls(2)),' nm'],'Color','w');xlabel('Detector')
+colormap(gca,cMap);
+cb=colorbar('Ticks',[0,0.075,0.1,0.2],...
+    'TickLabels',{'0','0.075','\sigma(Y)','0.2'},...
+    'Color','w','Position',[[p0(1)+p0(3)+0.005,p0(2)+0.075,0.005,0.2]]);
+set(gca,'XColor','w','YColor','w','YTickLabel','');axis square;
 
 
 %% Light level fall off
