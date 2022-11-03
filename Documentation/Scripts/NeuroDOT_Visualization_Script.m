@@ -152,7 +152,7 @@ cortex_HbT = cortex_HbO + cortex_HbR;
 
 %% Select Volumetric visualizations of block averaged data
 if ~exist('MNI', 'var')
-[MNI,infoB]=LoadVolumetricData('Segmented_MNI152nl_on_MNI111',[],'4dfp'); % Load MRI (same data set as in A matrix dim)
+[MNI,infoB]=LoadVolumetricData('Segmented_MNI152nl_on_MNI111_nifti',[],'nii'); % Load MRI (same data set as in A matrix dim)
 end
 MNI_dim = affine3d_img(MNI,infoB,A.info.tissue.dim,eye(4),'nearest'); % Transform to DOT volume space
 
