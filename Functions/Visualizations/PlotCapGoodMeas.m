@@ -1,4 +1,4 @@
-function PlotCapGoodMeas(info, params)
+function info = PlotCapGoodMeas(info, params)
 
 % PLOTCAPGOODMEAS A Good Measurements visualization overlaid on a cap grid.
 %
@@ -282,6 +282,8 @@ switch use_NNx_RxD
 end
 
 title(tcell, 'Color', LineColor, 'FontSize', 11)
+
+info.DQ_metrics.percentGM = num2str(100 * (N_GMs(l) / N_Tots(l)));
 
 
 

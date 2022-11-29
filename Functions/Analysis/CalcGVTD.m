@@ -1,4 +1,4 @@
-function [GVTD]=CalcGVTD(data)
+function [GVTD, med_GVTD]=CalcGVTD(data)
 
 % This function calculates the Root Mean Square across measurements (be
 % they log-mean light levels or voxels) of the temporal derivative. The
@@ -16,3 +16,5 @@ Ddata=data-circshift(data,[0 -1]);
 
 %% RMS across measurements
 GVTD=cat(1,0,rms(Ddata(:,1:(end-1)),1)');
+med_GVTD = median(GVTD);
+

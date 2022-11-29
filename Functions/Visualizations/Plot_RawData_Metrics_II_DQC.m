@@ -1,4 +1,4 @@
-function Plot_RawData_Metrics_II_DQC(data,info,params)
+function info = Plot_RawData_Metrics_II_DQC(data,info,params)
 %
 % This function generates a single-page report that includes:
 %   zoomed raw time trace
@@ -107,6 +107,23 @@ if isfield(info.MEAS,'Clipped')
     legend(cat(1,leg,'Clipped'),'Color','k','TextColor','w')
 end
 
+m=ceil(min(log10(Phi_0(:))))-2;
+Phi_0_to_plot=reshape(Phi_0,Nm,[]);
+Keep_range = find(r<20);
+
+info.DQ_metrics.WL1.min_val = min(Phi_0_to_plot(Keep_range,1));
+info.DQ_metrics.WL1.min_log = log10(info.DQ_metrics.WL1.min_val);
+info.DQ_metrics.WL1.max_val = max(Phi_0_to_plot(Keep_range,1));
+info.DQ_metrics.WL1.max_log = log10(info.DQ_metrics.WL1.max_val);
+info.DQ_metrics.WL1.range = info.DQ_metrics.WL1.max_log - info.DQ_metrics.WL1.min_log;
+info.DQ_metrics.WL1.WL = wls(1);
+
+info.DQ_metrics.WL2.min_val= min(Phi_0_to_plot(Keep_range,2));
+info.DQ_metrics.WL2.min_log = log10(info.DQ_metrics.WL2.min_val);
+info.DQ_metrics.WL2.max_val = max(Phi_0_to_plot(Keep_range,2));
+info.DQ_metrics.WL2.max_log = log10(info.DQ_metrics.WL2.max_val);
+info.DQ_metrics.WL2.range = info.DQ_metrics.WL2.max_log - info.DQ_metrics.WL2.min_log;
+info.DQ_metrics.WL2.WL = wls(2);
 
 
 %% <fft> for max wavelength at 2 distances

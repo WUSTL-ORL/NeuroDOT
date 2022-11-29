@@ -39,10 +39,10 @@ if ~isfield(params,'bthresh'),params.bthresh=0.075;end
 
 
 % Check if there is more than one NN - for determining rlimits and suplots
-if length(unique(info.pairs.NN)) < 2
+if length(unique(info.pairs.NN)) < 3
     numNNs = 1;
     if ~isfield(params,'rlimits')
-        params.rlimits = [1,30];
+        params.rlimits = [1,50]; % Changed to 50 to include all measurements (11/15/22)
     end
 else
     numNNs = 2;
@@ -61,7 +61,7 @@ if ~isfield(params, 'useGM'),params.useGM = 1;end
 if ~isreal(data),data=abs(data);end
 
 params.fig_handle=figure('Units','Normalized',...
-    'Position',[0.1,0.1,0.75,0.4],'Color','k');
+    'Position',[0.01,0.01,750,500],'Color','k');
 
 %% Check for good measurements
 if  ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')

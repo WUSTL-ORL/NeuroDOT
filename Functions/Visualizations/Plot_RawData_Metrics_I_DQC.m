@@ -1,4 +1,4 @@
-function Plot_RawData_Metrics_I_DQC(data,info,params)
+function DQ_metrics = Plot_RawData_Metrics_I_DQC(data,info,params)
 %
 % This function generates a single-page report that includes:
 %   light fall off as a function of Rsd
@@ -139,6 +139,22 @@ if params.NEPth
     semilogy([0:100],ones(101,1).*NEPth,'--w');
     legend(cat(1,leg1,'Noise Floor Estimate'),'Color','k','TextColor','w')
 end
+
+Phi_0_to_plot=reshape(Phi_0,Nm,[]);
+Keep_range = find(r<20);
+
+DQ_metrics = struct;
+DQ_metrics.min_val_685 = min(Phi_0_to_plot(Keep_range,1));
+DQ_metrics.min_log_685 = log10(DQ_metrics.min_val_685);
+DQ_metrics.max_val_685 = max(Phi_0_to_plot(Keep_range,1));
+DQ_metrics.max_log_685 = log10(DQ_metrics.max_val_685);
+DQ_metrics.range_685 = DQ_metrics.max_log_685 - DQ_metrics.min_log_685;
+
+DQ_metrics.min_val_830= min(Phi_0_to_plot(Keep_range,2));
+DQ_metrics.min_log_830 = log10(DQ_metrics.min_val_830);
+DQ_metrics.max_val_830 = max(Phi_0_to_plot(Keep_range,2));
+DQ_metrics.max_log_830 = log10(DQ_metrics.max_val_830);
+DQ_metrics.range_830 = DQ_metrics.max_log_830 - DQ_metrics.min_log_830;
 
 %% <fft> for max wavelength at 2 distances
 lmdata = logmean(data);

@@ -1,4 +1,4 @@
-function Plevels=PlotCapPhysiologyPower(data, info, params)
+function [Plevels, SNR_DQ]=PlotCapPhysiologyPower(data, info, params)
 
 % PlotCapPhysiologyPower A visualization of band limited power OR
 % band-referenced SNR for each optode.
@@ -237,9 +237,9 @@ for d=1:Nd
 end
 
 %% Scaling and colormapping
-M=max(llfo(:));
+M=max(llfo(:)); %% calculate the max SNR
 param.Th.P=max([min(llfo),0]);
-m=param.Th.P;
+m=param.Th.P; %min value
 % m=M/2;
 params.Scale=M;%/2;
 % llfo=llfo-M/2;
@@ -249,6 +249,26 @@ SrcRGB = SDRGB(1:Ns, :);
 DetRGB = SDRGB(Ns+1:end, :);
 PlotCapData(SrcRGB, DetRGB, info, params);
 pos=get(gca,'pos');
+
+llfo_len=size(llfo);
+llfo_Re=zeros(llfo_len);
+for i=1:llfo_len
+    if (llfo(i)<0)
+        llfo_Re(i)=0;
+    else
+        llfo_Re(i)=llfo(i);
+    end
+    
+end
+
+Med=median(llfo_Re(:));% median value
+Avg=mean(llfo_Re(:));%mean value
+
+SNR_DQ.min_SNR = m;
+SNR_DQ.max_SNR = M;
+SNR_DQ.med_SNR = Med;
+SNR_DQ.avg_SNR = Avg;
+
 
 %% Add Title and colorbar.
 switch params.type
@@ -280,5 +300,4 @@ CB = colorbar('YTick', [0, 0.5, 1],...
 
 title(tcell, 'Color', LineColor)
 end
-
 %
