@@ -19,10 +19,11 @@ load('NeuroDOT_Data_Sample_CCW1.mat'); % data, info, flags
 
 %% General data Quality Assessment with synchpts if present
 Plot_RawData_Time_Traces_Overview(data,info);   % Time traces
-Plot_RawData_Metrics_II_DQC(data,info);         % Spectrum, falloff, and good signal metric
-Plot_RawData_Cap_DQC(data,info);                % Cap-relevant views
+info = Plot_RawData_Metrics_II_DQC(data,info);         % Spectrum, falloff, and good signal metric
+info = Plot_RawData_Cap_DQC(data,info);                % Cap-relevant views
 
 %% Logmean Light Levels
+
 lmdata = logmean(data);
 
 %% Detect Noisy Channels
@@ -39,7 +40,7 @@ subplot(3,1,3); semilogx(ftdomain,ftmag), xlabel('Frequency (Hz)'), ylabel('|X(f
 xlim([1e-3 10])
 
 %% Show nn1, nn2, nn3 (plots)
-info.GVTD = CalcGVTD(lmdata);
+[info.GVTD, info.DQ_metrics.med_GVTD] = CalcGVTD(lmdata);
 nlrGrayPlots_180818(lmdata,info)
 
 keepd1=info.MEAS.GI & info.pairs.r2d<20 & info.pairs.WL==2;
@@ -77,6 +78,7 @@ for i = 1:3, subplot(3,1,i), xlim([2500 2600]), end
 
 
 %% Low Pass Filter 1
+
 lp1data = lowpass(hpdata, 1, info.system.framerate);
 
 figure('Position',[300 600 550 780])
