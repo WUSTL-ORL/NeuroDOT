@@ -33,8 +33,8 @@ end
 
 %% General data QC with synchpts if present
 Plot_RawData_Time_Traces_Overview(data,info);           % Time traces
-Plot_RawData_Cap_DQC(data, info);                % Cap-relevant views
-Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data quality figs
+info = Plot_RawData_Cap_DQC(data, info);                % Cap-relevant views
+info = Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data quality figs
 
 
 %% View data before filtering
@@ -73,7 +73,7 @@ hem = gethem(lmdata, info);                                               % Supe
 [lmdata, ~] = regcorr(lmdata, info, hem);
 lmdata = lowpass(lmdata, 0.5, info.system.framerate);                     % Low Pass Filter 2 (0.5 Hz)
 [lmdata, info] = resample_tts(lmdata, info, 1, 1e-5);                     % 1 Hz Resampling (1 Hz)
-info.GVTD = CalcGVTD(lmdata(info.MEAS.GI & info.pairs.r2d<20,:));         % Calculate GVTD
+[info.GVTD, info.DQ_metrics.med_GVTD] = CalcGVTD(lmdata(info.MEAS.GI & info.pairs.r2d<20,:));         % Calculate GVTD
 
 
 %% View pre-processed data
@@ -144,7 +144,7 @@ cortex_HbT = cortex_HbO + cortex_HbR;
 
 %% Select Volumetric visualizations of block averaged data
 if ~exist('MNI', 'var')
-[MNI,infoB]=LoadVolumetricData('Segmented_MNI152nl_on_MNI111',[],'4dfp'); % Load MRI (same data set as in A matrix dim)
+[MNI,infoB]=LoadVolumetricData('Segmented_MNI152nl_on_MNI111_nifti',[],'nii'); % Load MRI (same data set as in A matrix dim)
 end
 MNI_dim = affine3d_img(MNI,infoB,A.info.tissue.dim,eye(4),'nearest'); % Transform to DOT volume space
 
