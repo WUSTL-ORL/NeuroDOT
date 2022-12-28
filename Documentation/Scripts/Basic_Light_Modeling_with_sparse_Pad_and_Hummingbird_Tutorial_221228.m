@@ -1,12 +1,12 @@
 % 1. start with Mask and Pad
 % 2. make a Low Density mesh of the mask
-% 3. use AlignMe to place the Pad on the LD mesh
+% 3. use Hummingbird to place the Pad on the LD mesh
 % 4. remove unneeded components of the mask
 % 5. make a HD mesh of the scooped mask
-% 6. run AlignMe on the LD-aligned Pad and the HD mesh
+% 6. run Hummingbird on the LD-aligned Pad and the HD mesh
 % 7. update the info file and name it specifically for this light model
 % 8. prepare mesh for nirfast
-% 9. set flags and run makeAnirfaster
+% 9. set flags and run makeAnirfast
 % 10. package and save A with info etc
 % 11. view single measurement, Gsd, and flat field reconstruction
 % 12. view LD mesh, HD mesh, array, and cortex together
@@ -23,7 +23,7 @@ cd(outputdir)
 % i.e. are your 2D optode positions in a style similar to EEG?
 % If YES, set style = 1      If NO, set style = 0
 % By default style is set to 0
-style = 1; %for this tutorial, style should be set to 1
+style = 1;
 
 %Parameter Initialization
 p.Cmap='jet'; p.Scale=5; p.Th.P=0; p.Th.N=-p.Th.P; p.PD=1; p.BG=[0,0,0];
@@ -32,7 +32,7 @@ pS = pM; pS = rmfield(pS, 'orientation'); % make copy of params, to be used with
 
 
 %% Load a Segmented Volume and generate head mesh
-[mask,infoT1]=LoadVolumetricData(['Segmented_MNI152nl_on_MNI111_nifti'],[],'nii');
+[mask,infoT1]=LoadVolumetricData(['Segmented_MNI152nl_on_MNI111'],[],'4dfp');
 PlotSlices(mask,infoT1,p)       % Visualize the segmented mask: 
         % Note, PlotSlices is an interactive plot. 
         % Hit q or the middle mouse button to quit
@@ -40,7 +40,7 @@ PlotSlices(mask,infoT1,p)       % Visualize the segmented mask:
 
 %% Generate low density head mesh
 % Parameters for generating your mesh
-meshname=['LD_Mesh'];      % Provide a name for your mesh name here
+meshname=['Example_LD_Mesh_221115'];      % Provide a name for your mesh name here
 param.facet_distance=5;    % Node position error tolerance at boundary, changed to 5 from .75 12/2/19
 param.facet_size=3;        % boundary element size parameter
 param.cell_size=5;         % Volume element size parameter
@@ -77,7 +77,7 @@ view([135,30])%view the mesh where the nose of the head is pointing down and to 
 
 
 %% Load initial Pad file depending on data structure:
-padname='FullHead_32x32';
+padname='Adult_96x92_on_Example_Mesh';
 load(['Pad_',padname,'.mat']); % Pad file
 
 % If using a sparse grid where 2D positions are shorter than 3D positions for visualization purposes, 
@@ -92,67 +92,64 @@ Nd=size(info.optodes.dpos3,1);
 rad=info;
 
 paramsFoci.color=cat(1,repmat([1,0,0],Ns,1),repmat([0,0,1],Nd,1));
-paramsFoci.color(1,:) = [1 0.4 0.6]; %pink for s1
+paramsFoci.color(1,:) = [1 0.4 0.6]; % pink for s1
 paramsFoci.color(Ns+1,:) = [0.3010, 0.7450, 0.9330]; %light blue for d1
 paramsFoci.radius = 2; %set radius of spheres to 2
 
 %Visualize Pad
-Draw_Foci_191203(tpos, paramsFoci);view([-40,30]) %3D plot of pad
+PlotSD(tpos(1:Ns,:),tpos((Ns+1):end,:),'norm'); %3D plot of pad
 PlotCap(info) %2D plot of pad
 
 % Visualize LD mesh with optode positions 
 % Optodes have not been relaxed onto mesh yet
-PlotMeshSurface(meshLD,pM);Draw_Foci_191203(tpos, paramsFoci);
+PlotMeshSurface(meshLD,pM);PlotSD(tpos(1:Ns,:),tpos((Ns+1):end,:),'norm',gcf);
 view([135,30])%view the mesh where the nose of the head is pointing down and to the right
 %this will give you a good view of where the center of the mesh is
 %you should be able to see a few optodes peeking out of the mesh
 %the array has yet to be lined up correctly, which you'll do in the next section with hummingbird
 
 
-%% AlignMe Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
-% Location of atlas fiducials: Nasion; Left preauricular point; Right preauricular point; Cz; Inion
-atlasFiducials = [- 0.65,  -84.1, -31.88; ... % If using mesh2EEG- EEGPts(1,:)
-                   80.78,  15.95, -41.89; ... % EEGPts(155,:)
-                  -80.78,  15.95, -41.89; ... % EEGPts(175,:)
-                   0.233,   9.63, 97.296; ... % EEGPts(165,:)
-                   -0.65, 117.69, -11.78];    % EEGPts(329,:)
-               
-% Create an instance of our custom DataStorage HANDLE class to store variables
-ds = DataStorage(); 
+%% Make sure only NN1 and NN2 exist for meas < 6cm
+% Visualize scatterplot of Nearest neighbors for all measurements under 6cm
+keep = info.pairs.r3d < 60; %Set cutoff at 6cm (60mm), we won't use any measurements larger than this
+figure;
+scatter(info.pairs.NN(keep),info.pairs.r3d(keep));
+xlabel('NN');ylabel('r3d');title('NN vs SD separation');
 
-% Input structure
+% If the plot shows measurements for NN3 or greater, run the following lines (See slide 12 of tutorial powerpoint)
+info.pairs.NN(info.pairs.r3d < 30) = 1; %Set all meas with separation < 3cm to NN1
+info.pairs.NN(info.pairs.r3d >= 30 & info.pairs.r3d < 60) = 2; %Set all meas in between 3cm and 6cm separation to NN2
+figure; %Re-visualize
+scatter(info.pairs.NN(keep),info.pairs.r3d(keep));
+xlabel('NN');ylabel('r3d');title('NN vs SD separation');
+
+
+%% HUMMINGBIRD Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
+% Create an instance of our custom DataStorage HANDLE class to store variables
+ds = DataStorage();
+
+% input structure
 ds.dI.tpos = tpos;       
 ds.dI.mesh = meshLD;
-ds.dI.pad = info;
 ds.dI.pM = pM;
 ds.dI.paramsFoci = paramsFoci;
 ds.dI.Ns = Ns;
-ds.dI.photoPath = ''; %no participant photos for this tutorial, so leave as empty string
-ds.dI.imageType = '.jpeg'; %type of image file used, default is .jpeg
-ds.dI.atlasFiducials = atlasFiducials;
+ds.dI.rad = rad;
 
-% Create an instance of your App Designer application, passing variable 'ds' into the app.  
+% Create an instance of your App Designer application,
+% passing variable 'ds' into the app.  
 % The code is stuck at this line until your app closes, which destroys 'myapp'
 % But the data is assigned to ds variable in workspace
-% Run AlignMe
-myapp=AlignMe_2020b(ds);
+myapp = Hummingbird(ds);
 while isvalid(myapp); pause(0.1); end % Wait for app to close before continuing script
 
-% get relaxed optode positions from AlignMe
+% get relaxed optode positions from Hummingbird
 tposNew = ds.dO.tpos2_relaxed;
 
 % visualize mesh with relaxed optodes
 pM.reg=0;
 PlotMeshSurface(meshLD,pM);Draw_Foci_191203(tposNew,paramsFoci)
 view(0,0) %posterior view
-
-% Get affine matrix that can be used to transform FROM participant space TO MNI space
-if isfield(ds.dO, 'affineTform') %if mesh scaled, affineTform field will exist, save it to workspace
-    affine_Subj2MNI = [ds.dO.affineTform, zeros(3,1)];
-    save('affine_matrix_Subject_to_MNI.mat', 'affine_Subj2MNI')
-else %otherwise, set affine_Subj2MNI to eye(4)
-    affine_Subj2MNI = eye(4);
-end
 
 
 %% Generate smaller mask based on optode locations
@@ -163,7 +160,7 @@ PlotSlices(maskCrop,infoT1,pS) %visualize smaller mask
 %% Generate High Density Head Mesh (Can take up to 15 min)
 %If you get an error when running NirfastMesh_Region
 %try chagning the mesh name and clearing your output directory of all files
-meshname=['_HD_Mesh0'];      % Provide a name for your mesh name here, if making multiple meshes, provide a different name for each mesh
+meshname=['Mesh_example_220930'];      % Provide a name for your mesh name here, if making multiple meshes, provide a different name for each mesh
 param.facet_distance=2.0;   % Node position error tolerance at boundary
 param.facet_size=0.8;       % boundary element size parameter
 param.cell_size=1.5;        % Volume element size parameter - (for this mesh, 1.2 is the lowest you can set the cell_size for to have less than 999,999 nodes)
@@ -188,35 +185,26 @@ PlotMeshSurface(visMeshHD,pM);view([70,-80]) %Visualize in coordinate space
 
 
 %% Relax optodes onto HD Mesh
-% Create an instance of  DataStorage class
+% make DataStorage class
 ds_HD = DataStorage();
 
-% Input structure
+% input structure
 ds_HD.dI.tpos = tposNew;       
 ds_HD.dI.mesh = meshHD;
-ds_HD.dI.pad = info;
 ds_HD.dI.pM = pM;
 ds_HD.dI.paramsFoci = paramsFoci;
 ds_HD.dI.Ns = Ns;
-ds_HD.dI.photoPath = ''; %no participant photos for this tutorial, so leave as empty string
-ds_HD.dI.imageType = '.jpeg'; %type of image file used, default is .jpeg
-ds_HD.dI.atlasFiducials = atlasFiducials;
-ds_HD.dI.spheres = 1;
+ds_HD.dI.rad = rad;
 
-% Create an instance of your App Designer application,
-% passing variable 'ds' into the app.  
-% The code is stuck at this line until your app closes, which destroys 'myapp'
-% But the data is assigned to ds variable in workspace
-% Run AlignMe
-myapp = AlignMe_2020b(ds_HD);
+%run hummingbird
+myapp = Hummingbird(ds_HD);
 while isvalid(myapp); pause(0.1); end % Wait for app to close before continuing script
 
-% get relaxed optode positions from AlignMe
+% get relaxed optode positions from Hummingbird
 tposNew_HD = ds_HD.dO.tpos2_relaxed;
 
 % visualize mesh with relaxed optodes
-pM.reg=0;
-PlotMeshSurface(visMeshHD,pM);Draw_Foci_191203(tposNew_HD,paramsFoci)
+PlotMeshSurface(meshHD,pM);Draw_Foci_191203(tposNew_HD,paramsFoci)
 view(0,0) %posterior view
 
 
@@ -296,7 +284,7 @@ flags.Hz=0;
 if flags.Hz, flags.tag = [flags.tag,'FD']; end
 
 % Run makeAnirfast to get sensitivity matrix
-Ti=tic;[A,dim,Gsd]=makeAnirfaster(mesh,flags); % size(A)= [Nwl, Nmeas, Nvox]
+Ti=tic;[A,dim,Gsd]=makeAnirfast(mesh,flags); % size(A)= [Nwl, Nmeas, Nvox]
 disp(['<makeAnirfast took ',num2str(toc(Ti))])
 
 %Gsd vs Rsd provides a simulated light fall-off
@@ -328,7 +316,6 @@ temp_pairs.r3d=info.pairs.r3d;
 info.pairs=temp_pairs;
 
 save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
-
 
 % Get A with all SD separations within 5cm
 keep=info.pairs.r3d<=50; % for sparse density pad, only save measurements where SD separation is within 50mm (5cm)
