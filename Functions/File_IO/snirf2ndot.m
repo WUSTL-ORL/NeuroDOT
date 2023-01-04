@@ -194,15 +194,25 @@ if type == 'snirf'
             end
             if isfield(snf.nirs.data.measurementList, 'NN')
                 info.pairs.NN = [snf.nirs.data.measurementList(:).NN]'; %custom Ndot field (in snirf format)
-            else               
-                gridTemp.spos3=snf.nirs.probe.sourcePos3D;
-                gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
-                d = pdist2(gridTemp.spos3, gridTemp.dpos3);
-                dmax = max(d(:));
-                if dmax < 30
-                    gridTemp.spos3=snf.nirs.probe.sourcePos3D.*10;
-                    gridTemp.dpos3=snf.nirs.probe.detectorPos3D.*10;
-                end
+            else
+                max_log = max(log10(abs(snf.nirs.probe.sourcePos3D(:))));
+                if (0 <= max_log) && (max_log <= 1)
+                    mult = 10;
+                elseif (-1 <= max_log) && (max_log <= 0)
+                    mult = 100;
+                elseif (max_log <= -1)
+                    mult = 1000;
+                else
+                    mult = 1;
+                end                   
+                    
+                gridTemp.spos3=snf.nirs.probe.sourcePos3D.*mult;
+                gridTemp.dpos3=snf.nirs.probe.detectorPos3D.*mult;
+%                 dmax = max(log10(d(:)));
+%                 if dmax < 30
+%                     gridTemp.spos3=snf.nirs.probe.sourcePos3D.*10;
+%                     gridTemp.dpos3=snf.nirs.probe.detectorPos3D.*10;
+%                 end
                 Rad=Grid2Radius_180824(gridTemp,5);
                 params.lambda= snf.nirs.probe.wavelengths;
                 tempInfo=Generate_Info_from_Grid_Rad(gridTemp,Rad,params);
@@ -211,6 +221,8 @@ if type == 'snirf'
                 info.pairs.r3d=tempInfo.pairs.r3d(IdxA);
                 info.pairs.r2d = tempInfo.pairs.r2d(IdxA);
                 info.pairs.NN = tempInfo.pairs.NN(IdxA);
+                info.optodes.spos3 = gridTemp.spos3;
+                info.optodes.dpos3 = gridTemp.dpos3;
          
             end
                            
@@ -224,6 +236,7 @@ if type == 'snirf'
             else 
                 if isfield(snf.nirs.data.measurementList, 'r2d')
                     info.pairs.r2d = snf.nirs.data.measurementList(:).r2d'; %custom Ndot field (in snirf format)
+                
                 end
             end
             if ~isfield(info.pairs, 'r3d')
