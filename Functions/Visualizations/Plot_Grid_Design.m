@@ -42,8 +42,8 @@ xlabel('r_s_d [mm]');ylabel('N measurements')
 title(['Closest r_s_d: ',num2str(min(Rad.r2d)),' mm'])
 subplot(2,2,3)
 PlotSD(grid.spos3,grid.dpos3,'norm',gcf);view([64,46]);
-title([{['3D representation of grid']};...
-    {['Radius of curvature: ',num2str(grid.Srad),' mm']}])
+% title([{['3D representation of grid']};...
+%     {['Radius of curvature: ',num2str(grid.Srad),' mm']}])
 subplot(2,2,4);
-histogram(Rad.r,[1:0.1:(ceil(max(Rad.r)+1))])
+histogram(Rad.r3d,[1:0.1:(ceil(max(Rad.r3d)+1))])
 xlabel('r_s_d [mm]');ylabel('N measurements')
