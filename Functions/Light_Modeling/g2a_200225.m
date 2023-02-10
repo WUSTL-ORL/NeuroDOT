@@ -58,7 +58,7 @@ if flags.Hz~=0 && flags.compute_mua && flags.compute_mus
 end
 info=flags.infoA; % Herein is the measurement list
 numpt=size(Gd,3); % Gx are lambda-SD-vox
-measnum=size(info.pairs,1);
+measnum=length(info.pairs.Src);
 disp(['Initializing A: ',num2str(measnum),' Measurements by ',...
     num2str(numpt),' voxels'])
 % A=zeros(measnum,numpt,'single');
