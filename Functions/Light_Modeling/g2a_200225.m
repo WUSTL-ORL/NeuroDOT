@@ -8,7 +8,7 @@ function [A,Gsd]=g2a_200225(Gs,Gd,dc,dim,flags)
 % flags structure containing parameters, including Hz for mod freq of
 %           source light.
 % 
-% %%200225 Added functionality to allow A for a subset of measurements as
+% %%200225 Added functionality to create A for a subset of measurements as
 %           listed in measurement list in flags.infoA.pairs.
 %
 % Copyright (c) 2017 Washington University 
@@ -61,8 +61,13 @@ numpt=size(Gd,3); % Gx are lambda-SD-vox
 measnum=size(info.pairs,1);
 disp(['Initializing A: ',num2str(measnum),' Measurements by ',...
     num2str(numpt),' voxels'])
-A=zeros(measnum,numpt,'single');
-Gsd=zeros(measnum,1);
+% A=zeros(measnum,numpt,'single');
+dcInv=single(dc'.^(-1));
+c=single((dim.sV^3));
+Gs=single(Gs);
+Gd=single(Gd);
+A=zeros(numpt,measnum,'single');
+Gsd=zeros(measnum,1,'single');
 
 
 %% Calculate Gsd
@@ -81,12 +86,14 @@ toc
 if flags.Hz==0 || flags.compute_mua == 1    
     disp(['Creating Adjoint formulation for mua'])
     tic
-    for m=1:measnum
-        A(m,:)=squeeze(Gs(info.pairs.WL(m),info.pairs.Src(m),:)).*...
-            squeeze(Gd(info.pairs.WL(m),info.pairs.Det(m),:)).*...
-            (dim.sV^3./dc(info.pairs.WL(m),:))./Gsd(m);
+    parfor m=1:measnum 
+        a=squeeze(Gs(info.pairs.WL(m),info.pairs.Src(m),:));
+        b=squeeze(Gd(info.pairs.WL(m),info.pairs.Det(m),:));
+        d=(dcInv(:,info.pairs.WL(m)));
+        A(:,m)=a.*b.*(c.*d)./Gsd(m);
     end
     toc
+    A=A';
 
 elseif flags.compute_mus              
         disp(['Creating Adjoint formulation for musp'])
@@ -108,21 +115,6 @@ elseif flags.compute_mus
     toc
 else A=[];Gsd=[];return
 end
-
-
-%% Normalize Rytov with Gsd and interp with vol and diff coef
-% disp(['Normalizing Rytov'])
-% tic
-% A=bsxfun(@rdivide,A,Gsd);
-% toc
-%     
-% disp(['>Normalizing for Discretized Space'])
-% tic
-% for m=1:measnum
-%     f=dim.sV^3./dc(info.pairs.WL(m),:);
-%     A(m,:)=f.*squeeze(A(m,:));
-% end
-% toc
 
 %% Remove NaN's
 A(isnan(A))=0;
