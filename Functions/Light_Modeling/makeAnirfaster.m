@@ -110,7 +110,7 @@ clear G
 
 %% (3) Create A matrix from Green's Funcions, mesh, and optical props.
 % if flags.makeA
-[A,dim,Gsd]= GtoAmat(Gs,Gd,mesh,dc,flags);
+[A,dim,Gsd,Gs,Gd,dc]= GtoAmat(Gs,Gd,mesh,dc,flags);
 % else
 %     A=[];
 %     dim=[];
