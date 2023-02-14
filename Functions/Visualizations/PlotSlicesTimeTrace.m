@@ -1,4 +1,4 @@
-function PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
+function PlotSlicesTimeTrace_230214(underlay, infoVol, params, overlay, info)
 
 % PLOTSLICESTIMETRACE Creates an interactive 4D plot.
 %
@@ -428,7 +428,11 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             hh.LineWidth = 2;
             
             hold on
-            plot(S(4) * ones(1, 2), [-1,1].*c_max.*1.2, '-r');
+%             plot(S(4) * ones(1, 2), [-1,1].*c_max.*1.2, '-r');
+            % New syntax for plotting red line 2/7/23
+            TT_max = max(ydata);
+            TT_min = min(ydata);
+            plot(S(4) * ones(1,2), [TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)], '-r')
             hold off
         
         else
@@ -445,13 +449,33 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             xlabel('Time (samples)', 'Color', LineColor, 'FontSize', 10)
         end
         ylabel('[Hb]', 'Color', LineColor, 'FontSize', 10)
-        ylim([-1,1].*c_max.*1.2)
+        ylim([TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)])
         
         
         %% Add a colorbar to bottom of whole thing.
         subplot(2, 2, 3)
         colormap(CMAP)
         h2 = colorbar(traax, 'Color', LineColor);
+        
+        % Set default ticks to min, mid, max of colorscale 2/7/23
+        set(h2, 'Ticks', [c_min, c_mid, c_max], 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
+        % Py version has section here where we double check that ticks are kosher
+        % Not sure if this is 100% necessary for matlab
+        ticks = h2.Ticks; %get whatever ticks matlab is using
+        ticks_new  = [min(ticks), ((max(ticks)-min(ticks))/2) + min(ticks), max(ticks)];
+        if ticks_new(2) > ticks_new(3) %if mid > max, reverse sign of mid
+            ticks_new(2) = -1 * ticks_new(2);
+        end
+        limits = h2.Limits;
+        if ticks_new(1) < limits(1) %if lowest tick less than lower limit of cb, set lowest tick to lower limit of cb
+            ticks_new(1) = limits(1);
+        end
+        if ticks_new(3) > limits(2) %if highest tick greater than upper limit of cb, set highest tick to upper limit of cb
+            ticks_new(3) = limits(2);
+        end
+        set(h2, 'Ticks', ticks_new);
+        
+        % Back to OG colorbar code
         if params.cbmode
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
         end
@@ -526,3 +550,4 @@ end
 
 
 %
+end

@@ -1,4 +1,4 @@
-function PlotSlices(underlay, infoVol, params, overlay)
+function PlotSlices_230214(underlay, infoVol, params, overlay)
 
 % PLOTSLICES Creates an interactive three-slice plot.
 %
@@ -403,6 +403,26 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         % Add a colorbar.
         colormap(CMAP)
         h2 = colorbar(eval([lower(orlist{end}(1:3)), 'ax']), 'Color', LineColor);
+        
+        % Set default ticks to min, mid, max of colorscale 2/7/23
+        set(h2, 'Ticks', [c_min, c_mid, c_max], 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
+        % Py version has section here where we double check that ticks are kosher
+        % Not sure if this is 100% necessary for matlab
+        ticks = h2.Ticks; %get whatever ticks matlab is using
+        ticks_new  = [min(ticks), ((max(ticks)-min(ticks))/2) + min(ticks), max(ticks)];
+        if ticks_new(2) > ticks_new(3) %if mid > max, reverse sign of mid
+            ticks_new(2) = -1 * ticks_new(2);
+        end
+        limits = h2.Limits;
+        if ticks_new(1) < limits(1) %if lowest tick less than lower limit of cb, set lowest tick to lower limit of cb
+            ticks_new(1) = limits(1);
+        end
+        if ticks_new(3) > limits(2) %if highest tick greater than upper limit of cb, set highest tick to upper limit of cb
+            ticks_new(3) = limits(2);
+        end
+        set(h2, 'Ticks', ticks_new);
+        
+        % Back to OG colorbar code
         if params.cbmode
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
         end
