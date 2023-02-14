@@ -432,6 +432,16 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             % New syntax for plotting red line 2/7/23
             TT_max = max(ydata);
             TT_min = min(ydata);
+            
+            % need to check if max and min are equal 
+            % because if PSTT initializes to a place where there is no data
+            % the max and min of the time trace will both be 0
+            % which will cause an error when we set the axis limits to be
+            % based off of TT_max and TT_min (line 462)
+            if TT_max == TT_min 
+                TT_max = TT_max +1;
+            end
+            
             plot(S(4) * ones(1,2), [TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)], '-r')
             hold off
         
