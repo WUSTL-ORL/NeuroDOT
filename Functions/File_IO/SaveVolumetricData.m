@@ -81,91 +81,91 @@ switch lower(file_type)
         fclose(fid);
         
     case {'nifti', 'nii'}
+        % Implemented 2/20/2023 ES
+
         %% Call NIFTI_Reader functions.
         volume = flip(volume, 1); % Convert back from LAS to RAS for NIFTI.
         
         if isfield(header,'original_header') % was loaded as nii
+            nii = struct;
             nii.img=volume;
-            nii.hdr=header.original_header.hdr;
-            nii.hdr.dime.dim=[length(size(volume)),size(volume,1),...
-                                size(volume,2),size(volume,3),...
-                                size(volume,4),1 1 1];
-            
+            nii.hdr = nifti_4dfp(header, 'n');
+            nii.hdr.original_header=header.original_header.hdr;  
+             % Required fields
+            nii.hdr.Description = nii.hdr.descrip;
+            if length(nii.hdr.Description) > 80
+                nii.hdr.Description = 'Converted with NeuroDOT nifti_4dfp';
+            end
+            nii.hdr.ImageSize = nii.hdr.dim(2:4);
+            if nii.hdr.datatype == 16
+                nii.hdr.Datatype = 'single';
+            end
+            nii.hdr.BitsPerPixel = 32;
+            nii.hdr.Version = 'NIfTI1';
+            nii.hdr.Qfactor = nii.hdr.pixdim(1);
+            nii.hdr.PixelDimensions = nii.hdr.pixdim(2:4);
+            nii.hdr.SpaceUnits = 'Millimeter';
+            nii.hdr.TimeUnits = 'Second';
+            nii.hdr.AdditiveOffset = 0;
+            nii.hdr.MultiplicativeScaling = 0;
+            nii.hdr.TimeOffset = 0;
+            nii.hdr.SliceCode = 'Unknown';
+            nii.hdr.FrequencyDimension = 0;
+            nii.hdr.PhaseDimension = 0;
+            nii.hdr.SpatialDimension = 0;
+            nii.hdr.DisplayIntensityRange = [0,0];
+            nii.hdr.TransformName = 'Sform';
+            nii.hdr.Transform.T = [nii.hdr.srow_x(1), ...
+                nii.hdr.srow_y(1),nii.hdr.srow_z(1),0;...
+                nii.hdr.srow_x(2), nii.hdr.srow_y(2),...
+                nii.hdr.srow_z(2),0;nii.hdr.srow_x(3),...
+                nii.hdr.srow_y(3),nii.hdr.srow_z(3),0;...
+                nii.hdr.srow_x(4), nii.hdr.srow_y(4),...
+                nii.hdr.srow_z(4),1];
+            nii.hdr.Transform.Dimensionality = 4;
         else % Build nii header from information in NeuroDOT header
-             % .nii headers require hdr.hk, hdr.dime, hdr.hist
             nii = struct;
             nii.img = volume;
             % Required fields
-            nii.hdr.hk.sizeof_hdr = 348;  % Must be 348
-            
-            nii.hdr.hist.magic = 'n+1';   % 'n+1' if the image volume is in the same .nii file as the header
-            nii.hdr.hist.descrip = header.filename;
-            
-            nii.hdr.dime.datatype = 16;   
-            nii.hdr.dimebitpix = 32;      % Should correspond correctly to datatype 
-            nii.hdr.dime.vox_offset = 352;% Required for an 'n+1' header
-            nii.hdr.dime.dim(1) = header.nDim;
-            nii.hdr.dime.dim(2) = header.nVx;
-            nii.hdr.dime.dim(3) = header.nVy;
-            nii.hdr.dime.dim(4) = header.nVz;
-            nii.hdr.dime.dim(5) = header.nVt;
-            nii.hdr.dime.dim(6) = 1;
-            nii.hdr.dime.dim(7) = 1;
-            nii.hdr.dime.dim(8) = 1;
-            nii.hdr.dime.pixdim(1) = 1;
-            nii.hdr.dime.pixdim(2) = header.mmx;
-            nii.hdr.dime.pixdim(3) = header.mmy;
-            nii.hdr.dime.pixdim(4) = header.mmz;
-            nii.hdr.dime.pixdim(5) = 1;
-            nii.hdr.dime.pixdim(6) = 0;
-            nii.hdr.dime.pixdim(7) = 0;
-            nii.hdr.dime.pixdim(8) = 0;
-                    
-            % Calculate Srow values from Center 
-            nii.hdr.hist.srow_x = [header.mmx, 0, 0, -(header.center(1)- header.mmx)];
-            nii.hdr.hist.srow_y = [0, header.mmy, 0, -(header.center(2)- (header.mmy*header.nVy*(-1)))];
-            nii.hdr.hist.srow_z = [0, 0, header.mmz, -(header.center(3)- (header.mmz*header.nVz*(-1)))];
-            
-            % Optional fields must be set to zero if unused
-            nii.hdr.hk.dim_info = 0;
-            nii.hdr.hk.data_type = 0;
-            nii.hdr.hk.db_name = 0;
-            nii.hdr.hk.extents = 0;
-            nii.hdr.hk.session_error = 0;
-            nii.hdr.hk.regular = blanks(1);
-            nii.hdr.dime.intent_p1 = 0;
-            nii.hdr.dime.intent_p2 = 0;
-            nii.hdr.dime.intent_p3 = 0;
-            nii.hdr.dime.intent_code = 0;
-            nii.hdr.dime.scl_slope = 0;
-            nii.hdr.dime.scl_inter = 0;
-            nii.hdr.dime.xyzt_units = 2; % Milimeters
-            nii.hdr.dime.cal_max = 0;    
-            nii.hdr.dime.cal_min = 0; 
-            nii.hdr.dime.toffset = 0;
-            nii.hdr.dime.slice_code = 0;
-            nii.hdr.dime.slice_start = 0;
-            nii.hdr.dime.slice_end = 0;
-            nii.hdr.dime.slice_duration = 0;
-            nii.hdr.hist.intent_name = '\0';
-            nii.hdr.hist.qform_code = 1; % Not recommended to set to 0
-            nii.hdr.hist.quatern_b = 0;
-            nii.hdr.hist.quatern_c = 0;
-            nii.hdr.hist.quatern_d = 0;
-            nii.hdr.hist.qoffset_x = 0;
-            nii.hdr.hist.qoffset_y = 0;
-            nii.hdr.hist.qoffset_z = 0;
-            nii.hdr.hist.sform_code = 1; % Not recommended to set to 0
-            nii.hdr.hist.originator(1) = -nii.hdr.hist.srow_x(4) + 1;
-            nii.hdr.hist.originator(2) = -nii.hdr.hist.srow_y(4) + 1;
-            nii.hdr.hist.originator(3) = -nii.hdr.hist.srow_z(4) + 1;
-            nii.hdr.hist.aux_file = '';
-                           
-        save_nii(nii, [fullfile(pn, filename), '.nii']);
+            nii.hdr.raw = nifti_4dfp(header, 'n');
+            nii.hdr.Description = nii.hdr.raw.descrip;
+            nii.hdr.ImageSize = nii.hdr.raw.dim(2:4);
+            if nii.hdr.raw.datatype == 16
+                nii.hdr.Datatype = 'single';
+            end
+            nii.hdr.BitsPerPixel = 32;
+            nii.hdr.Version = 'NIfTI1';
+            nii.hdr.Qfactor = nii.hdr.raw.pixdim(1);
+            nii.hdr.PixelDimensions = nii.hdr.raw.pixdim(2:4);
+            nii.hdr.SpaceUnits = 'Millimeter';
+            nii.hdr.TimeUnits = 'Second';
+            nii.hdr.AdditiveOffset = 0;
+            nii.hdr.MultiplicativeScaling = 0;
+            nii.hdr.TimeOffset = 0;
+            nii.hdr.SliceCode = 'Unknown';
+            nii.hdr.FrequencyDimension = 0;
+            nii.hdr.PhaseDimension = 0;
+            nii.hdr.SpatialDimension = 0;
+            nii.hdr.DisplayIntensityRange = [0,0];
+            nii.hdr.TransformName = 'Sform';
+            nii.hdr.Transform.T = [nii.hdr.raw.srow_x(1), ...
+                nii.hdr.raw.srow_y(1),nii.hdr.raw.srow_z(1),0;...
+                nii.hdr.raw.srow_x(2), nii.hdr.raw.srow_y(2),...
+                nii.hdr.raw.srow_z(2),0;nii.hdr.raw.srow_x(3),...
+                nii.hdr.raw.srow_y(3),nii.hdr.raw.srow_z(3),0;...
+                nii.hdr.raw.srow_x(4), nii.hdr.raw.srow_y(4),...
+                nii.hdr.raw.srow_z(4),1];
+            nii.hdr.Transform.Dimensionality = 4;
         end
-end
-end
+        % In order to write the header, you need a very specific set of
+        % fields
+        % original_header does not get saved due to it not being one of the
+        % fields that niftiwrite considers
+%         save_nii(nii, filename);
+        niftiwrite(single(nii.img), filename, nii.hdr);
 
+end
+end
 
 
 %
