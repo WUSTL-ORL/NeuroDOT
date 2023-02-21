@@ -196,11 +196,12 @@ if type == 'snirf'
                 info.pairs.NN = [snf.nirs.data.measurementList(:).NN]'; %custom Ndot field (in snirf format)
             else
                 max_log = max(log10(abs(snf.nirs.probe.sourcePos3D(:))));
-                if (0 <= max_log) && (max_log <= 1)
+                min_log = min(log10(abs(snf.nirs.probe.sourcePos3D(:))));
+                if (0 <= min_log) && (min_log <= 1) % Changed max_log to min_log 2/1/23
                     mult = 10;
-                elseif (-1 <= max_log) && (max_log <= 0)
+                elseif (-1 <= min_log) && (min_log <= 0)
                     mult = 100;
-                elseif (max_log <= -1)
+                elseif (max_log <= -1) || (min_log <=-1)
                     mult = 1000;
                 else
                     mult = 1;
@@ -216,14 +217,17 @@ if type == 'snirf'
                 Rad=Grid2Radius_180824(gridTemp,5);
                 params.lambda= snf.nirs.probe.wavelengths;
                 tempInfo=Generate_Info_from_Grid_Rad(gridTemp,Rad,params);
-                [IdxA,IdxB]=ismember([tempInfo.pairs.Src,tempInfo.pairs.Det,tempInfo.pairs.WL],...
-                    [info.pairs.Src,info.pairs.Det,info.pairs.WL],'rows');
-                info.pairs.r3d=tempInfo.pairs.r3d(IdxA);
-                info.pairs.r2d = tempInfo.pairs.r2d(IdxA);
-                info.pairs.NN = tempInfo.pairs.NN(IdxA);
+                data_measList = [info.pairs.Src,info.pairs.Det,info.pairs.WL];
+                full_measList =[tempInfo.pairs.Src,tempInfo.pairs.Det,tempInfo.pairs.WL];
+                
+                [IdxA,IdxB]=ismember(data_measList, full_measList,'rows');
+                
+                info.pairs.r3d=tempInfo.pairs.r3d(IdxB);
+                info.pairs.r2d = tempInfo.pairs.r2d(IdxB);
+                info.pairs.NN = tempInfo.pairs.NN(IdxB);
                 info.optodes.spos3 = gridTemp.spos3;
                 info.optodes.dpos3 = gridTemp.dpos3;
-         
+            
             end
                            
             if ~isfield(info.pairs, 'Mod')
