@@ -88,11 +88,11 @@ end
 if numNNs == 2
     subplot(4,2,[5:8]);
     params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
-    PlotCapGoodMeas(info, params);
+    info = PlotCapGoodMeas(info, params);
 else
     subplot(1,3,3);
     params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
-    PlotCapGoodMeas(info, params);
+    info = PlotCapGoodMeas(info, params);
 end
 
 %% Cap Physiology Plot
@@ -100,17 +100,19 @@ params=rmfield(params,'mode');
 if numNNs == 2
     subplot(4,2,3);                             % Close neighborhood
     params.rlimits=Rlimits(1,:);
-    info.MEAS.Pulse_SNR_R1=PlotCapPhysiologyPower(data, info, params);
+    [info.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
 
     subplot(4,2,4);                             % 2nd neighborhood
     params.rlimits=Rlimits(2,:);
-    info.MEAS.Pulse_SNR_R2=PlotCapPhysiologyPower(data, info, params);
+    [info.MEAS.Pulse_SNR_R2, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
 else
     subplot(1,3,2);                             % Close neighborhood
     params.rlimits=Rlimits(1,:);
-    info.MEAS.Pulse_SNR_R1=PlotCapPhysiologyPower(data, info, params);
+    [info.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
 end
 
+info.DQ_metrics.SNR = SNR_DQ;
+end
 
 
 
