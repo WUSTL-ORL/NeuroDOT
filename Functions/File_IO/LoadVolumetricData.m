@@ -116,6 +116,16 @@ case {'nifti', 'nii' ,'nii.gz'}
             header.mmx = abs(header.mmppix(1));
             header.mmy = abs(header.mmppix(2));
             header.mmz = abs(header.mmppix(3));
+            
+            orientation = header.orientation;
+            switch orientation
+                case '2'
+                    header.acq = 'transverse';
+                case '3'
+                    header.acq = 'coronal';
+                case '4'
+                    header.acq = 'sagittal';
+            end
             if isfield(nii, 'machine')
                 switch nii.machine
                     case 'ieee-le'
