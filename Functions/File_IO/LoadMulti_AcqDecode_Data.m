@@ -197,6 +197,11 @@ switch flags.Nsys
             reshape(data_b, [], info_b.io.Nwl, L);...
             reshape(data_c, [], info_c.io.Nwl, L)];
         data = reshape(data, [], L);
+        
+        
+end
+if istable(info.pairs)
+    info.pairs = table2struct(info.pairs, 'ToScalar', true);
 end
 
 
