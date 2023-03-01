@@ -59,11 +59,15 @@ if type == 'snirf'
             info.system.init_framerate = info.system.framerate;
         end
     end
-  
+    
        
     if exist('snf','var')
         if ~isfield(snf.nirs, 'metaDataTags')
         else
+            if isfield(snf.nirs.metaDataTags,'framerate')
+                info.system.framerate = snf.nirs.metaDataTags.framerate;
+                info.system.init_framerate = info.system.framerate;
+            end
             if ~isfield(snf.nirs.metaDataTags, 'Nd') 
             else
                 info.io.Nd = snf.nirs.metaDataTags.Nd; %custom NeuroDOT field
