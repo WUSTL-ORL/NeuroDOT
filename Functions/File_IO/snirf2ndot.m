@@ -65,6 +65,15 @@ if type == 'snirf'
     
        
     if exist('snf','var')
+        if isfield(snf, 'original_header')
+            if isfield(snf.original_header.io,'a')
+                info.io.a = snf.original_header.io.a;
+                info.io.b = snf.original_header.io.b;
+            else
+                info.io = snf.original_header.io;
+            end
+        else
+           
         if ~isfield(snf.nirs, 'metaDataTags')
         else
             if isfield(snf.nirs.metaDataTags,'framerate')
@@ -154,6 +163,7 @@ if type == 'snirf'
             else
                 info.system.PadName = snf.nirs.metaDataTags.PadName; %custom NeuroDOT field
             end
+        end
         end
         
         if ~isfield(snf.nirs,'probe')
