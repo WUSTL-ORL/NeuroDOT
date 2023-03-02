@@ -1,4 +1,4 @@
-function header_out = nifti_4dfp_230215(header_in, mode)
+function header_out = nifti_4dfp(header_in, mode)
 % Function to convert between nifti and 4dfp header formats.
 % Inputs:
 %   header_in: 'struct' of either a nifti or 4dfp header
@@ -282,7 +282,7 @@ switch mode
             end
         end
         if header_in.sform_code > 0  % nifti_format.c:377
-            for i = 1:4 % Line 379
+            for i = 1:4 % nifti_format.c:379
                 sform(1,i) = header_in.srow_x(i); % nifti_format.c:381
                 sform(2,i) = header_in.srow_y(i); % nifti_format.c:382
                 sform(3,i) = header_in.srow_z(i); % nifti_format.c:383
