@@ -52,6 +52,9 @@ end
 snf = loadsnirf(filename);
 
 if type == 'snirf' 
+    if isfield(snf, 'original_header')
+        info.original_header = snf.original_header;
+    end
     if isfield(snf.nirs, 'data')
         data = snf.nirs.data.dataTimeSeries';% Snirf measurement list describes each channel as a column of the data
         if isfield(snf.nirs.data, 'time')
@@ -147,6 +150,10 @@ if type == 'snirf'
             else
                 info.io.Nt = snf.nirs.metaDataTags.Nt; %custom NeuroDOT field
             end
+            if ~isfield(snf.nirs.metaDataTags, 'PadName')
+            else
+                info.system.PadName = snf.nirs.metaDataTags.PadName; %custom NeuroDOT field
+            end
         end
         
         if ~isfield(snf.nirs,'probe')
@@ -196,9 +203,25 @@ if type == 'snirf'
                     info.pairs.lambda(info.pairs.WL == j) = wavelengths(j);
                 end
             end
-            if isfield(snf.nirs.data.measurementList, 'NN')
-                info.pairs.NN = [snf.nirs.data.measurementList(:).NN]'; %custom Ndot field (in snirf format)
-            else
+            if isfield(snf, 'original_header')
+                
+                if isfield(snf.original_header.pairs, 'r3d')
+                        info.pairs.r3d = snf.original_header.pairs.r3d; %custom Ndot field (in snirf format)
+                end
+                if isfield(snf.original_header.pairs, 'r2d')
+                        info.pairs.r2d = snf.original_header.pairs.r2d; %custom Ndot field (in snirf format)
+                end
+                if isfield(snf.original_header.pairs, 'NN')
+                    info.pairs.NN = snf.original_header.pairs.NN; %custom Ndot field (in snirf format)
+                end
+           
+                if isfield(snf.original_header.pairs, 'Mod')
+                    info.pairs.Mod = snf.original_header.pairs.Mod; %custom Ndot field (in snirf format)
+                end
+                
+            end
+            end
+            if ~isfield(snf, 'original_header')
                 max_log = max(log10(abs(snf.nirs.probe.sourcePos3D(:))));
                 min_log = min(log10(abs(snf.nirs.probe.sourcePos3D(:))));
                 if (0 <= min_log) && (min_log <= 1) % Changed max_log to min_log 2/1/23
@@ -234,26 +257,12 @@ if type == 'snirf'
             
             end
                            
-            if ~isfield(info.pairs, 'Mod')
-            else 
-                if isfield(snf.nirs.data.measurementList, 'Mod')
-                    info.pairs.Mod = snf.nirs.data.measurementList(:).Mod'; %custom Ndot field (in snirf format)
-                end
-            end
-            if ~isfield(info.pairs, 'r2d')
-            else 
-                if isfield(snf.nirs.data.measurementList, 'r2d')
-                    info.pairs.r2d = snf.nirs.data.measurementList(:).r2d'; %custom Ndot field (in snirf format)
-                
-                end
-            end
-            if ~isfield(info.pairs, 'r3d')
-            else 
-                if isfield(snf.nirs.data.measurementList, 'r3d')
-                    info.pairs.r3d = snf.nirs.measurementList(:).r3d'; %custom Ndot field (in snirf format)
-                end
-            end
-        end
+            
+        
+               
+            
+            
+        
       
         if isfield(snf.nirs, 'stim')
             Total_synchs = [];
@@ -267,10 +276,13 @@ if type == 'snirf'
             info.paradigm.synchtype = Total_synchtypes(sortedIdx);
             for j = 1:Npulses
                 info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
+                info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
             end
             info.paradigm.synchtimes = info.paradigm.synchpts;
+            info.paradigm.synchpts = info.paradigm.synchpts';
+            info.paradigm.init_synchpts = info.paradigm.synchpts;
             for j = 1: length(info.paradigm.synchpts)
-                [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                [~,info.paradigm.synchtimes(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
             end
         
         else
