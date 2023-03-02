@@ -44,7 +44,11 @@ nVx = dim.nVx;
 nVy = dim.nVy;
 nVz = dim.nVz;
 
-gsigma = gsigma / dim.sV;
+if isfield(dim, 'sV')
+    gsigma = gsigma / dim.sV;
+elseif isfield(dim, 'mmx')
+    gsigma = gsigma/dim.mmx;
+end
 
 
 %% Preallocate voxel space.
