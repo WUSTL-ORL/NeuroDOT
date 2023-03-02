@@ -226,7 +226,7 @@ if type == 'snirf'
                 end
            
                 if isfield(snf.original_header.pairs, 'Mod')
-                    info.pairs.Mod = snf.original_header.pairs.Mod; %custom Ndot field (in snirf format)
+                    info.pairs.Mod = cellstr(snf.original_header.pairs.Mod(:)); %custom Ndot field (in snirf format)
                 end
                 
             end
