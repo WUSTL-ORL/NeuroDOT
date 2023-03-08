@@ -254,23 +254,20 @@ if type == 'snirf'
                 info.pairs.NN = tempInfo.pairs.NN(IdxB);
                 
                 % Moved from Line 241 (3/8/23 ES)
-                max_log = max(log10(abs(info.pairs.r3d(:))));
-                min_log = min(log10(abs(info.pairs.r3d(:))));
-                if ((min_log >= 0) && (min_log <=1)) && ...
-                        ((max_log >=0) && (max_log <= 1)) % Changed max_log to min_log 2/1/23
+                avg_r3d = mean(info.pairs.r3d);
+                if (avg_r3d >=1) && (avg_r3d <=10) % Changed max_log to min_log 2/1/23
                     mult = 10;
-                elseif ((0 >= min_log) && (min_log >= -1)) && ...
-                        ((max_log >= 0) && (max_log <=1))
+                elseif (avg_r3d >=0.1) && (avg_r3d <=1)
                     mult = 100;
-                elseif ((max_log <= 0) || (max_log <= -1)) && ...
-                        ((min_log <=-1) || (min_log <= -2))
+                elseif (avg_r3d >=0) && (avg_r3d <=0.1)
                     mult = 1000;
                 else
                     mult = 1;
                 end      
                 info.optodes.spos3 = gridTemp.spos3*mult;
                 info.optodes.dpos3 = gridTemp.dpos3*mult;
-            
+                info.pairs.r3d = info.pairs.r3d*mult;
+                info.pairs.r2d = info.pairs.r2d*mult;
             end                                        
         
         if isfield(snf, 'original_header')
