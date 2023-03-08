@@ -66,11 +66,13 @@ if type == 'snirf'
        
     if exist('snf','var')
         if isfield(snf, 'original_header')
-            if isfield(snf.original_header.io,'a')
-                info.io.a = snf.original_header.io.a;
-                info.io.b = snf.original_header.io.b;
-            else
-                info.io = snf.original_header.io;
+            if isfield(snf.original_header,'io')
+                if isfield(snf.original_header.io,'a')
+                    info.io.a = snf.original_header.io.a;
+                    info.io.b = snf.original_header.io.b;
+                else
+                    info.io = snf.original_header.io;
+                end
             end
         else
            
@@ -231,21 +233,9 @@ if type == 'snirf'
                 
             end
             end
-            if ~isfield(snf, 'original_header')
-                max_log = max(log10(abs(snf.nirs.probe.sourcePos3D(:))));
-                min_log = min(log10(abs(snf.nirs.probe.sourcePos3D(:))));
-                if (0 <= min_log) && (min_log <= 1) % Changed max_log to min_log 2/1/23
-                    mult = 10;
-                elseif (-1 <= min_log) && (min_log <= 0)
-                    mult = 100;
-                elseif (max_log <= -1) || (min_log <=-1)
-                    mult = 1000;
-                else
-                    mult = 1;
-                end                   
-                    
-                gridTemp.spos3=snf.nirs.probe.sourcePos3D.*mult;
-                gridTemp.dpos3=snf.nirs.probe.detectorPos3D.*mult;
+            if ~isfield(snf, 'original_header') 
+                gridTemp.spos3=snf.nirs.probe.sourcePos3D;
+                gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
 %                 dmax = max(log10(d(:)));
 %                 if dmax < 30
 %                     gridTemp.spos3=snf.nirs.probe.sourcePos3D.*10;
@@ -262,71 +252,84 @@ if type == 'snirf'
                 info.pairs.r3d=tempInfo.pairs.r3d(IdxB);
                 info.pairs.r2d = tempInfo.pairs.r2d(IdxB);
                 info.pairs.NN = tempInfo.pairs.NN(IdxB);
-                info.optodes.spos3 = gridTemp.spos3;
-                info.optodes.dpos3 = gridTemp.dpos3;
+                
+                % Moved from Line 241 (3/8/23 ES)
+                max_log = max(log10(abs(info.pairs.r3d(:))));
+                min_log = min(log10(abs(info.pairs.r3d(:))));
+                if ((min_log >= 0) && (min_log <=1)) && ...
+                        ((max_log >=0) && (max_log <= 1)) % Changed max_log to min_log 2/1/23
+                    mult = 10;
+                elseif ((0 >= min_log) && (min_log >= -1)) && ...
+                        ((max_log >= 0) && (max_log <=1))
+                    mult = 100;
+                elseif ((max_log <= 0) || (max_log <= -1)) && ...
+                        ((min_log <=-1) || (min_log <= -2))
+                    mult = 1000;
+                else
+                    mult = 1;
+                end      
+                info.optodes.spos3 = gridTemp.spos3*mult;
+                info.optodes.dpos3 = gridTemp.dpos3*mult;
             
-            end
-                           
-            
+            end                                        
         
-               
-            
-            
-        
-      
-        if isfield(snf.nirs, 'stim')
-            Total_synchs = [];
-            Total_synchtypes = [];
-            Npulses = length(snf.nirs.stim);
-            for i = 1:length(snf.nirs.stim)
-                Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
-                Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
-            end
-            [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
-            info.paradigm.synchtype = Total_synchtypes(sortedIdx);
-            for j = 1:Npulses
-                info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
-                info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
-            end
-            info.paradigm.synchtimes = info.paradigm.synchpts;
-            info.paradigm.synchpts = info.paradigm.synchpts';
-            info.paradigm.init_synchpts = info.paradigm.synchpts;
-            for j = 1: length(info.paradigm.synchpts)
-                [~,info.paradigm.synchtimes(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
-            end
-        
+        if isfield(snf, 'original_header')
+            info.paradigm = snf.original_header.paradigm;
         else
-            fields = fieldnames(snf.nirs); 
-            fieldlist = [];
-        for j = 1:length(fields)
-            if strlength(fields(j)) >= 4
-                fieldlist = [fieldlist, fields(j)];
+            if isfield(snf.nirs, 'stim')
+                Total_synchs = [];
+                Total_synchtypes = [];
+                Npulses = length(snf.nirs.stim);
+                for i = 1:length(snf.nirs.stim)
+                    Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
+                    Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
+                end
+                [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
+                info.paradigm.synchtype = Total_synchtypes(sortedIdx);
+                for j = 1:Npulses
+                    info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
+                    info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
+                end
+                info.paradigm.synchtimes = info.paradigm.synchpts;
+                info.paradigm.synchpts = info.paradigm.synchpts';
+                info.paradigm.init_synchpts = info.paradigm.synchpts;
+                for j = 1: length(info.paradigm.synchpts)
+                    [~,info.paradigm.synchtimes(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                end
+
             else
-                fieldlist = [fieldlist, 'not_stim'];
+                fields = fieldnames(snf.nirs); 
+                fieldlist = [];
+            for j = 1:length(fields)
+                if strlength(fields(j)) >= 4
+                    fieldlist = [fieldlist, fields(j)];
+                else
+                    fieldlist = [fieldlist, 'not_stim'];
+                end
             end
-        end
-            idxPulse = ismember(cellfun(@(x) x(1:4), fieldlist, 'UniformOutput', false), 'stim');
-            pulses = fields(idxPulse);
-        if any(idxPulse) 
-            Total_synchs = [];
-            Total_synchtypes = [];
-            Npulses = length(pulses);
-            pulses = sort(pulses);
-            for j = 1:Npulses
-                pulse = string(pulses(j));
-                Total_synchs = [Total_synchs; snf.nirs.(pulse).data(:,1)];
-                Total_synchtypes = [Total_synchtypes; j.*ones(length(snf.nirs.(pulse).data(:,1)),1 )];
+                idxPulse = ismember(cellfun(@(x) x(1:4), fieldlist, 'UniformOutput', false), 'stim');
+                pulses = fields(idxPulse);
+            if any(idxPulse) 
+                Total_synchs = [];
+                Total_synchtypes = [];
+                Npulses = length(pulses);
+                pulses = sort(pulses);
+                for j = 1:Npulses
+                    pulse = string(pulses(j));
+                    Total_synchs = [Total_synchs; snf.nirs.(pulse).data(:,1)];
+                    Total_synchtypes = [Total_synchtypes; j.*ones(length(snf.nirs.(pulse).data(:,1)),1 )];
+                end
+                [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
+                info.paradigm.synchtype = Total_synchtypes(sortedIdx);
+                for j = 1:Npulses
+                    info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
+                end
+                info.paradigm.synchtimes = info.paradigm.synchpts;
+                for j = 1: length(info.paradigm.synchpts)
+                    [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                end      
             end
-            [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
-            info.paradigm.synchtype = Total_synchtypes(sortedIdx);
-            for j = 1:Npulses
-                info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
             end
-            info.paradigm.synchtimes = info.paradigm.synchpts;
-            for j = 1: length(info.paradigm.synchpts)
-                [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
-            end      
-        end
         end
     end
     
