@@ -54,7 +54,7 @@ switch mode
         % Adjust order of dimensions depending on the orientation
         switch header_in.orientation
             case 4
-                tempv = order(0);
+                tempv = order(2);
                 order(2) = order(1);
                 order(1) = tempv;
             case 3
@@ -147,7 +147,7 @@ switch mode
             case 6
                 order(3) = 0;
         end
-        order = [0,1,2,3];
+%         order = [0,1,2,3];
 
         orientation = 0;
         for i = 0:2
@@ -305,8 +305,8 @@ switch mode
                 sform(3,2) = 2*c*d + 2*a*b;
                 sform(3,3) = a^2 + d^2 - c^2 - b^2;
 
-                if pixdim(1) < 0.0
-                    pixdim(4) = -header_in.pixdim(4);%/* read nifti1.h:1005 for yourself, i can't make this stuff up */
+                if header_in.pixdim(1) < 0.0
+                    header_in.pixdim(4) = -header_in.pixdim(4);%/* read nifti1.h:1005 for yourself, i can't make this stuff up */
                 end
 
 
