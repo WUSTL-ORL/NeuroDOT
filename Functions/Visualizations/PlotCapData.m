@@ -54,8 +54,8 @@ function PlotCapData(SrcRGB, DetRGB, info, params)
 %% Parameters and Initialization.
 
 % Nm = height(info.pairs);
-Ns = length(info.optodes.spos2);
-Nd = length(info.optodes.dpos2);
+Ns = length(info.optodes.spos3);
+Nd = length(info.optodes.dpos3);
 
 Srcs = [1:Ns];%unique(info.pairs.Src);
 Dets = [1:Nd];%unique(info.pairs.Det);

@@ -248,7 +248,7 @@ switch params.dimension
     case '2D'
         CB.Position = [pos(1)+pos(3)/3, pos(2), pos(3)/3, pos(4)/35];
     case '3D'
-        CB.Position = [pos(1)+os(3)/3, pos(2)+0.11, pos(3)/3, 0.015];
+        CB.Position = [pos(1)+pos(3)/3, pos(2)+0.11, pos(3)/3, 0.015];
 end
 
 %% Add Title.

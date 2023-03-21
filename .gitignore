@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Windows default autosave extension
 *.asv
 
@@ -34,3 +35,11 @@ octave-workspace
 Documentation/MATLAB_Help_Files/html/DOT_Processing_Tutorial_eq16949843601793904612.png
 Documentation/MATLAB_Help_Files/html/DOT_Processing_Tutorial_eq03133971348043604638.png
 Support_Files/._.DS_Store
+=======
+
+Support_Files/.DS_Store
+Support_Files/._.DS_Store
+Documentation/Scripts/Basic_Light_Modeling_with_Hummingbird_Tutorial_220913.asv
+Documentation/MATLAB_Help_Files/html/DOT_Processing_Tutorial_eq03133971348043604638.png
+Documentation/MATLAB_Help_Files/html/DOT_Processing_Tutorial_eq16949843601793904612.png
+>>>>>>> Stashed changes

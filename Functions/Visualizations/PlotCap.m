@@ -50,8 +50,8 @@ function PlotCap(info, params)
 %% Parameters and Initialization.
 % Ns = length(unique(info.pairs.Src));
 % Nd = length(unique(info.pairs.Det));
-Ns = length(info.optodes.spos2);
-Nd = length(info.optodes.dpos2);
+Ns = length(info.optodes.spos3);
+Nd = length(info.optodes.dpos3);
 LineColor = 'w';
 BkgdColor = 'k';
 if ~exist('params','var'),params=struct;end

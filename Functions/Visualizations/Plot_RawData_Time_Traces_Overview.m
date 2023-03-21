@@ -110,9 +110,14 @@ for j=1:Nwl
             num2str(params.rlimits(1,2)),' mm'],...
             'Color','w')
     end    
-    
+    % Divide experimental paradigm timing by framerate if not done
 if isfield(info,'paradigm') % Add in experimental paradigm timing
-    DrawColoredSynchPoints(info,1);
+    if max(info.paradigm.synchpts) <= size(data,2)/info.system.framerate
+       DrawColoredSynchPoints(info,0);
+    else
+       DrawColoredSynchPoints(info,1);
+
+    end
 end
 
 end
