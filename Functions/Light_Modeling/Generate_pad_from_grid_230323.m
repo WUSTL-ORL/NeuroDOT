@@ -143,7 +143,7 @@ end
 
 %% Populate NN's 
 
-info = calc_NN_230316(info,params.dr);
+info = calc_NN(info,params.dr);
 
 
 end

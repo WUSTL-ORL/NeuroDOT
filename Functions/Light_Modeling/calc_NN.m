@@ -1,4 +1,4 @@
-function info_out = calc_NN_230323(info_in, dr)
+function info_out = calc_NN(info_in, dr)
 %
 % This function takes in a neuroDOT info structure (info_in), calculates the
 % Nearest Neigbor value for all measurement pairs, populates the output
@@ -17,9 +17,7 @@ if ~exist('dr', 'var')
     dr = 10; %default = 10mm minimum separation for SD to be grouped into different neighbors
 end
 
-Ns = size(info_in.optodes.spos3,1);
-Nd = size(info_in.optodes.dpos3,1);
-Nm = Ns*Nd;
+Nm = length(info_in.pairs.r3d);
 
 NN=zeros(Nm,1); %initialize NN vector
 
