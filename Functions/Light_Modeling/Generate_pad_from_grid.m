@@ -1,4 +1,4 @@
-function info = Generate_pad_from_grid_230323(grid, params, info)
+function info = Generate_pad_from_grid(grid, params, info)
 
 % This function generates info structures optodes and pairs from the 
 % data in grid and radius files. 
@@ -36,7 +36,7 @@ function info = Generate_pad_from_grid_230323(grid, params, info)
 % Params and output structure
 if ~exist('info', 'var'), info = struct;end
 if ~exist('params', 'var'), params = struct;end
-if ~isfield(params, 'dr'),dr=10; % defaults to 10mm
+if ~isfield(params, 'dr'),params.dr=10; % defaults to 10mm
 else
     dr = params.dr;
 end
@@ -143,7 +143,7 @@ end
 
 %% Populate NN's 
 
-info = calc_NN(info,params.dr);
+info = calc_NN(info,params.dr); %updated number of measurment calculation within calc_NN to be based on length of r3d
 
 
 end
