@@ -291,7 +291,7 @@ if type == 'snirf'
                 info.paradigm.synchpts = info.paradigm.synchpts';
                 info.paradigm.init_synchpts = info.paradigm.synchpts;
                 for j = 1: length(info.paradigm.synchpts)
-                    [~,info.paradigm.synchtimes(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                    [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
                 end
 
             else
