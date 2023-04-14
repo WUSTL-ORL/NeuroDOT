@@ -289,11 +289,10 @@ if type == 'snirf'
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
                 info.paradigm.synchpts = info.paradigm.synchpts';
-                info.paradigm.init_synchpts = info.paradigm.synchpts;
                 for j = 1: length(info.paradigm.synchpts)
                     [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
                 end
-
+                info.paradigm.init_synchpts = info.paradigm.synchpts;
             else
                 fields = fieldnames(snf.nirs); 
                 fieldlist = [];
@@ -324,7 +323,8 @@ if type == 'snirf'
                 info.paradigm.synchtimes = info.paradigm.synchpts;
                 for j = 1: length(info.paradigm.synchpts)
                     [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
-                end      
+                end
+                info.paradigm.init_synchpts = info.paradigm.synchpts;
             end
             end
         end
