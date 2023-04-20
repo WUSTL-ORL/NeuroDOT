@@ -1,4 +1,4 @@
-function PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
+function PlotSlicesTimeTrace_AS_230420(underlay, infoVol, params, overlay, info)
 
 % PLOTSLICESTIMETRACE Creates an interactive 4D plot.
 %
@@ -435,7 +435,11 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             plot(S(4) * ones(1,2), [TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)], '-r')
             hold off
             
-            ylim([TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)])
+            if TT_max == TT_min
+                plot([xlim, NaN, xlim], [ylim, NaN, flip(ylim)], '-r'); %plot red X
+            else
+                ylim([TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)])
+            end
         
         else
             plot([xlim, NaN, xlim], [ylim, NaN, flip(ylim)], '-r');
