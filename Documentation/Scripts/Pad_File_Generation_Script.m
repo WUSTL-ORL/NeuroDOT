@@ -38,7 +38,7 @@ params.CapName = 'ND_tutorial_pad'; % Create this yourself
 info = Generate_pad_from_grid(grid,params);
 
 
-%% Visualize layout of pad fiole
+%% Visualize layout of pad file
 
 % 2D layout - PlotCap
 PlotCap(info)
