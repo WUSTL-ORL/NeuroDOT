@@ -30,6 +30,7 @@ if ~isfield(params,'T2_bias_kernel'),params.T2_bias_kernel=8; end % csf T1 thres
 if ~isfield(params,'CSF_T1_th'),params.CSF_T1_th=0.175; end % csf T1 thresh
 if ~isfield(params,'CSF_T2_th'),params.CSF_T2_th=0.2750; end % csf T2 thresh
 if ~isfield(params,'killY'),params.killY=[1:20]; end    % ventral removal
+if ~isfield(params,'smooth_gauss'),params.smooth_gauss=1.2; end    % Gaussian smoothing
 
 SE_sa = strel('ball', params.Rsa, 0); % skull dilate: skull thickness
 SE_sa2 = strel('ball', params.Rba2, 0);% bknd dilate(2): final scalp boundary
@@ -117,7 +118,7 @@ disp('<<< Smoothing head and setting mask values')
 
 head_bknd=1-head;
 head_bknd=+(imdilate(head_bknd,SE_sa2)>0);
-head_bknd=+(imgaussfilt3(head_bknd,1.2)>0.5);    % Smooth head
+head_bknd=+(imgaussfilt3(head_bknd,params.smooth_gauss)>0.5);    % Smooth head
 head_T1_bw=1-head_bknd;
 
 mask=head.*5;
