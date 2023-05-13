@@ -43,8 +43,6 @@ mesh=NirfastMesh(mask,meshname,param,param.Mode);
 
 %% Label nodes based on region overlay with segmented volume
 if ~param.Mode
-    
-[Nx,Ny,Nz]=size(mask_old);
 
 if ~isfield(param,'Offset'),param.Offset=[0,0,0];end
 if (isfield(param,'info') && norm(param.Offset-[0,0,0]))
@@ -54,28 +52,9 @@ else
     Vnodes=mesh.nodes;
 end
 
-for j=1:size(mesh.nodes,1)
-    x=round(Vnodes(j,1));
-    y=round(Vnodes(j,2));
-    z=round(Vnodes(j,3));
-        
-    if ((min([x,y,z,Nx-x+1,Ny-y+1,Nz-z+1])<1))
-        mesh.region(j)=Scalp;
-    else
-        mesh.region(j)=mask_old(x,y,z);
-    end
-end
-
-% if node outside of mask, set equal to boundary region.
-if isstruct(param)
-    if isfield(param,'r0')
-mesh.region(mesh.region==0)=param.r0; 
-    else
-mesh.region(mesh.region==0)=Scalp; 
-    end
-else
-mesh.region(mesh.region==0)=Scalp; 
-end
+% Interpolate region labels using nearest neighbor method
+F = griddedInterpolant(mask_old,'nearest','nearest');
+mesh.region = F(Vnodes);
 
 disp('<<<Saving mesh')
 save_mesh(mesh,meshname);
