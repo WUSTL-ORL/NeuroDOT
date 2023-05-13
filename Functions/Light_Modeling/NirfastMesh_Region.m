@@ -56,6 +56,17 @@ end
 F = griddedInterpolant(mask_old,'nearest','nearest');
 mesh.region = F(Vnodes);
 
+% if node outside of mask, set equal to boundary region.
+if isstruct(param)
+    if isfield(param,'r0')
+mesh.region(mesh.region==0)=param.r0; 
+    else
+mesh.region(mesh.region==0)=Scalp; 
+    end
+else
+mesh.region(mesh.region==0)=Scalp; 
+end
+
 disp('<<<Saving mesh')
 save_mesh(mesh,meshname);
 end
