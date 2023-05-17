@@ -59,11 +59,15 @@ if type == 'snirf'
         data = snf.nirs.data.dataTimeSeries';% Snirf measurement list describes each channel as a column of the data
         if isfield(snf.nirs.data, 'time')
             info.system.framerate = 1/(mean(diff(snf.nirs.data.time)));
+            % To account for seconds or milliseconds (EEVR 230510)
+            if strcat(snf.nirs.metaDataTags.TimeUnit,'ms')        
+                info.system.framerate = info.system.framerate*1e3;
+            end                                                   
             info.system.init_framerate = info.system.framerate;
         end
     end
     
-       
+        
     if exist('snf','var')
         if isfield(snf, 'original_header')
             if isfield(snf.original_header,'io')
@@ -75,7 +79,7 @@ if type == 'snirf'
                 end
             end
         else
-           
+            
         if ~isfield(snf.nirs, 'metaDataTags')
         else
             if isfield(snf.nirs.metaDataTags,'framerate')
@@ -226,16 +230,23 @@ if type == 'snirf'
                 if isfield(snf.original_header.pairs, 'NN')
                     info.pairs.NN = snf.original_header.pairs.NN; %custom Ndot field (in snirf format)
                 end
-           
+            
                 if isfield(snf.original_header.pairs, 'Mod')
                     info.pairs.Mod = cellstr(snf.original_header.pairs.Mod(:)); %custom Ndot field (in snirf format)
-                end
-                
+                end                
             end
-            end
+        end
+        % Re-order channels by wavelenth for plotting functions  (EEVR 230510)
+        T=struct2table(info.pairs);  
+        [T,I] = sortrows(T,3);       
+        data = data(I,:);            
+        info.pairs=table2struct(T,"ToScalar",true); 
             if ~isfield(snf, 'original_header') 
                 gridTemp.spos3=snf.nirs.probe.sourcePos3D;
                 gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
+                % Include 2D positions for consistent ordering later on  (EEVR 230510)
+                gridTemp.spos2=snf.nirs.probe.sourcePos2D;  
+                gridTemp.dpos2=snf.nirs.probe.detectorPos2D;
 %                 dmax = max(log10(d(:)));
 %                 if dmax < 30
 %                     gridTemp.spos3=snf.nirs.probe.sourcePos3D.*10;
@@ -248,7 +259,7 @@ if type == 'snirf'
                 full_measList =[tempInfo.pairs.Src,tempInfo.pairs.Det,tempInfo.pairs.WL];
                 
                 [IdxA,IdxB]=ismember(data_measList, full_measList,'rows');
-                
+                info.pairs.Mod=tempInfo.pairs.Mod(IdxB,:); % Used in the generation of the info structure for the Jacobian  (EEVR 230510)
                 info.pairs.r3d=tempInfo.pairs.r3d(IdxB);
                 info.pairs.r2d = tempInfo.pairs.r2d(IdxB);
                 info.pairs.NN = tempInfo.pairs.NN(IdxB);
@@ -289,8 +300,12 @@ if type == 'snirf'
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
                 info.paradigm.synchpts = info.paradigm.synchpts';
+                % Create time vector, which does not exist by default  (EEVR 230510)
+                T = 1/info.system.framerate;             
+                L = size(snf.nirs.data.dataTimeSeries,1);
+                t = (0:L-1)*T;                           
                 for j = 1: length(info.paradigm.synchpts)
-                    [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                    [~,info.paradigm.synchpts(j)] = min(abs(t - info.paradigm.synchtimes(j))); % Modified by EEVR 230512
                 end
                 info.paradigm.init_synchpts = info.paradigm.synchpts;
             else
@@ -344,3 +359,4 @@ outputfilename=fullfile(p,f);
 save(outputfilename,'data','info');
 
 end
+    
