@@ -126,18 +126,24 @@ ylabel('{\Phi_0 _R_M_S} ( {\mu}W )','Color','w')
 set(gca,'XColor','w','YColor','w','Xgrid','on','Ygrid','on','Color','k')
 legend(leg,'Color','w')
 
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
+
 if isfield(info.MEAS,'Clipped')
     hold on;
     keep=info.MEAS.Clipped;
     semilogy(info.pairs.r3d(keep),Phi_0(keep),'xw');
-    leg1=cat(1,leg,'Clipped');
-    legend(leg1,'Color','k','TextColor','w')
+    leg=cat(1,leg,'Clipped');
+    legend(leg,'Color','k','TextColor','w')
 end 
 
 if params.NEPth
     hold on
     semilogy([0:100],ones(101,1).*NEPth,'--w');
-    legend(cat(1,leg1,'Noise Floor Estimate'),'Color','k','TextColor','w')
+    legend(cat(1,leg,'Noise Floor Estimate'),'Color','k','TextColor','w')
 end
 
 Phi_0_to_plot=reshape(Phi_0,Nm,[]);
