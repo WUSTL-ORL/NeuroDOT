@@ -60,7 +60,14 @@ if type == 'snirf'
         if isfield(snf.nirs.data, 'time')
             info.system.framerate = 1/(mean(diff(snf.nirs.data.time)));
             info.system.init_framerate = info.system.framerate;
+            
         end
+        if strcmp(snf.nirs.metaDataTags.TimeUnit, 'ms')
+            info.system.framerate = info.system.framerate*1e3;
+            info.system.init_framerate = info.system.framerate;        
+        end
+        
+            
     end
     
        
@@ -83,14 +90,17 @@ if type == 'snirf'
                 info.system.init_framerate = info.system.framerate;
             end
             if ~isfield(snf.nirs.metaDataTags, 'Nd') 
+                info.io.Nd = size(snf.nirs.probe.detectorPos3D,1);
             else
                 info.io.Nd = snf.nirs.metaDataTags.Nd; %custom NeuroDOT field
             end
             if ~isfield(snf.nirs.metaDataTags, 'Ns')
+                info.io.Ns = size(snf.nirs.probe.sourcePos3D,1);
             else
                 info.io.Ns = snf.nirs.metaDataTags.Ns; %custom NeuroDOT field
             end
             if ~isfield(snf.nirs.metaDataTags, 'Nwl')
+                info.io.Nwl = size(snf.nirs.probe.wavelengths,2);
             else
                 info.io.Nwl = snf.nirs.metaDataTags.Nwl; %custom NeuroDOT field
             end
@@ -120,6 +130,7 @@ if type == 'snirf'
                 info.io.nblank = snf.nirs.metaDataTags.nblank; %custom NeuroDOT field
             end
             if ~isfield(snf.nirs.metaDataTags, 'nframe')
+                info.io.nframe = size(snf.nirs.data.dataTimeSeries,1);
             else
                 info.io.nframe = snf.nirs.metaDataTags.nframe; %custom NeuroDOT field
             end
@@ -236,11 +247,11 @@ if type == 'snirf'
             if ~isfield(snf, 'original_header') 
                 gridTemp.spos3=snf.nirs.probe.sourcePos3D;
                 gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
-%                 dmax = max(log10(d(:)));
-%                 if dmax < 30
-%                     gridTemp.spos3=snf.nirs.probe.sourcePos3D.*10;
-%                     gridTemp.dpos3=snf.nirs.probe.detectorPos3D.*10;
-%                 end
+                if isfield(snf.nirs.probe, 'sourcePos3D') && isfield(snf.nirs.probe, 'detectorPos3D')
+                    gridTemp.spos3=snf.nirs.probe.sourcePos3D;
+                    gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
+                end
+
                 Rad=Grid2Radius_180824(gridTemp,5);
                 params.lambda= snf.nirs.probe.wavelengths;
                 tempInfo=Generate_Info_from_Grid_Rad(gridTemp,Rad,params);
@@ -248,7 +259,7 @@ if type == 'snirf'
                 full_measList =[tempInfo.pairs.Src,tempInfo.pairs.Det,tempInfo.pairs.WL];
                 
                 [IdxA,IdxB]=ismember(data_measList, full_measList,'rows');
-                
+                info.pairs.Mod = tempInfo.pairs.Mod(IdxB,:);
                 info.pairs.r3d=tempInfo.pairs.r3d(IdxB);
                 info.pairs.r2d = tempInfo.pairs.r2d(IdxB);
                 info.pairs.NN = tempInfo.pairs.NN(IdxB);
@@ -273,6 +284,13 @@ if type == 'snirf'
         if isfield(snf, 'original_header')
             info.paradigm = snf.original_header.paradigm;
         else
+            if length(snf.nirs.data.time) == 2 % Create Time array if one is not provided
+                T = 1/info.system.framerate;
+                nTp = size(snf.nirs.data.dataTimeSeries,1);
+                timeArray = (0:nTp-1)*T;
+            else
+                timeArray = snf.nirs.data.time;
+            end
             if isfield(snf.nirs, 'stim')
                 Total_synchs = [];
                 Total_synchtypes = [];
@@ -289,8 +307,10 @@ if type == 'snirf'
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
                 info.paradigm.synchpts = info.paradigm.synchpts';
+                
+                    
                 for j = 1: length(info.paradigm.synchpts)
-                    [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                    [~,info.paradigm.synchpts(j)] = min(abs(timeArray - info.paradigm.synchtimes(j)));
                 end
                 info.paradigm.init_synchpts = info.paradigm.synchpts;
             else
@@ -322,7 +342,7 @@ if type == 'snirf'
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
                 for j = 1: length(info.paradigm.synchpts)
-                    [~,info.paradigm.synchpts(j)] = min(abs(snf.nirs.data.time - info.paradigm.synchtimes(j)));
+                    [~,info.paradigm.synchpts(j)] = min(abs(timeArray - info.paradigm.synchtimes(j)));
                 end
                 info.paradigm.init_synchpts = info.paradigm.synchpts;
             end
@@ -343,4 +363,5 @@ outputfilename=fullfile(p,f);
 
 save(outputfilename,'data','info');
 
+end
 end
