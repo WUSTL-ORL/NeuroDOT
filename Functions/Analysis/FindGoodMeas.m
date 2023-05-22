@@ -7,16 +7,16 @@ function info_out = FindGoodMeas(data, info_in, bthresh, params)
 %   as its noise level. These are then thresholded by the default value of
 %   0.075 to create a logical array, and both are returned as MEAS x 1
 %   columns of the "info.MEAS" table. If pulse synch point information
-%   exists in "info.system.synchpts", then FINDGOODMEAS will crop the data
+%   exists in "info.system.synchpts", then FINDGOODMEAS will crop the data 
 %   to the start and stop pulses.
 %
 %   info_out = FINDGOODMEAS(data, info_in, bthresh) allows the user to
 %   specify a threshold value.
-%
-% See Also: PLOTCAPGOODMEAS, PLOTHISTOGRAMSTD.
 % 
+% See Also: PLOTCAPGOODMEAS, PLOTHISTOGRAMSTD.
+%  
 % Copyright (c) 2017 Washington University 
-% Created By: Adam T. Eggebrecht
+% Created By: Adam T. Eggebrecht 
 % Eggebrecht et al., 2014, Nature Photonics; Zeff et al., 2007, PNAS.
 %
 % Washington University hereby grants to you a non-transferable, 
@@ -124,8 +124,10 @@ else
 end
 
 %% Populate in table of on-the-fly calculated stuff.
-info_out.GVTDparams.t0=t0;
-info_out.GVTDparams.tF=tF;
+if (exist('t0','var') && exist('tf','var'))
+    info_out.GVTDparams.t0=t0;
+    info_out.GVTDparams.tF=tF;
+end
 if ~isfield(info_out,'MEAS')
     info_out.MEAS = struct;
     info_out.MEAS.STD = STD;
@@ -137,5 +139,6 @@ end
 if isfield(info_out.MEAS,'Clipped')
     info_out.MEAS.GI=info_out.MEAS.GI & ~info_out.MEAS.Clipped;
 end
+
 
 %
