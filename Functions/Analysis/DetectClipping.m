@@ -6,6 +6,12 @@ function clipping=DetectClipping(data,params)
 %   clipPlus    maximum allowed value
 %   clipMu      maximum allowed mean value
 %   clipRange   maximum allowed full data range
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Clipping params are based on a +/- 1V range, not the actual ADC %%%
+%%% voltages.                                                       %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 % It is assumed that data is NxT where T is time.
 
 %% Parameters and Initialization
