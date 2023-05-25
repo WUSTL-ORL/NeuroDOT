@@ -80,9 +80,11 @@ switch lower(file_type)
         fwrite(fid, volume, header.format);
         fclose(fid);
         
-    case {'nifti', 'nii'}
+    case {'nifti', 'nii','.nii'}
         % Implemented 2/20/2023 ES
-
+        if strcmp(file_type, '.nii')
+            file_type = 'nii';
+        end
         %% Call NIFTI_Reader functions.
         volume = flip(volume, 1); % Convert back from LAS to RAS for NIFTI.
         

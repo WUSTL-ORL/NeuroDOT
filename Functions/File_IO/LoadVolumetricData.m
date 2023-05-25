@@ -84,12 +84,14 @@ switch lower(file_type)
                 volume = flip(volume, 2);
                 volume = flip(volume, 3);  
         end
-case {'nifti', 'nii' ,'nii.gz'}   
+case {'nifti', 'nii' ,'nii.gz', '.nii'}   
         %% Call NIFTI_Reader function.
         %%% NOTE: When passing file types, if you have the ".nii" file
         %%% extension, you must use that as both the "ext" input AND add it
         %%% as an extension on the "filename" input.
-
+            if strcmp(file_type, '.nii')
+                file_type = 'nii';
+            end
             if strcmp(file_type, 'nii.gz')
                nii.img = niftiread(fullfile(pn,[filename, '.nii.gz']));
                nii.hdr = niftiinfo(fullfile(pn,[filename, '.nii.gz']));
