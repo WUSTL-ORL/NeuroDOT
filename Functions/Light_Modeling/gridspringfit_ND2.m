@@ -91,10 +91,11 @@ tpos=[spos3;dpos3];
 %% Initialize
 
 % Prep Mesh
-TR=TriRep(mesh.elements,mesh.nodes);% Make MATLAB triangulation class
-[elemb,nodesb]=freeBoundary(TR);    % Get Boundary
-TRb=TriRep(elemb,nodesb);           % triangulation of boundary
-faceb=incenters(TRb);               % centers of faces
+TR=triangulation(mesh.elements,mesh.nodes); % Make MATLAB triangulation class
+[elemb,nodesb]=freeBoundary(TR);            % Get Boundary
+TRb=triangulation(elemb,nodesb);            % triangulation of boundary
+faceb=incenter(TRb);                        % centers of faces
+clear TR TRb
 
 % testSpot should be inside mesh, so use this to test if fn pos or neg
 % fn=faceNormals(TRb); % Normals of faces
