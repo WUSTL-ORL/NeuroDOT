@@ -15,7 +15,7 @@ function snirf2ndot(filename, output, type)
 % Only the fields that are needed to run NeuroDOT are extracted
 
 % Copyright (c) 2017 Washington University 
-% Created By: Adam T. Eggebrecht
+% Created By: Emma Speh
 % Eggebrecht et al., 2014, Nature Photonics; Zeff et al., 2007, PNAS.
 %
 % Washington University hereby grants to you a non-transferable, 
@@ -85,6 +85,8 @@ if type == 'snirf'
            
         if ~isfield(snf.nirs, 'metaDataTags')
         else
+            info.misc = snf.nirs.metaDataTags;
+            info.misc.time = snf.nirs.data.time;
             if isfield(snf.nirs.metaDataTags,'framerate')
                 info.system.framerate = snf.nirs.metaDataTags.framerate;
                 info.system.init_framerate = info.system.framerate;
@@ -302,6 +304,7 @@ if type == 'snirf'
                 [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
                 info.paradigm.synchtype = Total_synchtypes(sortedIdx);
                 for j = 1:Npulses
+                    info.misc.stimDuration(j) = snf.nirs.stim(j).data(1,2);
                     info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
                     info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
                 end
@@ -332,12 +335,14 @@ if type == 'snirf'
                 pulses = sort(pulses);
                 for j = 1:Npulses
                     pulse = string(pulses(j));
+                    info.misc.stimDuration(j) = snf.nirs.(pulse).data(1,2);
                     Total_synchs = [Total_synchs; snf.nirs.(pulse).data(:,1)];
                     Total_synchtypes = [Total_synchtypes; j.*ones(length(snf.nirs.(pulse).data(:,1)),1 )];
                 end
                 [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
                 info.paradigm.synchtype = Total_synchtypes(sortedIdx);
                 for j = 1:Npulses
+                    
                     info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
@@ -356,6 +361,10 @@ if type == 'snirf'
         else
             info.misc.subject_id = join(convertCharsToStrings(snf.nirs.metaDataTags.SubjectID));
         end
+    % Aux
+    if isfield(snf.nirs, 'aux')
+        info.misc.aux = snf.nirs.aux;
+    end
     
 % Save Output NeuroDOT File
 [p,f,e]=fileparts(output);
