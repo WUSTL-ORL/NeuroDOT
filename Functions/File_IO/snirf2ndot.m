@@ -47,7 +47,6 @@ end
 if ~exist('output','var')
     output = filename;
 end
-    
 
 snf = loadsnirf(filename);
 
@@ -102,7 +101,7 @@ if type == 'snirf'
                 info.io.Ns = snf.nirs.metaDataTags.Ns; %custom NeuroDOT field
             end
             if ~isfield(snf.nirs.metaDataTags, 'Nwl')
-                info.io.Nwl = size(snf.nirs.probe.wavelengths,2);
+                info.io.Nwl = length(snf.nirs.probe.wavelengths);
             else
                 info.io.Nwl = snf.nirs.metaDataTags.Nwl; %custom NeuroDOT field
             end
@@ -132,7 +131,6 @@ if type == 'snirf'
                 info.io.nblank = snf.nirs.metaDataTags.nblank; %custom NeuroDOT field
             end
             if ~isfield(snf.nirs.metaDataTags, 'nframe')
-                info.io.nframe = size(snf.nirs.data.dataTimeSeries,1);
             else
                 info.io.nframe = snf.nirs.metaDataTags.nframe; %custom NeuroDOT field
             end
@@ -210,15 +208,15 @@ if type == 'snirf'
         else
             if ~isfield(snf.nirs.data.measurementList, 'sourceIndex')
             else
-                info.pairs.Src = [snf.nirs.data.measurementList(:).sourceIndex]'; %required Snirf/Ndot field
+                info.pairs.Src = [snf.nirs.data.measurementList(:).sourceIndex]; %required Snirf/Ndot field
             end
             if ~isfield(snf.nirs.data.measurementList, 'detectorIndex')
             else 
-                info.pairs.Det = [snf.nirs.data.measurementList(:).detectorIndex]'; %required Snirf/Ndot field
+                info.pairs.Det = [snf.nirs.data.measurementList(:).detectorIndex]; %required Snirf/Ndot field
             end            
             if ~isfield(snf.nirs.data.measurementList, 'wavelengthIndex')
             else  
-                info.pairs.WL = [snf.nirs.data.measurementList(:).wavelengthIndex]'; %required Snirf/Ndot field
+                info.pairs.WL = [snf.nirs.data.measurementList(:).wavelengthIndex]; %required Snirf/Ndot field
             end
             if ~isfield(snf.nirs.probe, 'wavelengths')
             else 
@@ -226,7 +224,9 @@ if type == 'snirf'
                 info.pairs.lambda = info.pairs.WL;
                 for j = 1:length(wavelengths)
                     info.pairs.lambda(info.pairs.WL == j) = wavelengths(j);
+                                
                 end
+
             end
             if isfield(snf, 'original_header')
                 
@@ -257,6 +257,15 @@ if type == 'snirf'
                 Rad=Grid2Radius_180824(gridTemp,5);
                 params.lambda= snf.nirs.probe.wavelengths;
                 tempInfo=Generate_Info_from_Grid_Rad(gridTemp,Rad,params);
+                if size(info.pairs.Src,2) > 1
+                    info.pairs.Src = info.pairs.Src';
+                end
+                if size(info.pairs.Det,2) > 1
+                    info.pairs.Det = info.pairs.Det';
+                end
+                if size(info.pairs.WL,2) > 1
+                    info.pairs.WL = info.pairs.WL';
+                end
                 data_measList = [info.pairs.Src,info.pairs.Det,info.pairs.WL];
                 full_measList =[tempInfo.pairs.Src,tempInfo.pairs.Det,tempInfo.pairs.WL];
                 
@@ -309,7 +318,7 @@ if type == 'snirf'
                     info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
-                info.paradigm.synchpts = info.paradigm.synchpts';
+                info.paradigm.synchpts = info.paradigm.synchpts;
                 
                     
                 for j = 1: length(info.paradigm.synchpts)
