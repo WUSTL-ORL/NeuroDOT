@@ -223,10 +223,11 @@ if type == 'snirf'
                 wavelengths = snf.nirs.probe.wavelengths;
                 info.pairs.lambda = info.pairs.WL;
                 for j = 1:length(wavelengths)
-                    info.pairs.lambda(info.pairs.WL == j) = wavelengths(j);
-                                
+                    info.pairs.lambda(info.pairs.WL == j) = wavelengths(j);                   
                 end
-
+                if size(info.pairs.lambda,2) > 1
+                    info.pairs.lambda = info.pairs.lambda';
+                end
             end
             if isfield(snf, 'original_header')
                 
