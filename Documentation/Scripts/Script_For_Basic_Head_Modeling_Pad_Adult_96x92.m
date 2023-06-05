@@ -160,7 +160,7 @@ flags.makeA=1; % don't make A, just make G
 flags.Hz=0;
 if flags.Hz, flags.tag = [flags.tag,'FD']; end
 
-Ti=tic;[A,dim]=makeAnirfast(mesh,flags); % size(A)= [Nwl, Nmeas, Nvox]
+Ti=tic;[A,dim]=makeAnirfaster(mesh,flags); % size(A)= [Nwl, Nmeas, Nvox]
 disp(['<makeAnirfast took ',num2str(toc(Ti))])
 
 
