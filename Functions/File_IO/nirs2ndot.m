@@ -221,7 +221,7 @@ function [data, info] = nirs2ndot(nirsData)
     info.pairs.r3d = r3dArray;
     
     % Calculate NNs
-    info = calc_NN_230316(info,10); %minimum separation for binning NN = 10mm
+    info = calc_NN(info,10); %minimum separation for binning NN = 10mm
 
     % Do lambda
     info.pairs.lambda = lambdaArray'; %transpose array so it is column vector
