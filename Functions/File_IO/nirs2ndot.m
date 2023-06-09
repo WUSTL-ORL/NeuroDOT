@@ -47,6 +47,12 @@ function [data, info] = nirs2ndot(nirsData)
 
     % Framerate
 	info.system.framerate = 1/(mean(diff(nirsData.t)));
+    if nirsData.t(1) == 0
+        info.misc.startTime = 0;
+    else
+        info.misc.startTime = 1;
+    end
+    
     
     
     %% Paradigm
