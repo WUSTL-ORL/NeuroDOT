@@ -100,7 +100,7 @@ case {'nifti', 'nii' ,'nii.gz', '.nii'}
                 nii.hdr = niftiinfo(fullfile(pn,[filename, '.', file_type]));
             end
             % Implemented 2/20/2023 ES
-            header = nifti_4dfp(nii.hdr, '4'); % Convert nifti format header to 4dfp/NeuroDOT format
+            [header,nii.img] = nifti_4dfp(nii.hdr, nii.img, '4'); % Convert nifti format header to 4dfp/NeuroDOT format
             
             if isfield(nii, 'img')
                 volume = flip(nii.img, 1); % NIFTI loads in RAS orientation. We want LAS, so we flip first dim.
@@ -118,8 +118,10 @@ case {'nifti', 'nii' ,'nii.gz', '.nii'}
             header.mmx = abs(header.mmppix(1));
             header.mmy = abs(header.mmppix(2));
             header.mmz = abs(header.mmppix(3));
-            
+            header.bytes_per_pixel = 4;
             orientation = header.orientation;
+            header = rmfield(header, 'matrix_size');
+            header = rmfield(header, 'scaling_factor');
             switch orientation
                 case '2'
                     header.acq = 'transverse';
@@ -135,9 +137,14 @@ case {'nifti', 'nii' ,'nii.gz', '.nii'}
                     case 'ieee-be'
                         header.byte = 'b';
                 end 
+            else
+                header.byte = 'l';
             end
-           
-           
+            field_order = [{'version_of_keys'}, {'format'},{'conversion_program'},...
+                {'filename'}, {'bytes_per_pixel'},{'byte'},{'acq'}, {'nDim'},...
+                {'nVx'}, {'nVy'}, {'nVz'}, {'nVt'}, {'mmx'}, {'mmy'}, {'mmz'}, ...
+                {'mmppix'}, {'center'}, {'orientation'}, {'original_header'}];
+            header = orderfields(header, field_order);
              
 if ~isempty(volume)
 volume=double(volume);end

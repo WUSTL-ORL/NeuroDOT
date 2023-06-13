@@ -1,4 +1,4 @@
-function header_out = nifti_4dfp(header_in, mode)
+function [header_out, img_out] = nifti_4dfp(header_in, img_in, mode)
 % Function to convert between nifti and 4dfp header formats.
 % Inputs:
 %   header_in: 'struct' of either a nifti or 4dfp header
@@ -263,7 +263,7 @@ switch mode
         % Look for the raw structure- if the raw is passed in, do as
         % normal; if the whole header, then look for
         % header_in.raw.
-        
+        %% Parse_Nifti
         % Initialize parameters
         AXES_NII = [0,1,2,3]; % From common-format.h 
         axes = AXES_NII; % nifti_format.c:342
@@ -324,12 +324,10 @@ switch mode
                 sform(3,3) = header_in.pixdim(4);
             end
         end
-% 
-%         disp('parse_nifti output: ')
 %         disp(sform)
 
-        % to_lpi  
-        order = [0,1,2,3];
+%% Save_4dfp (Line 412 in 4dfp_format.c) 
+        % to_lpi (in transform.c) 
         used = 0;
         for i = 0:1
             max = -1.0;
@@ -363,10 +361,11 @@ switch mode
         for i = 0:3 % 4dfp_format.c:426
             revorder(order(i+1)+1) = i;
         end
-
-        % auto_orient_header
         orientation = bitxor(orientation, bitshift(1, revorder(1)));
         orientation = bitxor(orientation, bitshift(1, revorder(2)));
+        orig_sform = sform;
+        %% Auto_orient_header
+        temp_sform = zeros(3,4);  
         for i = 0:2
             % Flip axes
             if bitand(orientation, (bitshift(1,i)))
@@ -376,18 +375,18 @@ switch mode
                 end
             end        
         end
-
+        
         % Re-order axes to x, y, z, t
         for i = 0:2
             for j =0:2
-                sform(i+1,order(j+1)+1) = sform(i+1,j+1);
+                temp_sform(i+1,order(j+1)+1) = sform(i+1,j+1);
             end
         end
-
+        
         % Load it back into the sform
         for i = 0:2
             for j = 0:2
-                sform(i+1,j+1) = sform(i+1,j+1);
+                sform(i+1,j+1) = temp_sform(i+1,j+1);
             end
         end
         % Initialize spacing
@@ -411,7 +410,9 @@ switch mode
                 sform (i,j) = sform(i,j)/spacing(j); % 4dfp_format.c:464
             end
         end
-
+        
+        
+        %% Calculate Determinant of 3x3 rotation matrix
         determinant = 0;
         for i = 0:2 % 4dfp_format.c:467-477
             % Determinant
@@ -424,8 +425,9 @@ switch mode
             determinant = determinant + temp-temp2;
             temp = 1.0;
         end
-
-        % Adjugate
+        
+        
+        %% Adjugate
         % Since mod() is performing math, given the i,j in C, use the same i and j,
         % then add 1 at the end since a,b,c,d are indices
         t4trans = repmat(0.0, 4,4); % Line 4dfp_format.c:453
@@ -439,9 +441,13 @@ switch mode
                 t4trans(j+1,i+1) =(sform(a,c)*sform(b,d)) - (sform(a,d) *  sform(b,c));
             end
         end
-        % Divide t4trans by determinant
+        
+        
+        %% Divide t4trans by determinant
         t4trans(1:3,1:3) = t4trans(1:3,1:3)./determinant;  
 
+        
+        %% Calculate center
         % Initialize center and assign values from sform multiplied by
         % t4trans (4dfp_format.c:497-505)
         center = [0,0,0];
@@ -451,13 +457,13 @@ switch mode
             end
         end
 
-        %% center lines 4dfp_format.c:513-518
+        % center lines 4dfp_format.c:513-518
         for i = 0:2
             center(i+1) = -center(i+1);
             center(i+1) = center(i+1) + spacing(i+1);
         end
 
-        %% center 4dfp_format.c:522-527
+        % center 4dfp_format.c:522-527
         center(1) = (spacing(1) * (header_in.dim(revorder(1)+1)+1))-center(1);
         center(1) = -center(1);
         spacing(1) = -spacing(1);
@@ -466,7 +472,6 @@ switch mode
         center(3) = -center(3);
         spacing(3) = -spacing(3);
 
-%         disp(center)
 
         header_out = struct;
         header_out.matrix_size = [header_in.dim(revorder(1)+1),...
@@ -481,7 +486,38 @@ switch mode
         header_out.center = [center(1), center(2), center(3)];
 
         
+        %% New dev 6/12/23
+        outmem = zeros(size(img_in)); 
+        %% auto_orient
+        nan_found = 0; i = 0; val_flip = zeros(1,4);
+        in_val = zeros(4,1);
+        out_val = zeros(4,1);
+        target_length = zeros(4,1);
+        in_length = header_in.dim(1:4);
+        voxels = img_in;
+        rData = voxels;
+        for i = 0:3
+            target_length(order(i+1)+1) = in_length(i+1);
+            val_flip(i+1) = bitand(orientation, bitshift(1, i));
+        end
+        
+        % Flip 
+        [~, idx_flip] = find(val_flip > 1);
+        new_order = 1:3;
+        if any(idx_flip) > 0
+            idx_new = flip(idx_flip);
+        end
+        new_order(idx_new) = flip(new_order(idx_new));           
+        img_xfm = permute(img_in, new_order);      
+            
+        for k = 1:length(val_flip)
+            if any(orig_sform(k, 1:3) < 0)
+                img_xfm = flip(img_xfm, k);
+            end
+        end    
+         img_out = img_xfm;
 end
+
 end
 
 

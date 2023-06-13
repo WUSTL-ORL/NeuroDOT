@@ -91,7 +91,7 @@ switch lower(file_type)
         if isfield(header,'original_header') % was loaded as nii
             nii = struct;
             nii.img=volume;
-            nii.hdr = nifti_4dfp(header, 'n');
+            [nii.hdr, nii.img] = nifti_4dfp(header,nii.img, 'n');
             nii.hdr.original_header=header.original_header.hdr;  
              % Required fields
             nii.hdr.Description = nii.hdr.descrip;
@@ -129,7 +129,7 @@ switch lower(file_type)
             nii = struct;
             nii.img = volume;
             % Required fields
-            nii.hdr.raw = nifti_4dfp(header, 'n');
+            [nii.hdr.raw, nii.img] = nifti_4dfp(header, volume, 'n');
             nii.hdr.Description = nii.hdr.raw.descrip;
             nii.hdr.ImageSize = nii.hdr.raw.dim(2:4);
             if nii.hdr.raw.datatype == 16
