@@ -90,5 +90,4 @@ DetRGB = repmat(params.DetColor, Nd, 1);
 %% Send to PlotCapData.
 PlotCapData(SrcRGB, DetRGB, info, params)
 
-
 %
