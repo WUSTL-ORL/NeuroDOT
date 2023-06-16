@@ -503,13 +503,15 @@ switch mode
         
         % Flip 
         [~, idx_flip] = find(val_flip > 1);
-        new_order = 1:3;
+        new_order = 1:ndims(img_in);
         if any(idx_flip) > 0
             idx_new = flip(idx_flip);
+            new_order(idx_new) = flip(new_order(idx_new));           
+            img_xfm = permute(img_in, new_order);
+        else
+            img_xfm = img_in;
         end
-        new_order(idx_new) = flip(new_order(idx_new));           
-        img_xfm = permute(img_in, new_order);      
-            
+              
         for k = 1:length(val_flip)
             if any(orig_sform(k, 1:3) < 0)
                 img_xfm = flip(img_xfm, k);
