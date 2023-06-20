@@ -248,7 +248,7 @@ if type == 'snirf'
             end
 
             % Re-order channels by wavelenth (EVR 230510)
-            [info.pairs.WL,I] = sort(info.pairs.WL)
+            [info.pairs.WL,I] = sort(info.pairs.WL);
             data = data(I,:);
             info.pairs.Src = info.pairs.Src(I);
             info.pairs.Det = info.pairs.Det(I);
