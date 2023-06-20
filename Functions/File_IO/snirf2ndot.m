@@ -246,10 +246,18 @@ if type == 'snirf'
                 end
                 
             end
+
+            % Re-order channels by wavelenth (EVR 230510)
+            [info.pairs.WL,I] = sort(info.pairs.WL)
+            data = data(I,:);
+            info.pairs.Src = info.pairs.Src(I);
+            info.pairs.Det = info.pairs.Det(I);
+            info.pairs.lambda = info.pairs.lambda(I);
+
             end
             if ~isfield(snf, 'original_header') 
-                gridTemp.spos3=snf.nirs.probe.sourcePos3D;
-                gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
+                gridTemp.spos2=snf.nirs.probe.sourcePos2D;
+                gridTemp.dpos2=snf.nirs.probe.detectorPos2D;
                 if isfield(snf.nirs.probe, 'sourcePos3D') && isfield(snf.nirs.probe, 'detectorPos3D')
                     gridTemp.spos3=snf.nirs.probe.sourcePos3D;
                     gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
@@ -275,7 +283,8 @@ if type == 'snirf'
                 info.pairs.r3d=tempInfo.pairs.r3d(IdxB);
                 info.pairs.r2d = tempInfo.pairs.r2d(IdxB);
                 info.pairs.NN = tempInfo.pairs.NN(IdxB);
-                
+                info.pairs.lambda = tempInfo.pairs.lambda(IdxB);
+
                 % Moved from Line 241 (3/8/23 ES)
                 avg_r3d = mean(info.pairs.r3d);
                 if (avg_r3d >=1) && (avg_r3d <=10) % Changed max_log to min_log 2/1/23
