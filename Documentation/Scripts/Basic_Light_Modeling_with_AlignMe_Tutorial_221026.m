@@ -103,12 +103,12 @@ view([0,90])%view the mesh where the nose of the head is pointing down and to th
 
 
 %% AlignMe Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
-% Location of atlas fiducials: Nasion; Left preauricular point; Right preauricular point; Cz; Inion
-atlasFiducials = [- 0.65,  -84.1, -31.88; ... % If using mesh2EEG- EEGPts(1,:)
-                   80.78,  15.95, -41.89; ... % EEGPts(155,:)
-                  -80.78,  15.95, -41.89; ... % EEGPts(175,:)
-                   0.233,   9.63, 97.296; ... % EEGPts(165,:)
-                   -0.65, 117.69, -11.78];    % EEGPts(329,:)
+% Location of atlas fiducials                    Mesh2EEG output
+atlasFiducials = [- 0.65,  -84.1, -31.88; ... % Nasion --> EEGPts(1,:)
+                  - 0.65, 117.69, -11.78; ... % Inion  EEGPts(329,:)
+                   80.78,  15.95, -41.89; ... % LPA    EEGPts(155,:)
+                  -80.78,  15.95, -41.89; ... % RPA    EEGPts(175,:)
+                   0.233,   9.63, 97.296];    % Cz     EEGPts(165,:)
                
 % Create an instance of our custom DataStorage HANDLE class to store variables
 ds = DataStorage(); 
