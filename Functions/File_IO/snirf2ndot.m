@@ -390,7 +390,7 @@ if type == 'snirf'
     end
     pairs_table = [info.pairs.Det,info.pairs.Src, info.pairs.WL, info.pairs.lambda,...
         info.pairs.r3d, info.pairs.r2d, info.pairs.NN];
-    [pairs_table,index] = sortrows(pairs_table, [1,3]);
+    [pairs_table,index] = sortrows(pairs_table, [3,1]);
     info.pairs.Det = pairs_table(:,1);
     info.pairs.Src = pairs_table(:,2);
     info.pairs.WL = pairs_table(:,3);
