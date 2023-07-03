@@ -246,13 +246,15 @@ if type == 'snirf'
                 end
                 
             end
+            
+
             end
             if ~isfield(snf, 'original_header') 
                 gridTemp.spos3=snf.nirs.probe.sourcePos3D;
                 gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
-                if isfield(snf.nirs.probe, 'sourcePos3D') && isfield(snf.nirs.probe, 'detectorPos3D')
-                    gridTemp.spos3=snf.nirs.probe.sourcePos3D;
-                    gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
+                if isfield(snf.nirs.probe, 'sourcePos2D') && isfield(snf.nirs.probe, 'detectorPos2D')
+                    gridTemp.spos2=snf.nirs.probe.sourcePos2D;
+                    gridTemp.dpos2=snf.nirs.probe.detectorPos2D;
                 end
 
                 Rad=Grid2Radius_180824(gridTemp,5);
@@ -275,7 +277,7 @@ if type == 'snirf'
                 info.pairs.r3d=tempInfo.pairs.r3d(IdxB);
                 info.pairs.r2d = tempInfo.pairs.r2d(IdxB);
                 info.pairs.NN = tempInfo.pairs.NN(IdxB);
-                
+                info.pairs.lambda = tempInfo.pairs.lambda(IdxB);
                 % Moved from Line 241 (3/8/23 ES)
                 avg_r3d = mean(info.pairs.r3d);
                 if (avg_r3d >=1) && (avg_r3d <=10) % Changed max_log to min_log 2/1/23
@@ -375,6 +377,29 @@ if type == 'snirf'
     if isfield(snf.nirs, 'aux')
         info.misc.aux = snf.nirs.aux;
     end
+    
+    % Order info.pairs and data by wavelength Src, then by wavelength
+    if size(info.pairs.Src,2) > 1
+        info.pairs.Src = info.pairs.Src';
+    end
+    if size(info.pairs.Det,2) > 1
+        info.pairs.Det = info.pairs.Det';
+    end
+    if size(info.pairs.WL,2) > 1
+        info.pairs.WL = info.pairs.WL';
+    end
+    pairs_table = [info.pairs.Det,info.pairs.Src, info.pairs.WL, info.pairs.lambda,...
+        info.pairs.r3d, info.pairs.r2d, info.pairs.NN];
+    [pairs_table,index] = sortrows(pairs_table, [1,3]);
+    info.pairs.Det = pairs_table(:,1);
+    info.pairs.Src = pairs_table(:,2);
+    info.pairs.WL = pairs_table(:,3);
+    info.pairs.lambda = pairs_table(:,4);
+    info.pairs.r3d = pairs_table(:,5);
+    info.pairs.r2d = pairs_table(:,6);
+    info.pairs.NN = pairs_table(:,7);
+    info.pairs.Mod = info.pairs.Mod(index); 
+    data = data(index,:);
     
 % Save Output NeuroDOT File
 [p,f,e]=fileparts(output);
