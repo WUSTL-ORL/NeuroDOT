@@ -378,7 +378,7 @@ if type == 'snirf'
         info.misc.aux = snf.nirs.aux;
     end
     
-    % Order info.pairs and data by wavelength Src, then by wavelength
+    % Order info.pairs and data by wavelength, then by detector
     if size(info.pairs.Src,2) > 1
         info.pairs.Src = info.pairs.Src';
     end
