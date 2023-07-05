@@ -255,7 +255,8 @@ switch mode
 %         disp(header_out.srow_x)
 %         disp(header_out.srow_y)
 %         disp(header_out.srow_z)
-
+        
+        img_out = img_in;
 
     case '4'
         % Convert from Nifti to 4dfp style header
