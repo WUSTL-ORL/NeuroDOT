@@ -98,14 +98,14 @@ switch lower(file_type)
             if length(nii.hdr.Description) > 80
                 nii.hdr.Description = 'Converted with NeuroDOT nifti_4dfp';
             end
-            nii.hdr.ImageSize = nii.hdr.dim(2:4);
+            nii.hdr.ImageSize = nii.hdr.dim(2:5);
             if nii.hdr.datatype == 16
                 nii.hdr.Datatype = 'single';
             end
             nii.hdr.BitsPerPixel = 32;
             nii.hdr.Version = 'NIfTI1';
             nii.hdr.Qfactor = nii.hdr.pixdim(1);
-            nii.hdr.PixelDimensions = nii.hdr.pixdim(2:4);
+            nii.hdr.PixelDimensions = nii.hdr.pixdim(2:5);
             nii.hdr.SpaceUnits = 'Millimeter';
             nii.hdr.TimeUnits = 'Second';
             nii.hdr.AdditiveOffset = 0;
@@ -131,14 +131,14 @@ switch lower(file_type)
             % Required fields
             [nii.hdr.raw, nii.img] = nifti_4dfp(header, volume, 'n');
             nii.hdr.Description = nii.hdr.raw.descrip;
-            nii.hdr.ImageSize = nii.hdr.raw.dim(2:4);
+            nii.hdr.ImageSize = nii.hdr.raw.dim(2:5);
             if nii.hdr.raw.datatype == 16
                 nii.hdr.Datatype = 'single';
             end
             nii.hdr.BitsPerPixel = 32;
             nii.hdr.Version = 'NIfTI1';
             nii.hdr.Qfactor = nii.hdr.raw.pixdim(1);
-            nii.hdr.PixelDimensions = nii.hdr.raw.pixdim(2:4);
+            nii.hdr.PixelDimensions = nii.hdr.raw.pixdim(2:5);
             nii.hdr.SpaceUnits = 'Millimeter';
             nii.hdr.TimeUnits = 'Second';
             nii.hdr.AdditiveOffset = 0;
