@@ -1,12 +1,19 @@
-function [data, info] = nirs2ndot(nirsData)
+function [data, info] = nirs2ndot(filename, save_file, output)
 
     % Translation from .nirs to NeuroDOT-compatible format
-    % This function takes in a .nirs data structure (nirsData) and converts it to NeuroDOT compatible variables: data and info
+    % This function takes in a .nirs file and converts it to NeuroDOT 
+    % compatible variables: data and info
+        % The input 'filename' should contain the full file name including
+        % the *.nirs extension.
         % data is the nirs data in the format of: N_meas x N_samples
         % info is the data structure that holds information pertaining to data aquisition
-    % You can load any .nirs file into matlab using the following code:
-        % nirsData = load('filename.nirs', '-mat')
+    % The flag 'save_file' can be set to zero to suppress saving out the 
+    % 'data' and 'info' variables to a NeuroDOT compatible *.mat file.
+        % By default, the *.mat file will be saved (save_file = 10
+    % The optional input 'output' defines the name of the output *.mat file
+        % By default, the output filename will match the input filename.
         
+%
 % Copyright (c) 2017 Washington University 
 % Created By: Ari Segel
 % Eggebrecht et al., 2014, Nature Photonics; Zeff et al., 2007, PNAS.
@@ -32,8 +39,20 @@ function [data, info] = nirs2ndot(nirsData)
 % THE SOFTWARE, THE USE OF THE SOFTWARE, OR THIS AGREEMENT, WHETHER 
 % IN BREACH OF CONTRACT, TORT OR OTHERWISE, EVEN IF SUCH PARTY IS 
 % ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+
+    %% Parameters and Initialization
+    if ~exist('output','var')
+        output = filename;
+    end
+    
+    if ~exist('save_file','var')
+        save_file = 1;
+    end
+    
     
     %% Data
+    nirsData = load(filename, '-mat');
     data = nirsData.d';
     
     
@@ -258,4 +277,11 @@ function [data, info] = nirs2ndot(nirsData)
         info.pairs.r2d = r2dArray;
     end
     
+    % Save Output NeuroDOT File
+    if save_file == 1
+        [p,f,e]=fileparts(output);
+        outputfilename=fullfile(p,f);
+
+        save(outputfilename,'data','info');
+    end
 end
