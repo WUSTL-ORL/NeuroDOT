@@ -1,4 +1,4 @@
-function snirf2ndot(filename, output, type)
+function [data, info] = snirf2ndot(filename, save_file, output, type)
 %
 % snirf2ndot(filename,output,type) takes a file with the '.snirf' extension
 % in the SNIRF format and converts it to NeuroDOT formatting. 
@@ -6,6 +6,10 @@ function snirf2ndot(filename, output, type)
 % 'Filename' is the name of the file to be converted, followed by the 
 % .snirf extension.
 
+% 'Save_file' is a flag which determines whether the data will be saved to
+% a '.mat' file in NeuroDOT format. File will be saved be default if this
+% is not set.
+%
 % 'Output' is the filename (without extension) to be saved in NeuroDOT
 % format. Output files are saved as '.mat.' 
 % 'Type' is an optional input -
@@ -39,6 +43,10 @@ function snirf2ndot(filename, output, type)
 % THE SOFTWARE, THE USE OF THE SOFTWARE, OR THIS AGREEMENT, WHETHER 
 % IN BREACH OF CONTRACT, TORT OR OTHERWISE, EVEN IF SUCH PARTY IS 
 % ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+if ~exist('save_file','var')
+    save_file = 1;
+end
 
 if ~exist('type','var')
     type = 'snirf';
@@ -402,10 +410,12 @@ if type == 'snirf'
     data = data(index,:);
     
 % Save Output NeuroDOT File
-[p,f,e]=fileparts(output);
-outputfilename=fullfile(p,f);
+if save_file == 1
+    [p,f,e]=fileparts(output);
+    outputfilename=fullfile(p,f);
 
-save(outputfilename,'data','info');
+    save(outputfilename,'data','info');
+end
 
 end
 end
