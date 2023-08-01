@@ -399,13 +399,13 @@ if type == 'snirf'
     pairs_table = [info.pairs.Det,info.pairs.Src, info.pairs.WL, info.pairs.lambda,...
         info.pairs.r3d, info.pairs.r2d, info.pairs.NN];
     [pairs_table,index] = sortrows(pairs_table, [3,1]);
-    info.pairs.Det = pairs_table(:,1);
-    info.pairs.Src = pairs_table(:,2);
-    info.pairs.WL = pairs_table(:,3);
-    info.pairs.lambda = pairs_table(:,4);
-    info.pairs.r3d = pairs_table(:,5);
-    info.pairs.r2d = pairs_table(:,6);
-    info.pairs.NN = pairs_table(:,7);
+    info.pairs.Det = double(pairs_table(:,1));
+    info.pairs.Src = double(pairs_table(:,2));
+    info.pairs.WL = double(pairs_table(:,3));
+    info.pairs.lambda = double(pairs_table(:,4));
+    info.pairs.r3d = double(pairs_table(:,5));
+    info.pairs.r2d = double(pairs_table(:,6));
+    info.pairs.NN = double(pairs_table(:,7));
     info.pairs.Mod = info.pairs.Mod(index); 
     data = data(index,:);
     
