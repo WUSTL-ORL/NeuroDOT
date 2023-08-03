@@ -161,7 +161,7 @@ function [data, info] = nirs2ndot(filename, save_file, output)
                 newline, '    Place the 2D source coordinates in info.optodes.spos2',... 
                 ' and the 2D detector coordinates in info.optodes.dpos2.'])
         end
-    else %WTF
+    else 
         disp(['No optode coordinates in this nirs data.',...
                 newline, '    Please find the 3D SD coordinates and place the source coordinates in',...
                 ' info.optodes.spos3', newline, '    and the detector coordinates in info.optodes.dpos3.',...
@@ -184,7 +184,7 @@ function [data, info] = nirs2ndot(filename, save_file, output)
             dpos3(nirsData.SD.MeasList(ii,2),:))]; %changed from SD3D to SD 12/8/22
     end
     
-    % Check if SD units are in mm (Adapted Emma's code for this)
+    % Check if SD units are in mm 
     avg_SD_sep = mean(abs(SD_sep(:))); %average SD separation
     min_SD_sep = min(abs(SD_sep(:))); %minimum SD separation
     
@@ -275,6 +275,8 @@ function [data, info] = nirs2ndot(filename, save_file, output)
                 dpos2(nirsData.SD.MeasList(ii,2),:))];
         end
         info.pairs.r2d = r2dArray;
+    else % If no 2D coordinates are present in the .nirs file
+        info.pairs.r2d = info.pairs.r3d;
     end
     
     % Save Output NeuroDOT File
