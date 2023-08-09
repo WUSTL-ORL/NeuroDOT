@@ -256,7 +256,40 @@ switch mode
 %         disp(header_out.srow_y)
 %         disp(header_out.srow_z)
         
-        img_out = img_in;
+        %% New dev 6/12/23
+        outmem = zeros(size(img_in));
+        orig_sform = sform;
+
+        %% auto_orient
+        nan_found = 0; i = 0; val_flip = zeros(1,4);
+        in_val = zeros(4,1);
+        out_val = zeros(4,1);
+        target_length = zeros(4,1);
+        in_length = header_out.dim(1:4);
+        voxels = img_in;
+        rData = voxels;
+        for i = 0:3
+            target_length(order(i+1)+1) = in_length(i+1);
+            val_flip(i+1) = bitand(orientation, bitshift(1, i));
+        end
+        
+        % Flip 
+        [~, idx_flip] = find(val_flip > 1);
+        new_order = 1:ndims(img_in);
+        if any(idx_flip) > 0
+            idx_new = flip(idx_flip);
+            new_order(idx_new) = flip(new_order(idx_new));           
+            img_xfm = permute(img_in, new_order);
+        else
+            img_xfm = img_in;
+        end
+              
+        for k = 1:length(val_flip)
+            if any(orig_sform(k, 1:3) < 0)
+                img_xfm = flip(img_xfm, k);
+            end
+        end    
+         img_out = img_xfm;
 
     case '4'
         % Convert from Nifti to 4dfp style header
