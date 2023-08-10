@@ -283,7 +283,9 @@ switch mode
         else
             img_xfm = img_in;
         end
-              
+        if header_out.dim(5) <= 1
+            val_flip = val_flip(1:3);
+        end
         for k = 1:length(val_flip)
             if any(orig_sform(k, 1:3) < 0)
                 img_xfm = flip(img_xfm, k);
