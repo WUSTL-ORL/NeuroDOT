@@ -85,53 +85,8 @@ switch lower(file_type)
         if strcmp(file_type, '.nii')
             file_type = 'nii';
         end
-        %% Call NIFTI_Reader functions.
-        volume = flip(volume, 1); % Convert back from LAS to RAS for NIFTI.
-        
-        if isfield(header,'original_header') % was loaded as nii
-            nii = struct;
-            nii.img=volume;
-            [nii.hdr, nii.img] = nifti_4dfp(header,nii.img, 'n');
-            nii.hdr.original_header=header.original_header.hdr;  
-             % Required fields
-            nii.hdr.Description = nii.hdr.descrip;
-            if length(nii.hdr.Description) > 80
-                nii.hdr.Description = 'Converted with NeuroDOT nifti_4dfp';
-            end
-            if nii.hdr.dim(5) > 1
-                nii.hdr.ImageSize = nii.hdr.dim(2:5);
-                nii.hdr.PixelDimensions = nii.hdr.pixdim(2:5);
-            else
-                nii.hdr.ImageSize = nii.hdr.dim(2:4);
-                nii.hdr.PixelDimensions = nii.hdr.pixdim(2:4);
-            end
-            if nii.hdr.datatype == 16
-                nii.hdr.Datatype = 'single';
-            end
-            nii.hdr.BitsPerPixel = 32;
-            nii.hdr.Version = 'NIfTI1';
-            nii.hdr.Qfactor = nii.hdr.pixdim(1);
-            
-            nii.hdr.SpaceUnits = 'Millimeter';
-            nii.hdr.TimeUnits = 'Second';
-            nii.hdr.AdditiveOffset = 0;
-            nii.hdr.MultiplicativeScaling = 0;
-            nii.hdr.TimeOffset = 0;
-            nii.hdr.SliceCode = 'Unknown';
-            nii.hdr.FrequencyDimension = 0;
-            nii.hdr.PhaseDimension = 0;
-            nii.hdr.SpatialDimension = 0;
-            nii.hdr.DisplayIntensityRange = [0,0];
-            nii.hdr.TransformName = 'Sform';
-            nii.hdr.Transform.T = [nii.hdr.srow_x(1), ...
-                nii.hdr.srow_y(1),nii.hdr.srow_z(1),0;...
-                nii.hdr.srow_x(2), nii.hdr.srow_y(2),...
-                nii.hdr.srow_z(2),0;nii.hdr.srow_x(3),...
-                nii.hdr.srow_y(3),nii.hdr.srow_z(3),0;...
-                nii.hdr.srow_x(4), nii.hdr.srow_y(4),...
-                nii.hdr.srow_z(4),1];
-            nii.hdr.Transform.Dimensionality = 4;
-        else % Build nii header from information in NeuroDOT header
+            % NeuroDOT uses LAS orientation. Convert to RAS for NIFTI.
+            volume = flip(volume, 1); 
             nii = struct;
             nii.img = volume;
             % Required fields
@@ -177,7 +132,6 @@ switch lower(file_type)
 %         save_nii(nii, filename);
         niftiwrite(single(nii.img), filename, nii.hdr);
 
-end
 end
 
 
