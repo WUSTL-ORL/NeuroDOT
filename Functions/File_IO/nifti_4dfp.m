@@ -259,7 +259,6 @@ switch mode
         %% New dev 6/12/23
         outmem = zeros(size(img_in));
         orig_sform = sform;
-
         %% auto_orient
         nan_found = 0; i = 0; val_flip = zeros(1,4);
         in_val = zeros(4,1);
@@ -274,6 +273,9 @@ switch mode
         end
         
         % Flip 
+        if header_in.orientation == 2
+            val_flip = zeros(1,4);
+        end
         [~, idx_flip] = find(val_flip > 1);
         new_order = 1:ndims(img_in);
         if any(idx_flip) > 0
@@ -399,9 +401,10 @@ switch mode
         end
         orientation = bitxor(orientation, bitshift(1, revorder(1)));
         orientation = bitxor(orientation, bitshift(1, revorder(2)));
-        orig_sform = sform;
         %% Auto_orient_header
-        temp_sform = zeros(3,4);  
+        temp_sform = zeros(3,4);
+        orig_sform = sform;
+
         for i = 0:2
             % Flip axes
             if bitand(orientation, (bitshift(1,i)))
@@ -523,6 +526,7 @@ switch mode
 
         
         %% New dev 6/12/23
+
         outmem = zeros(size(img_in)); 
         %% auto_orient
         nan_found = 0; i = 0; val_flip = zeros(1,4);
@@ -532,12 +536,16 @@ switch mode
         in_length = header_in.dim(1:4);
         voxels = img_in;
         rData = voxels;
+
         for i = 0:3
             target_length(order(i+1)+1) = in_length(i+1);
             val_flip(i+1) = bitand(orientation, bitshift(1, i));
         end
         
         % Flip 
+        if orientation == 2
+            val_flip = zeros(4,1);
+        end
         [~, idx_flip] = find(val_flip > 1);
         new_order = 1:ndims(img_in);
         if any(idx_flip) > 0
@@ -547,12 +555,12 @@ switch mode
         else
             img_xfm = img_in;
         end
-              
+        
         for k = 1:length(val_flip)
-            if any(orig_sform(k, 1:3) < 0)
+            if any(orig_sform(k, 1:3) < 0) && orig_sform(k, 4) > 0
                 img_xfm = flip(img_xfm, k);
             end
-        end    
+        end  
          img_out = img_xfm;
 end
 
