@@ -124,14 +124,14 @@ switch lower(file_type)
                 nii.hdr.raw.srow_x(4), nii.hdr.raw.srow_y(4),...
                 nii.hdr.raw.srow_z(4),1];
             nii.hdr.Transform.Dimensionality = 4;
-        end
+       
         % In order to write the header, you need a very specific set of
         % fields
         % original_header does not get saved due to it not being one of the
         % fields that niftiwrite considers
 %         save_nii(nii, filename);
         niftiwrite(single(nii.img), filename, nii.hdr);
-
+end
 end
 
 
