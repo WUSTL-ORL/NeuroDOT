@@ -92,6 +92,9 @@ switch lower(file_type)
             % Required fields
             [nii.hdr.raw, nii.img] = nifti_4dfp(header, volume, 'n');
             nii.hdr.Description = nii.hdr.raw.descrip;
+            if length(nii.hdr.Description) > 79
+                nii.hdr.Description = [nii.hdr.Description(1:76),'...'];
+            end
             if nii.hdr.raw.dim(5) > 1
                 nii.hdr.ImageSize = nii.hdr.raw.dim(2:5);
                 nii.hdr.PixelDimensions = nii.hdr.raw.pixdim(2:5);
