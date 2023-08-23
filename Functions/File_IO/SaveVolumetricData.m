@@ -94,7 +94,7 @@ switch lower(file_type)
             nii.hdr.Description = nii.hdr.raw.descrip;
             if nii.hdr.raw.dim(5) > 1
                 nii.hdr.ImageSize = nii.hdr.raw.dim(2:5);
-                nii.hdr.PixelDimensions = nii.hdr.pixdim(2:5);
+                nii.hdr.PixelDimensions = nii.hdr.raw.pixdim(2:5);
             else
                 nii.hdr.ImageSize = nii.hdr.raw.dim(2:4);
                 nii.hdr.PixelDimensions = nii.hdr.raw.pixdim(2:4);
