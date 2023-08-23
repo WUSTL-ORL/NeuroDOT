@@ -46,7 +46,7 @@ kernel = sqrt(xgv.^2 + ygv.^2 + zgv.^2) <= kern;
 disp(['Normalizing data'])
 DC=squeeze(nanmean(bsxfun(@times,data,params.tMask'),2));
 data=bsxfun(@times,data,params.tMask')-repmat(DC,[1,Nt]); % Subtract off mean
-data=normrND(data);               % Normalize across time
+data=normr(data);               % Normalize across time
 if NDtf
     data=reshape(data,dims);
 else
@@ -63,7 +63,7 @@ for k=1:Nseeds
     Ns=nansum(roi(:));
     
     % Generate Seed Time Trace
-    seedTT(:,k)=[sum(reshape(bsxfun(@times,data,roi),[],Nt),1)./Ns]';
+    seedTT(:,k)=(normr([sum(reshape(bsxfun(@times,data,roi),[],Nt),1)./Ns]))';
     
     % Generate Seed map
     fcMaps(:,:,:,k)=reshape(FisherR2Z((seedTT(:,k)'*...
