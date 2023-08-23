@@ -289,7 +289,7 @@ switch mode
             val_flip = val_flip(1:3);
         end
         for k = 1:length(val_flip)
-            if any(orig_sform(k, 1:3) < 0)
+            if any(orig_sform(1:3,k) < 0)
                 img_xfm = flip(img_xfm, k);
             end
         end    
