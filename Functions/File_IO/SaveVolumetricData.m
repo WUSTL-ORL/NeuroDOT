@@ -71,7 +71,6 @@ switch lower(file_type)
                 volume = flip(volume, 2);
                 volume = flip(volume, 3);
         end
-        
         Write_4dfp_Header(header, fullfile(pn, filename))
      
         %% Write 4dfp image file.
@@ -133,6 +132,9 @@ switch lower(file_type)
         % original_header does not get saved due to it not being one of the
         % fields that niftiwrite considers
 %         save_nii(nii, filename);
+        if exist(pn)
+            cd(pn)
+        end
         niftiwrite(single(nii.img), filename, nii.hdr);
 end
 end
