@@ -129,6 +129,7 @@ case {'nifti', 'nii' ,'nii.gz', '.nii'}
                     header.acq = 'coronal';
                 case '4'
                     header.acq = 'sagittal';
+                    
             end
             if isfield(nii, 'machine')
                 switch nii.machine

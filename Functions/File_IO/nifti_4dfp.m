@@ -45,15 +45,18 @@ switch mode
             end
         end
         
-        % Assign diagonal of sform to ones
-        for i = 0:2
-            sform(order(i+1)+1,i+1) = 1.0;
-        end
-        
+%         % Assign diagonal of sform to ones
+%         for i = 0:2
+%             sform(order(i+1)+1,i+1) = 1.0;
+%         end
+%         
         
         % Adjust order of dimensions depending on the orientation
         switch header_in.orientation
             case 4
+                tempv = order(3);
+                order(3) = order(1);
+                order(1) = tempv;
                 tempv = order(2);
                 order(2) = order(1);
                 order(1) = tempv;
@@ -63,7 +66,10 @@ switch mode
                 order(2) = tempv;
             % case 2 is default case, so do nothing here
         end
-
+        % 8/28/23 ES
+        for i = 0:2
+            sform(order(i+1)+1,i+1) = 1.0;
+        end
         dims = number_of_dimensions;
         if isfield(header_in, 'nVx')
             header_in.matrix_size = [header_in.nVx, header_in.nVy, header_in.nVz, header_in.nVt];
@@ -92,6 +98,9 @@ switch mode
                 center(3) = -center(3);
                 spacing(3) = -spacing(3);
                 center(3) = spacing(3) *(dim(3) +1)-center(3);
+                center(1) = -center(1);
+                spacing(1) = -spacing(1);
+                center(1) = spacing(1)*(dim(1) +1) - center(1);
             case 3
                 center(1) = -center(1);
                 spacing(1) = -spacing(1);
@@ -166,18 +175,19 @@ switch mode
                 end
             end        
         end
-
+        orig_sform = sform;
+        auto_orient_sform = zeros(3,4);
         % Re order axes to x, y, z, t
-        for i = 0:2
-            for j =0:2
-                sform(i+1,order(j+1)+1) = sform(i+1,j+1);
+        for i = 1:3
+            for j =1:3
+                auto_orient_sform(i,order(j)+1) = sform(i,j);
             end
         end
 
         % Load it back into the sform
         for i = 0:2
             for j = 0:2
-                sform(i+1,j+1) = sform(i+1,j+1);
+                sform(i+1,j+1) = auto_orient_sform(i+1,j+1);
             end
         end
 
@@ -258,41 +268,64 @@ switch mode
         
         %% New dev 6/12/23
         outmem = zeros(size(img_in));
-        orig_sform = sform;
+%         orig_sform = sform;
         %% auto_orient
         nan_found = 0; i = 0; val_flip = zeros(1,4);
         in_val = zeros(4,1);
         out_val = zeros(4,1);
         target_length = zeros(4,1);
-        in_length = header_out.dim(1:4);
+        in_length = size(img_in); %header_out.dim(1:4)
         voxels = img_in;
         rData = voxels;
-        for i = 0:3
-            target_length(order(i+1)+1) = in_length(i+1);
-            val_flip(i+1) = bitand(orientation, bitshift(1, i));
+        
+        for i = 1:length(in_length)
+            target_length(order(i)+1) = in_length(i);
+            val_flip(i) = bitand(orientation, bitshift(1, (i-1)));
         end
         
         % Flip 
         if header_in.orientation == 2
             val_flip = zeros(1,4);
         end
-        [~, idx_flip] = find(val_flip > 1);
-        new_order = 1:ndims(img_in);
-        if any(idx_flip) > 0
-            idx_new = flip(idx_flip);
-            new_order(idx_new) = flip(new_order(idx_new));           
-            img_xfm = permute(img_in, new_order);
-        else
-            img_xfm = img_in;
-        end
+        
         if header_out.dim(5) <= 1
             val_flip = val_flip(1:3);
         end
         for k = 1:length(val_flip)
             if any(orig_sform(1:3,k) < 0)
-                img_xfm = flip(img_xfm, k);
+                img_in = flip(img_in, k);
             end
         end    
+         %Permute if needed
+         new_dim = zeros(1,3);
+         for i = 1:3
+             idx = find(target_length(i) == dim(1:3));
+             if length(idx) > 1
+                 idx = idx(1);
+             end
+             dim(idx) = 0;
+             new_dim(i) = idx;
+         end
+         
+         
+         if ~isequal(new_dim, [1,2,3])
+             img_in = permute(img_in, new_dim);
+             val_flip_new(:) = val_flip(new_dim);
+             val_flip_combined = val_flip & val_flip_new;
+             [~,idx2] = find(val_flip_combined == 1);
+             img_in = flip(img_in, idx2);
+         end
+        
+         [~, idx_flip] = find(val_flip > 0);
+        if any(idx_flip) > 0
+            for i = 1:length(idx_flip)
+                img_xfm = flip(img_in, idx_flip(i));
+            end
+
+        else
+            img_xfm = img_in;
+        end
+         img_xfm = flip(img_xfm,1);
          img_out = img_xfm;
 
     case '4'
@@ -561,6 +594,7 @@ switch mode
                 img_xfm = flip(img_xfm, k);
             end
         end  
+%          img_xfm = flip(img_xfm, 1); 
          img_out = img_xfm;
 end
 

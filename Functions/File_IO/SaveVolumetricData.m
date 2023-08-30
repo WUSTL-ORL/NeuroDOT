@@ -84,12 +84,11 @@ switch lower(file_type)
         if strcmp(file_type, '.nii')
             file_type = 'nii';
         end
-            % NeuroDOT uses LAS orientation. Convert to RAS for NIFTI.
-            volume = flip(volume, 1); 
             nii = struct;
             nii.img = volume;
             % Required fields
             [nii.hdr.raw, nii.img] = nifti_4dfp(header, volume, 'n');
+           
             nii.hdr.Description = nii.hdr.raw.descrip;
             if length(nii.hdr.Description) > 79
                 nii.hdr.Description = [nii.hdr.Description(1:76),'...'];
@@ -131,10 +130,10 @@ switch lower(file_type)
         % fields
         % original_header does not get saved due to it not being one of the
         % fields that niftiwrite considers
-%         save_nii(nii, filename);
         if exist(pn)
             cd(pn)
         end
+
         niftiwrite(single(nii.img), filename, nii.hdr);
 end
 end
