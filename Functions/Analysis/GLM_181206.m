@@ -1,4 +1,4 @@
-function [b,e,DM,EDM,keep]=GLM_181206(data,hrf,info,params)
+function [b,e,DM,EDM,keep, r_sqrd]=GLM_181206(data,hrf,info,params)
 %
 % This code creates a general linear model (GLM) based on a model of the
 % hemodynamic response function (hrf) and a set of stimulus times
@@ -128,6 +128,7 @@ for j=1:(Nevents-1)
         EDM(info.paradigm.synchpts(j):(info.paradigm.synchpts(j+1)-1),j)=1;
     end
 end
+
 EDM(info.paradigm.synchpts(end):end,Nevents)=1;
 
 if strcmp(params.type,'events')
@@ -231,6 +232,7 @@ end
 indcc=pinv(DM'*DM);
 b=(indcc*DM'*data')';
 e=(data'-DM*b')';
+r_sqrd=1-(sum(e.^2,2)./(var(data,1,2).*size(data,2)));
 
 %% Fix beta maps to be zero in correct spots if DM zeros
 if FixDM
