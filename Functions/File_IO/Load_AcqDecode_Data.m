@@ -219,6 +219,31 @@ end
 
 %% Set Clipping array
 clipping=[];
+if ( exist([fn,'.clip'],'file') && strcmp(ext, '.mag') )
+    % Open and read .clip file and header.
+    fid = fopen([fn,'.clip'],'rb');
+    [NdClip, NsClip, NwlClip, NtClip] = Read_AcqDecode_Header(fid);
+    % Read out data - should be uint8 but initially was saved as double
+    % so read out uint8 and check size - if it is too big, read out as double
+    clipping = fread(fid, 'uint8');
+    fclose(fid);    
+    % See comments in %%Reshaping section on how to unpack the .mag file
+    clipping = reshape(clipping, Nwl, Ns, Nd, []);
+    if ( size(clipping,4) > TTL + 1 )
+        fid = fopen([fn,'.clip'],'rb');
+        [NdClip, NsClip, NwlClip, NtClip] = Read_AcqDecode_Header(fid);
+        clipping = fread(fid, 'double');
+        fclose(fid);    
+        clipping = reshape(clipping, Nwl, Ns, Nd, []);
+    end
+    clipping = permute(clipping, [2, 3, 1, 4]);
+    clipping = clipping(:, :, :, 2:TTL);
+    clipping_NMeas_x_ts=reshape(clipping,[],size(clipping,4));
+    clipped=sum(clipping_NMeas_x_ts,2);
+    info.MEAS=table(clipped>0,...
+            'VariableNames', {'Clipped'});
+end
+
 if exist([fn,'.clipping'],'file')
     fid = fopen([fn,'.clipping']);
     clipping = fread(fid, 'double');
