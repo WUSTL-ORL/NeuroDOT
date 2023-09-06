@@ -1,4 +1,4 @@
-function PlotSlices_230214(underlay, infoVol, params, overlay)
+function PlotSlices(underlay, infoVol, params, overlay)
 
 % PLOTSLICES Creates an interactive three-slice plot.
 %

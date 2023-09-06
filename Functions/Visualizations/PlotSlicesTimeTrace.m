@@ -1,4 +1,4 @@
-function PlotSlicesTimeTrace_AS_230420(underlay, infoVol, params, overlay, info)
+function PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
 
 % PLOTSLICESTIMETRACE Creates an interactive 4D plot.
 %
