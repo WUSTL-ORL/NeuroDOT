@@ -123,6 +123,11 @@ if ~isfield(params, 'fig_size')  ||  isempty(params.fig_size)
             params.fig_size = [20, 200, 560, 560];
     end
 end
+if ~isfield(params, 'calc_only')
+    params.calc_only = 0;
+end
+
+if ~params.calc_only
 if ~isfield(params, 'fig_handle')  ||  isempty(params.fig_handle)
     params.fig_handle = figure('Color', BkgdColor, 'Position', params.fig_size);
     new_fig = 1;
@@ -133,6 +138,7 @@ else
         case 'axes'
             set(gcf, 'CurrentAxes', params.fig_handle);
     end
+end
 end
 
 if ~isfield(params, 'freqs')  % Freq range to find peak
@@ -148,6 +154,7 @@ end
 if ~isfield(params, 'freqsBW')  
    params.freqsBW=[0.009,0.08]; % range from which to determine bandwidth
 end
+
 
 
 
@@ -243,12 +250,6 @@ m=param.Th.P; %min value
 % m=M/2;
 params.Scale=M;%/2;
 % llfo=llfo-M/2;
-params.Cmap.P='hot';
-[SDRGB, CMAP] = applycmap(llfo, [], params);
-SrcRGB = SDRGB(1:Ns, :);
-DetRGB = SDRGB(Ns+1:end, :);
-PlotCapData(SrcRGB, DetRGB, info, params);
-pos=get(gca,'pos');
 
 llfo_len=size(llfo);
 llfo_Re=zeros(llfo_len);
@@ -269,35 +270,48 @@ SNR_DQ.max_SNR = M;
 SNR_DQ.med_SNR = Med;
 SNR_DQ.avg_SNR = Avg;
 
+if params.calc_only
+    return
+else
+    params.Cmap.P='hot';
+    [SDRGB, CMAP] = applycmap(llfo, [], params);
+    SrcRGB = SDRGB(1:Ns, :);
+    DetRGB = SDRGB(Ns+1:end, :);
+    PlotCapData(SrcRGB, DetRGB, info, params);
+    pos=get(gca,'pos');
 
-%% Add Title and colorbar.
-switch params.type
-    case 'SNR'
-tcell=[{['Mean Band-limited SNR']};...
-    {['r', lower(params.dimension), ' \in ','[',...
-    num2str(params.rlimits(1, 1)), ', ',...
-    num2str(params.rlimits(1, 2)), '] mm; ',...
-    'f\in ','[',num2str(params.freqs(1, 1)), ', ',...
-    num2str(params.freqs(1, 2)), '] Hz']}];    
-CB = colorbar('YTick', [0, 0.5, 1],...
-    'YTickLabel',{[num2str(m)], 'SNR_d_B',[num2str(M)]},...
-    'Color', LineColor,'Location', 'southoutside','position',...
-    [pos(1)+pos(3)/3,pos(2)-0.01,pos(3)/3,pos(4)/35]);
 
-title(tcell, 'Color', LineColor)
 
-    case 'mag'
-tcell=[{['Mean FFT Power']};...
-    {['r', lower(params.dimension), ' \in ','[',...
-    num2str(params.rlimits(1, 1)), ', ',...
-    num2str(params.rlimits(1, 2)), '] mm; ',...
-    'f\in ','[',num2str(params.freqs(1, 1)), ', ',...
-    num2str(params.freqs(1, 2)), '] Hz']}];    
-CB = colorbar('YTick', [0, 0.5, 1],...
-    'YTickLabel',{[num2str(m)], 'Max Relative Power',[num2str(M)]},...
-    'Color', LineColor,'Location', 'southoutside','position',...
-     [pos(1)+pos(3)/3,pos(2)-0.01,pos(3)/3,0.01]);
 
-title(tcell, 'Color', LineColor)
+    %% Add Title and colorbar.
+    switch params.type
+        case 'SNR'
+    tcell=[{['Mean Band-limited SNR']};...
+        {['r', lower(params.dimension), ' \in ','[',...
+        num2str(params.rlimits(1, 1)), ', ',...
+        num2str(params.rlimits(1, 2)), '] mm; ',...
+        'f\in ','[',num2str(params.freqs(1, 1)), ', ',...
+        num2str(params.freqs(1, 2)), '] Hz']}];    
+    CB = colorbar('YTick', [0, 0.5, 1],...
+        'YTickLabel',{[num2str(m)], 'SNR_d_B',[num2str(M)]},...
+        'Color', LineColor,'Location', 'southoutside','position',...
+        [pos(1)+pos(3)/3,pos(2)-0.01,pos(3)/3,pos(4)/35]);
+
+    title(tcell, 'Color', LineColor)
+
+        case 'mag'
+    tcell=[{['Mean FFT Power']};...
+        {['r', lower(params.dimension), ' \in ','[',...
+        num2str(params.rlimits(1, 1)), ', ',...
+        num2str(params.rlimits(1, 2)), '] mm; ',...
+        'f\in ','[',num2str(params.freqs(1, 1)), ', ',...
+        num2str(params.freqs(1, 2)), '] Hz']}];    
+    CB = colorbar('YTick', [0, 0.5, 1],...
+        'YTickLabel',{[num2str(m)], 'Max Relative Power',[num2str(M)]},...
+        'Color', LineColor,'Location', 'southoutside','position',...
+         [pos(1)+pos(3)/3,pos(2)-0.01,pos(3)/3,0.01]);
+
+    title(tcell, 'Color', LineColor)
+    end
 end
-%
+    %
