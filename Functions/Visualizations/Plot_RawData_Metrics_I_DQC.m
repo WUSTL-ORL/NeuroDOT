@@ -150,17 +150,17 @@ Phi_0_to_plot=reshape(Phi_0,Nm,[]);
 Keep_range = find(r<20);
 
 DQ_metrics = struct;
-DQ_metrics.min_val_685 = min(Phi_0_to_plot(Keep_range,1));
-DQ_metrics.min_log_685 = log10(DQ_metrics.min_val_685);
-DQ_metrics.max_val_685 = max(Phi_0_to_plot(Keep_range,1));
-DQ_metrics.max_log_685 = log10(DQ_metrics.max_val_685);
-DQ_metrics.range_685 = DQ_metrics.max_log_685 - DQ_metrics.min_log_685;
+DQ_metrics.min_val_WL1 = min(Phi_0_to_plot(Keep_range,1));
+DQ_metrics.min_log_WL1 = log10(DQ_metrics.min_val_WL1);
+DQ_metrics.max_val_WL1 = max(Phi_0_to_plot(Keep_range,1));
+DQ_metrics.max_log_WL1 = log10(DQ_metrics.max_val_WL1);
+DQ_metrics.range_WL1 = DQ_metrics.max_log_WL1 - DQ_metrics.min_log_WL1;
 
-DQ_metrics.min_val_830= min(Phi_0_to_plot(Keep_range,2));
-DQ_metrics.min_log_830 = log10(DQ_metrics.min_val_830);
-DQ_metrics.max_val_830 = max(Phi_0_to_plot(Keep_range,2));
-DQ_metrics.max_log_830 = log10(DQ_metrics.max_val_830);
-DQ_metrics.range_830 = DQ_metrics.max_log_830 - DQ_metrics.min_log_830;
+DQ_metrics.min_val_WL2= min(Phi_0_to_plot(Keep_range,2));
+DQ_metrics.min_log_WL2 = log10(DQ_metrics.min_val_WL2);
+DQ_metrics.max_val_WL2 = max(Phi_0_to_plot(Keep_range,2));
+DQ_metrics.max_log_WL2 = log10(DQ_metrics.max_val_WL2);
+DQ_metrics.range_WL2 = DQ_metrics.max_log_WL2 - DQ_metrics.min_log_WL2;
 
 %% <fft> for max wavelength at 2 distances
 lmdata = logmean(data);
