@@ -48,6 +48,11 @@ function PlotSlices(underlay, infoVol, params, overlay)
 %       orientation 't'                     Select orientation of volume.
 %                                           't' for transverse, 's' for
 %                                           sagittal.
+%       bgW        [0,0,0]                  For images with an overlay, change
+%                                           the background color.
+%                                           Options are all RGB values [0,1].
+%                                           For paper-ready figures with a
+%                                           white background [1,1,1].
 %
 %   Note: APPLYCMAP has further options for using "params" to specify
 %   parameters for the fusion, scaling, and colormapping process.
@@ -260,6 +265,10 @@ if strcmp(params.orientation, 't')
     end
 end
 
+if ~isfield(params, 'bgW')
+    params.bgW = [0,0,0];
+end
+
 %% Populate orientation stuff.
 switch params.orientation
     case 's'
@@ -305,8 +314,17 @@ if isempty(overlay)
     if isempty(FUSED),return;end
 else
     [FUSED, CMAP] = applycmap(overlay, underlay, params);
+    if isfield(params, 'bgW')
+        FUSED = reshape(FUSED, [], 3);
+        idx = sum(~FUSED,2)==3;
+        FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
+        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz,3]);
+    end
     if isempty(FUSED),return;end
+    
 end
+
+
 
 %% Display the views on three subplots in a while loop for point-and-click navigation.
 N = 0;
