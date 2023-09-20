@@ -20,6 +20,7 @@ function DrawColoredSynchPoints(info,SPfr)
 %                           checkerboard)
 %   *.Pulse_3           Index of synchpts of a 2nd stimulus type
 %   *.Pulse_4           Index of synchpts of a 3rd stimulus type
+%   9/20/2023, AS updated to account for more colors than just 4
 % The 2nd input, SPfr, selects whether or not to adjust synchpoint timing
 % based on framerate of data. (Default=0).
 
@@ -54,6 +55,12 @@ for j=1:length(synchs)    % Draw synch pt bars
         plot([1,1].*synchs(j),yLim,'b','LineWidth',1)
     elseif ismember(j,info.paradigm.Pulse_4)
         plot([1,1].*synchs(j),yLim,'m','LineWidth',1)
+    elseif ismember(j,info.paradigm.Pulse_5)
+        plot([1,1].*synchs(j),yLim,'c','LineWidth',1)
+    elseif ismember(j,info.paradigm.Pulse_6)
+        plot([1,1].*synchs(j),yLim,'Color',[0.9290 0.6940 0.1250],'LineWidth',1) %gold
+    elseif ismember(j,info.paradigm.Pulse_7)
+        plot([1,1].*synchs(j),yLim,'Color',[0.4940 0.1840 0.5560],'LineWidth',1) %dark purple
     else
         if any(h.Color)
             plot([1,1].*synchs(j),yLim,'k','LineWidth',1)   
