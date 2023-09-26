@@ -3,9 +3,9 @@ function [HbO,HbR] = MBLL(data_in, info, ppf, e_mat)
 %
 % Takes the optical density data (data_in) measured at two wavelengths for 
 % each source-detector pair and multiplies it by the inverse of the 
-% extinction coefficient matrix (e_mat). Then, divides by the source-detector
-% separation of that channel, and multiplies by the partial path length 
-% factor (ppf). Creates the outputs HbO and HbR, the concentrations of 
+% extinction coefficient matrix (e_mat). Then, divides by the partial
+% path length factor (ppf) multiplied by the source-detector separation.
+% Creates the outputs HbO and HbR, the concentrations of 
 % oxygenated and deoxygenated hemoglobin, respectively.
 %
 % INPUTS:
