@@ -45,6 +45,12 @@ function PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
 %       kernel      [1]                     A sampling kernel for the time
 %                                           trace plot. Other options:
 %                                           'gaussian' | 'cube' | 'sphere'.
+%       bgW        [0,0,0]                  For images with an overlay, change
+%                                           the background color.
+%                                           Options are all RGB values [0,1].
+%                                           For paper-ready figures with a
+%                                           white background [1,1,1].
+%
 %
 %   Note: APPLYCMAP has further options for using "params" to specify
 %   parameters for the fusion, scaling, and colormapping process.
@@ -269,6 +275,10 @@ if ~isfield(params, 'xlimits')  ||  isempty(params.xlimits)
     end
 end
 
+if ~isfield(params, 'bgW')
+    params.bgW = [0,0,0];
+end
+
 %% Populate orientation stuff.
 switch params.orientation
     case 's'
@@ -308,11 +318,23 @@ end
 %% Apply color mapping.
 if isempty(overlay)
     [FUSED, CMAP] = applycmap(underlay, [], params);
+    if isempty(FUSED),return;end
+
 else
     if nVtU == 1
         underlay = repmat(underlay, 1, 1, 1, nVtO);
     end
     [FUSED, CMAP] = applycmap(overlay, underlay, params);
+    if isfield(params, 'bgW')
+        FUSED = reshape(FUSED, [], 3);
+        idx = sum(~FUSED,2)==3;
+        FUSED(idx, :) =  repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
+        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz, nVt, 3]);
+        if params.bgW == [1,1,1]
+            idx2 = sum(~CMAP,2) == 3;
+            CMAP(idx2, :) = repmat([1,1,1], sum(idx2), 1);
+        end
+   end
 end
 
 %% Display the views on three subplots in a while loop for point-and-click navigation.
