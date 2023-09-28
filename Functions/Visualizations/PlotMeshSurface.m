@@ -213,7 +213,7 @@ if ~isfield(m,'data')       % NO DATA
         cb=1;
         CMAP=params.Cmap.P;
         EdgeColor = params.EdgeColor;
-        FaceColor = 'flat';
+        FaceColor = params.FaceColor;
         FaceLighting = 'gouraud';
 %         AmbientStrength = 0.25;
 %         DiffuseStrength = 0.75; % or 0.75
