@@ -127,8 +127,11 @@ end
 if ~isfield(params, 'bgW')
     params.bgW = [0,0,0];
 else
-    BkgdColor = params.bgW;
-    LineColor = 'k';
+    if ~isequal(params.bgW, [0,0,0])
+        LineColor = 'k';
+        BkgdColor = params.bgW;
+  
+    end
 end
 if ~isfield(params, 'fig_handle')  ||  isempty(params.fig_handle)
     params.fig_handle = figure('Color', BkgdColor, 'Position', params.fig_size);
@@ -470,7 +473,7 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             plot([xlim, NaN, xlim], [ylim, NaN, flip(ylim)], '-r');
         end
         
-        set(params2.fig_handle, 'Color', BkgdColor);
+        set(params2.fig_handle, 'Color', 'white');
         set(params2.fig_handle, 'XColor', LineColor, 'YColor', LineColor, 'Box', 'on');
         title({'Time Trace'; ['t = ' num2str(S(4))]},...
             'Color', LineColor, 'FontSize', 12)
