@@ -212,11 +212,11 @@ end
 if isfield(params,'Saturation')
     nbg = setdiff(1:size(mapped, 1), bg);
      if ~params.underlay
-         mapped(nbg, :) = bsxfun(@times, params.Saturation(nbg), mapped(nbg, :))...
-             + bsxfun(@times, params.BG, 1 - params.Saturation(nbg));
+         mapped(nbg, :) = bsxfun(@times, params.Saturation(nbg)', mapped(nbg, :))...
+             + bsxfun(@times, params.BG, 1 - params.Saturation(nbg)');
      else
-         mapped(nbg, :) = bsxfun(@times, params.Saturation(nbg), mapped(nbg, :))...
-             + bsxfun(@times, params.BG, (1 - params.Saturation(nbg)) .* underlay(nbg, :));
+         mapped(nbg, :) = bsxfun(@times, params.Saturation(nbg)', mapped(nbg, :))...
+             + bsxfun(@times, params.BG, (1 - params.Saturation(nbg)') .* underlay(nbg, :));
      end
 end
 
