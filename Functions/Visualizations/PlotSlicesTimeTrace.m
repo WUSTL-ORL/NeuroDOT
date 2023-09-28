@@ -124,6 +124,12 @@ end
 if ~isfield(params, 'fig_size')  ||  isempty(params.fig_size)
     params.fig_size = [20, 100, 840, 720];
 end
+if ~isfield(params, 'bgW')
+    params.bgW = [0,0,0];
+else
+    BkgdColor = params.bgW;
+    LineColor = 'k';
+end
 if ~isfield(params, 'fig_handle')  ||  isempty(params.fig_handle)
     params.fig_handle = figure('Color', BkgdColor, 'Position', params.fig_size);
     new_fig = 1;
@@ -275,9 +281,7 @@ if ~isfield(params, 'xlimits')  ||  isempty(params.xlimits)
     end
 end
 
-if ~isfield(params, 'bgW')
-    params.bgW = [0,0,0];
-end
+
 
 %% Populate orientation stuff.
 switch params.orientation
@@ -332,6 +336,7 @@ else
         FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz, nVt, 3]);
         idx2 = sum(~CMAP,2) == 3;
         CMAP(idx2, :) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx2), 1);
+
    end
 end
 
@@ -378,4 +383,202 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             else
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(S(a))]};
             end
-    
+            
+            if exist('coords', 'var')
+                if strcmp(params.orientation, 's')  &&  ~strcmp(orlist{a}, 'Sagittal')
+                cel{end + 1} = [axlist{a} ' = ' num2str(coords(a))];
+                elseif strcmp(params.orientation, 't')  &&  strcmp(orlist{a}, 'Sagittal')
+                cel{end + 1} = [axlist{a} ' = ' num2str(coords(a).*-1)];
+                else
+                    cel{end + 1} = [axlist{a} ' = ' num2str(coords(a))];
+                end
+            end
+            
+            title(cel, 'Color', LineColor, 'FontSize', 12)
+            xlabel(xlist{a}, 'Color', LineColor, 'FontSize', 10)
+            ylabel(ylist{a}, 'Color', LineColor, 'FontSize', 10)
+            
+            % Flip axes tick labels as necessary.
+            if (N == 1)  &&  xflip(a)
+                h.XTickLabel = flip(h.XTickLabel); % This is mainly window dressing, flips the labels but not the data.
+                incr = mean(diff(h.XTick));
+                dif = incr + max(h.XTick(:)) - xdimlist{a}; % As such, this formula fixes the positions of the labels.
+                h.XTick = h.XTick - dif  + 1;
+                h.XTickLabel(h.XTick == 1) = [];
+                h.XTick(h.XTick == 1) = [];
+            end
+            if (N == 1)  &&  yflip(a)
+                h.YTickLabel = flip(h.YTickLabel);
+                incr = mean(diff(h.YTick));
+                dif = incr + max(h.YTick(:)) - ydimlist{a};
+                h.YTick = h.YTick - dif + 1;
+                h.YTickLabel(h.YTick == 1) = [];
+                h.YTick(h.YTick == 1) = [];
+            end
+            
+            % This saves the axes as an object to be used later in
+            % navigation.
+            eval([lower(orlist{a}(1:3)), 'ax = gca;'])
+            
+            % Add crosshairs.
+            if params.CH
+                hold on
+                eval(CHs{a, 1})
+                eval(CHs{a, 2})
+            end
+        end
+       
+        %% Fourth subplot is the time trace.
+        params2 = params;
+        params2.fig_handle = subplot(2, 2, 4);
+        
+        if ~exist('overlay', 'var')  ||  isempty(overlay)
+            DATA = underlay;
+        else
+            DATA = overlay;
+        end
+        if isempty(infoVol)  ||  ((isfield(infoVol, 'Good_Vox')...
+                &&  any(infoVol.Good_Vox == (S(1) + S(2)*nVxU + S(3)*nVxU*nVyU))))...
+                || isfield(infoVol,'nDim')
+            
+            kernel = zeros(nVxU, nVyU, nVzU);
+            kernel(S(1), S(2), S(3)) = 1;
+            kernel = convn(kernel, params.kernel, 'same');
+            
+            DATA = bsxfun(@times,DATA,kernel);
+            
+            ydata = squeeze(sum(sum(sum(DATA))))./nnz(kernel(:));
+            
+            hh = PlotTimeTraceData(ydata, time, params);
+            hh.LineWidth = 2;
+            
+            hold on
+%             plot(S(4) * ones(1, 2), [-1,1].*c_max.*1.2, '-r');
+            % New syntax for plotting red line 2/7/23
+            TT_max = max(ydata);
+            TT_min = min(ydata);
+            plot(S(4) * ones(1,2), [TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)], '-r')
+            hold off
+            
+            if TT_max == TT_min
+                plot([xlim, NaN, xlim], [ylim, NaN, flip(ylim)], '-r'); %plot red X
+            else
+                ylim([TT_min - (0.1*abs(TT_min)),TT_max + 0.1*abs(TT_max)])
+            end
+        
+        else
+            plot([xlim, NaN, xlim], [ylim, NaN, flip(ylim)], '-r');
+        end
+        
+        set(params2.fig_handle, 'Color', BkgdColor);
+        set(params2.fig_handle, 'XColor', LineColor, 'YColor', LineColor, 'Box', 'on');
+        title({'Time Trace'; ['t = ' num2str(S(4))]},...
+            'Color', LineColor, 'FontSize', 12)
+        if exist('dt', 'var')
+            xlabel('Time (seconds)', 'Color', LineColor, 'FontSize', 10)
+        else
+            xlabel('Time (samples)', 'Color', LineColor, 'FontSize', 10)
+        end
+        ylabel('[Hb]', 'Color', LineColor, 'FontSize', 10)
+        
+        
+        
+        %% Add a colorbar to bottom of whole thing.
+        subplot(2, 2, 3)
+        colormap(CMAP)
+        h2 = colorbar(traax, 'Color', LineColor);
+        
+        % Set default ticks to min, mid, max of colorscale 2/7/23
+        set(h2, 'Ticks', [c_min, c_mid, c_max], 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
+        % Py version has section here where we double check that ticks are kosher
+        % Not sure if this is 100% necessary for matlab
+        ticks = h2.Ticks; %get whatever ticks matlab is using
+        ticks_new  = [min(ticks), ((max(ticks)-min(ticks))/2) + min(ticks), max(ticks)];
+        if ticks_new(2) > ticks_new(3) %if mid > max, reverse sign of mid
+            ticks_new(2) = -1 * ticks_new(2);
+        end
+        limits = h2.Limits;
+        if ticks_new(1) < limits(1) %if lowest tick less than lower limit of cb, set lowest tick to lower limit of cb
+            ticks_new(1) = limits(1);
+        end
+        if ticks_new(3) > limits(2) %if highest tick greater than upper limit of cb, set highest tick to upper limit of cb
+            ticks_new(3) = limits(2);
+        end
+        set(h2, 'Ticks', ticks_new);
+        set(h, 'XColor', LineColor, 'YColor', LineColor, 'Box', 'on');
+        % Back to OG colorbar code
+        if params.cbmode
+            set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
+        end
+        
+        %% Add point-and-click navigation.
+        if lookon == 0
+            break
+        end
+        oldS = S;
+        [gx, gy, button] = ginput(1);
+        gx = round(gx);
+        gy = round(gy);
+        if gx < 1, gx = 1;end;
+        if gy < 1, gy = 1;end;
+        if button == 1
+            switch params.orientation
+                case 't'
+                    switch gca
+                        case sagax
+                            if gx > nVyU, gx = nVyU;end;
+                            if gy > nVzU, gy = nVzU;end;
+                            S(2) = gx;
+                            S(3) = nVzU - gy + 1;
+                        case corax
+                            if gx > nVxU, gx = nVxU;end;
+                            if gy > nVzU, gy = nVzU;end;
+                            S(1) = gx;
+                            S(3) = nVzU - gy + 1;
+                        case traax
+                            if gx > nVxU, gx = nVxU;end;
+                            if gy > nVyU, gy = nVyU;end;
+                            S(1) = gx;
+                            S(2) = nVyU - gy + 1;
+                        case params2.fig_handle
+                            if gx > nVt, gx = nVg;end;
+                            S(4) = gx;
+                    end
+                case 's'
+                    switch gca
+                        case sagax
+                            if gx > nVxU, gx = nVxU;end;
+                            if gy > nVyU, gy = nVyU;end;
+                            S(1) = gx;
+                            S(2) = nVyU - gy + 1;
+                        case corax
+                            if gx > nVzU, gx = nVzU;end;
+                            if gy > nVyU, gy = nVyU;end;
+                            S(2) = nVyU - gy + 1;
+                            S(3) = nVzU - gx + 1;
+                        case traax
+                            if gy > nVxU, gy = nVxU;end;
+                            if gx > nVzU, gx = nVzU;end;
+                            S(1) = nVxU - gy + 1;
+                            S(3) = nVzU - gx + 1;
+                        case params2.fig_handle
+                            if gx > nVt, gx = nVg;end;
+                            S(4) = gx;
+                    end
+            end
+        elseif button == 3
+            S(1) = round(nVxU / 2);
+            S(2) = round(nVyU / 2);
+            S(3) = round(nVzU / 2);
+            S(4) = round(nVt / 2);
+        end
+    catch err
+        rethrow(err)
+        S = oldS;
+    end
+end
+
+
+
+%
+end
