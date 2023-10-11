@@ -10,6 +10,9 @@ function info_out = converter_info(info_in, conversion)
 %   All leftover fields in 'ND1 to ND2' are stored in "info_out.misc".
 %
 %   Only intended for use with ND1 and ND2 data structures.
+%   
+%   Use conversion 'table' to remove tables from NeuroDOT data, regardless
+%   of ND1 or ND2 format.
 %
 % See Also: CONVERTER_DATA, CONVERTER_ND1_TO_ND2, CONVERTER_ND2_TO_ND1.
 % 
@@ -73,10 +76,11 @@ switch conversion
                 inames(tf) = [];
             end
         end
-        if ~isfield(info_out.system,'framerate')
-            info_out.system.framerate=info_out.system.init_framerate;
+        if isfield(info_out, 'system')
+            if ~isfield(info_out.system,'framerate')
+                info_out.system.framerate=info_out.system.init_framerate;
+            end
         end
-        
     if ~isfield(info_in,'Pad_info')
         %% Build "info.optodes".
         if isfield(info_in, 'pad')
@@ -381,7 +385,21 @@ switch conversion
         %% Reorder fields.
         info_out = orderfields(info_out);
         
+        %% For Removing Tables
         
+    case 'table'
+        if isa(info_in.pairs, 'table')
+            info_in.pairs = table2struct(info_in.pairs, 'ToScalar', true);
+        end
+        if isa(info_in.optodes, 'table')
+            info_in.optodes = table2struct(info_in.optodes, 'ToScalar', true);
+        end
+        if isfield(info_in, 'MEAS')
+            if isa(info_in.MEAS, 'table')
+                info_in.MEAS = table2struct(info_in.MEAS, 'ToScalar', true);
+            end
+        end
+        info_out = info_in;
 end
 
 
