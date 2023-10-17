@@ -27,7 +27,7 @@ function [Plevels, SNR_DQ]=PlotCapPhysiologyPower(data, info, params)
 %
 % Washington University hereby grants to you a non-transferable, 
 % non-exclusive, royalty-free, non-commercial, research license to use 
-% and copy the computer code that is provided here (the Software).  
+% and copy the computer code that is provided here (the “Software”).  
 % You agree to include this license and the above copyright notice in 
 % all copies of the Software.  The Software may not be distributed, 
 % shared, or transferred to any third party.  This license does not 
@@ -36,7 +36,7 @@ function [Plevels, SNR_DQ]=PlotCapPhysiologyPower(data, info, params)
 % University.
 % 
 % YOU AGREE THAT THE SOFTWARE PROVIDED HEREUNDER IS EXPERIMENTAL AND IS 
-% PROVIDED AS IS, WITHOUT ANY WARRANTY OF ANY KIND, EXPRESSED OR 
+% PROVIDED “AS IS”, WITHOUT ANY WARRANTY OF ANY KIND, EXPRESSED OR 
 % IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY 
 % OR FITNESS FOR ANY PARTICULAR PURPOSE, OR NON-INFRINGEMENT OF ANY 
 % THIRD-PARTY PATENT, COPYRIGHT, OR ANY OTHER THIRD-PARTY RIGHT.  
@@ -237,7 +237,7 @@ end
 for d=1:Nd    
     Dgood=keep & info.pairs.Det==d;
     if sum(Dgood)>0
-    Cvalue=mean(Plevels(Dgood)); % Average across measurements
+    Cvalue=mean(Plevels(Dgood)); % Average across measurementsl
     else, Cvalue=1;
     end
     llfo(Ns+d)=Cvalue;
@@ -269,6 +269,28 @@ SNR_DQ.min_SNR = m;
 SNR_DQ.max_SNR = M;
 SNR_DQ.med_SNR = Med;
 SNR_DQ.avg_SNR = Avg;
+
+keepNN1 = info.pairs.NN == 1 & ...
+        info.pairs.WL==2 & ...
+        GM;
+SNR_NN1 = Plevels(keepNN1);
+
+SNR_DQ.min_SNR_NN1 = min(SNR_NN1); 
+SNR_DQ.max_SNR_NN1 = max(SNR_NN1);
+SNR_DQ.med_SNR_NN1 = median(SNR_NN1);
+SNR_DQ.avg_SNR_NN1 = mean(SNR_NN1);
+
+keepNN2 = info.pairs.NN == 2 & ...
+        info.pairs.WL==2 & ...
+        GM;
+SNR_NN2 = Plevels(keepNN2);
+
+SNR_DQ.min_SNR_NN2 = min(SNR_NN2); 
+SNR_DQ.max_SNR_NN2 = max(SNR_NN2);
+SNR_DQ.med_SNR_NN2 = median(SNR_NN2);
+SNR_DQ.avg_SNR_NN2 = mean(SNR_NN2);
+
+
 
 if params.calc_only
     return
