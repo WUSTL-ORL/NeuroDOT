@@ -35,7 +35,6 @@ function Plot_RawData_Time_Traces_Overview(data,info,params)
 % IN BREACH OF CONTRACT, TORT OR OTHERWISE, EVEN IF SUCH PARTY IS 
 % ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-
 %% Parameters and Initialization
 Nwl=length(unique(info.pairs.WL));
 [Nm,Nt]=size(data);
@@ -46,6 +45,10 @@ else
     fr=info.system.framerate;
 end
     
+if istable(info.pairs)
+    info.pairs = table2struct(info.pairs, 'ToScalar', true);
+end
+
 dt=1/fr;                          
 t=[1:1:Nt].*dt;
 

@@ -49,7 +49,7 @@ if exist([datafile2save,'.mat'],'file') && ~params.overwrite
     end
     if isfield(info, 'pairs')
         if istable(info.pairs)
-            info.pairs = table2struct(info.pairs, 'ToScalar', true)
+            info.pairs = table2struct(info.pairs, 'ToScalar', true);
         end
     end
 else % do all of decoding...

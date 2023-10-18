@@ -7,6 +7,17 @@ function Plot_Measurement_PER(data,info,StimF)
 %
 %
 %% Parameters and Initialization
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true);
+    end
+end
+
 fs=info.system.framerate;
 Trange=info.paradigm.synchpts(2):info.paradigm.synchpts(end);
 Ns=max(info.pairs.Src);

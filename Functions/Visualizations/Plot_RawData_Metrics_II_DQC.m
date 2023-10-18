@@ -51,7 +51,16 @@ else
 end
 if ~isfield(params,'logfft'),params.logfft=0;end
 
-
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true);
+    end
+end
 
 wls=unique(info.pairs.lambda);
 Nwls=length(wls);

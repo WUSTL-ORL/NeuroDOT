@@ -76,6 +76,18 @@ switch sel_type
         end
 end
 
+%% Check if info contains tables
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true);
+    end
+end
+
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
 %% If no GI, assume all measurements good.
 if (isfield(info, 'MEAS')  &&  ~isfield(info.MEAS, 'GI'))
     info.MEAS.GI = true(Nm, 1);

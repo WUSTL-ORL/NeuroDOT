@@ -6,6 +6,17 @@ function GrayPlots_Rsd_by_Wavelength(data,info)
 % into info.pairs.r2d<20, 20<=info.pairs.r2d<30, and 30<=info.pairs.r2d<40.
 
 %% Parameters and Initialization
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true);
+    end
+end
+
 Nwl=length(unique(info.pairs.WL));
 [Nm,Nt]=size(data);
 LineColor='w';
@@ -15,7 +26,12 @@ BkndColor='k';
 wl=unique(info.pairs.lambda);
 figure('Units','normalized','OuterPosition',[0.1 0.1 0.5 0.5],...
     'Color',BkndColor);
-if ~isfield(info,'MEAS')
+if isfield(info, 'MEAS')
+    if ~isfield(info.MEAS, 'GI')
+        info.MEAS.GI=ones(size(info.pairs.Src,1),1);
+    end
+else
+    info.MEAS = struct;
     info.MEAS.GI=ones(size(info.pairs.Src,1),1);
 end
 

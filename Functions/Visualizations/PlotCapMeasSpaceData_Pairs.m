@@ -67,6 +67,17 @@ function PlotCapMeasSpaceData_Pairs(data, info, params)
 % ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 %% Paramters and Initialization.
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true);
+    end
+end
+
 %BkgdColor = 'k';
 LineColor = 'w';
 SMarkerColor = [1, .75, .75];

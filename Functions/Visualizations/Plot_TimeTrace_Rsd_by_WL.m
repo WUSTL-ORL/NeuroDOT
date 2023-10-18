@@ -7,6 +7,17 @@ function Plot_TimeTrace_Rsd_by_WL(data,info,params)
 
 
 %% Parameters and Initialization
+if isfield(info, 'MEAS')
+    if istable(info.MEAS)
+        info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
+    end
+end
+if isfield(info, 'pairs')
+    if istable(info.pairs)
+        info.pairs = table2struct(info.pairs, 'ToScalar', true);
+    end
+end
+
 Nwl=length(unique(info.pairs.WL));
 [Nm,Nt]=size(data);
 if isfield(info.system,'init_framerate')
