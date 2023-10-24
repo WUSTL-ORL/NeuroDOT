@@ -24,7 +24,7 @@ function varargout = Cap_Fitter(varargin)
 % grant any rights or licenses to any other patents, copyrights, or 
 % other forms of intellectual property owned or controlled by Washington 
 % University.
-% 
+%  
 % YOU AGREE THAT THE SOFTWARE PROVIDED HEREUNDER IS EXPERIMENTAL AND IS 
 % PROVIDED AS IS, WITHOUT ANY WARRANTY OF ANY KIND, EXPRESSED OR 
 % IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY 
