@@ -267,7 +267,7 @@ if type == 'snirf'
 
                 Rad=Grid2Radius_180824(gridTemp,5);
                 params.lambda= snf.nirs.probe.wavelengths;
-                tempInfo=Generate_Info_from_Grid_Rad(gridTemp,Rad,params);
+                tempInfo=Generate_pad_from_grid(gridTemp,params,Rad);
                 if size(info.pairs.Src,2) > 1
                     info.pairs.Src = info.pairs.Src';
                 end
