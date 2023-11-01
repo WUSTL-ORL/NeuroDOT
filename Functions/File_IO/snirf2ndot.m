@@ -266,7 +266,7 @@ if type == 'snirf'
                 end
 
                 params.lambda= snf.nirs.probe.wavelengths;
-                tempInfo=Generate_pad_from_grid(gridTemp,params,Rad);
+                tempInfo=Generate_pad_from_grid(gridTemp,params);
                 if size(info.pairs.Src,2) > 1
                     info.pairs.Src = info.pairs.Src';
                 end
