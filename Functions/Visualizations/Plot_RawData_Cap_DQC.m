@@ -1,4 +1,4 @@
-function info=Plot_RawData_Cap_DQC(data,info,params)
+function info_out=Plot_RawData_Cap_DQC(data,info,params)
 %
 % This function generates plots of data quality as related to the cap
 % layout including: relative average light levels for 2 sets of distances
@@ -42,12 +42,14 @@ if isfield(info, 'MEAS')
         info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
     end
 end
+
 if isfield(info, 'pairs')
     if istable(info.pairs)
         info.pairs = table2struct(info.pairs, 'ToScalar', true);
     end
 end
 
+info_out = info;
 % Check if there is more than one NN - for determining rlimits and suplots
 if length(unique(info.pairs.NN)) < 3
     numNNs = 1;
@@ -82,7 +84,7 @@ end
 if numNNs == 2
     subplot(4,2,1);
     params.rlimits=Rlimits(1,:);
-    info.MEAS.Phi_o=PlotCapMeanLL(data, info, params);
+    info_out.MEAS.Phi_o=PlotCapMeanLL(data, info, params);
 
     subplot(4,2,2);
     params.rlimits=Rlimits(2,:);
@@ -90,7 +92,7 @@ if numNNs == 2
 else
     subplot(1,3,1)
     params.rlimits = Rlimits(1,:);
-    info.MEAS.Phi_o= PlotCapMeanLL(data,info,params);
+    info_out.MEAS.Phi_o= PlotCapMeanLL(data,info,params);
 end
 
 
@@ -110,18 +112,19 @@ params=rmfield(params,'mode');
 if numNNs == 2
     subplot(4,2,3);                             % Close neighborhood
     params.rlimits=Rlimits(1,:);
-    [info.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
+    [info_out.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
 
     subplot(4,2,4);                             % 2nd neighborhood
     params.rlimits=Rlimits(2,:);
-    [info.MEAS.Pulse_SNR_R2, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
+    [info_out.MEAS.Pulse_SNR_R2, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
 else
     subplot(1,3,2);                             % Close neighborhood
     params.rlimits=Rlimits(1,:);
-    [info.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
+    [info_out.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
 end
 
-info.DQ_metrics.SNR = SNR_DQ;
+info_out.DQ_metrics.SNR = SNR_DQ;
+
 end
 
 
