@@ -47,13 +47,22 @@ if ~exist('info_in','var')
 else
     info_out = info_in;
 end
-if ~exist('GVwin','var'),GVwin=600;end
+
+if ~exist('params','var')
+    params = struct;
+end
+
+if ~isfield(params,'GVwin')
+    GVwin=600;
+else
+    GVwin = params.GVwin;
+end
 
 if ~isfield(info_out,'paradigm'),info_out.paradigm=struct;end
 
 if ~exist('bthresh', 'var')
     bthresh = 0.075; % Empirically derived threshold value.
-end
+end 
 
 omega_lp1 = 1;
 
@@ -63,9 +72,7 @@ if info_in.system.framerate/2 < omega_lp1
     omega_lp1 = (info_in.system.framerate/2)*0.90;
 end
 
-if ~exist('params','var')
-    params = struct;
-end
+
 
 if ~isfield(params, 'r2d_dist')
     params.r2d_dist = 20;
@@ -119,6 +126,7 @@ elseif isfield(info_out.paradigm, 'synchpts')
     STD = std(data(:, t0:tF), [], 2); % Calculate STD
 else
     tF = size(data, 2);
+    
     t0 = 1;
     STD = std(data, [], 2);
 end
@@ -133,11 +141,14 @@ if ~isfield(info_out,'MEAS')
     info_out.MEAS.STD = STD;
     info_out.MEAS.GI = STD <= bthresh;
 else
+    if istable(info_out.MEAS)
+        info_out.MEAS = table2struct(info_out.MEAS, 'ToScalar', true);
+    end
     info_out.MEAS.STD=STD;
     info_out.MEAS.GI=STD <= bthresh;
 end
 if isfield(info_out.MEAS,'Clipped')
-    info_out.MEAS.GI=info_out.MEAS.GI & ~info_out.MEAS.Clipped;
+    info_out.MEAS.GI=info_out.MEAS.GI & ~info_out.MEAS.Clipped; 
 end
 
 
