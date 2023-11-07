@@ -150,6 +150,8 @@ switch params.ctx
         mesh.nodes=mesh.MTHnodes;
     case 'SPH'
         mesh.nodes=mesh.SPHnodes;
+    case 'flat'
+        mesh.nodes = mesh.Fnodes;
 end
 
 
