@@ -2,6 +2,8 @@ function [data, info] = snirf2ndot(filename, save_file, output, type)
 %
 % snirf2ndot(filename,output,type) takes a file with the '.snirf' extension
 % in the SNIRF format and converts it to NeuroDOT formatting. 
+% This function depends on the function loadsnirf from snirf:
+% https://github.com/fNIRS/snirf
 
 % 'Filename' is the name of the file to be converted, followed by the 
 % .snirf extension.
