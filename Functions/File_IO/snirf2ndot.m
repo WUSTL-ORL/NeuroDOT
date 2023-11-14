@@ -1,4 +1,4 @@
-function [data, info] = snirf2ndot(filename, save_file, output, type)
+function [data, info] = snirf2ndot_231114(filename, save_file, output, type)
 %
 % snirf2ndot(filename,output,type) takes a file with the '.snirf' extension
 % in the SNIRF format and converts it to NeuroDOT formatting. 
@@ -262,9 +262,20 @@ if type == 'snirf'
             if ~isfield(snf, 'original_header') 
                 gridTemp.spos3=snf.nirs.probe.sourcePos3D;
                 gridTemp.dpos3=snf.nirs.probe.detectorPos3D;
+                %Enforce that arrays are column-wise
+                if size(gridTemp.spos3,2) > size(gridTemp.spos3,1)
+                    gridTemp.spos3 = gridTemp.spos3';
+                    gridTemp.dpos3 = gridTemp.dpos3';
+                end
+                
                 if isfield(snf.nirs.probe, 'sourcePos2D') && isfield(snf.nirs.probe, 'detectorPos2D')
                     gridTemp.spos2=snf.nirs.probe.sourcePos2D;
                     gridTemp.dpos2=snf.nirs.probe.detectorPos2D;
+                    %Enforce that arrays are column-wise
+                    if size(gridTemp.spos3,2) > size(gridTemp.spos3,1)
+                        gridTemp.spos2 = gridTemp.spos2';
+                        gridTemp.dpos2 = gridTemp.dpos2';
+                    end
                 end
 
                 params.lambda= snf.nirs.probe.wavelengths;

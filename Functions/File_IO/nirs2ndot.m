@@ -1,4 +1,4 @@
-function [data, info] = nirs2ndot(filename, save_file, output)
+function [data, info] = nirs2ndot_231114(filename, save_file, output)
 
     % Translation from .nirs to NeuroDOT-compatible format
     % This function takes in a .nirs file and converts it to NeuroDOT 
@@ -214,6 +214,16 @@ function [data, info] = nirs2ndot(filename, save_file, output)
     %Adjust optodes pos to be mm
     spos3 = spos3*mult;
     dpos3 = dpos3*mult;
+    
+    %Enforce column-wise optode arrays
+    if size(spos3, 2) > size(spos3, 1)
+        spos3 = spos3';
+        dpos3 = dpos3';
+        if exist('spos2', 'var')
+            spos2 = spos2';
+            dpos2 = dpos2';
+        end
+    end
 
     % Place optode locations and plot orientation in info structure
     info.optodes.spos3 = spos3;
