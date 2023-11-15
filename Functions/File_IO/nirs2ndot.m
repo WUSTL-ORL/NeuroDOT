@@ -1,4 +1,4 @@
-function [data, info] = nirs2ndot_231114(filename, save_file, output)
+function [data, info] = nirs2ndot(filename, save_file, output)
 
     % Translation from .nirs to NeuroDOT-compatible format
     % This function takes in a .nirs file and converts it to NeuroDOT 
