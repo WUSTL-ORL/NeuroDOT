@@ -5,10 +5,15 @@
 % visualizations. The NeuroDOT_Tutorial_Full_Data_Processing.pptx uses
 % NeuroDOT_Data_Sample_CCW1.mat. 
 
-
+%% Add paths
+addpath(genpath('/data/culver/data1/matlab_codes/NIRFASTer-master'),'-BEGIN')
+addpath(genpath('/data/culver/data1/matlab_codes/NeuroDOT_NITRC-Release'),'-BEGIN')
+addpath(genpath('/data/culver/data1/matlab_codes/NeuroDOT_Internal_Additional_Files_and_Functions'),'-BEGIN')
+addpath(genpath('/data/culver/data1/matlab_codes/gifti-1.4'),'-BEGIN')
+addpath(genpath('/data/culver/data1/Paul/SCOT_Paul/util'))
 
 %% Load Measurement data
-dataset='CCW1'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
+dataset='CCW2'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
 load(['NeuroDOT_Data_Sample_',dataset,'.mat']); % data, info, flags
 
 % Set parameters for A and block length for quick processing examples
@@ -24,7 +29,7 @@ switch dataset
         tp=32;                      % Example (block averaged) time point
         
     case {'HW1','HW2','RW1','GV1','HW3_Noisy'}
-        A_fn='A_Adult_96x92_on_Example_Mesh_test.mat';   % Sensitivity Matrix
+        A_fn='A_Adult_96x92.mat';   % Sensitivity Matrix
         dt=30;                      % Block length
         tp=16;                      % Example (block averaged) time point
         
@@ -38,6 +43,14 @@ info = Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data qualit
 
 
 %% View data before filtering
+omega_lp1 = 1;
+
+if info.system.framerate/2 < omega_lp1 
+    % Adjust Lowpass filter cutoff
+    % frequency for systems with lower framerates
+    omega_lp1 = (info.system.framerate/2)*0.90;
+end
+
 lmdata_b4_filt = logmean(data);                                           % Logmean Light Levels
 info_b4_filt  = FindGoodMeas(lmdata_b4_filt , info, 0.075);               % Detect Noisy Channels
 lmdata_b4_filt  = detrend_tts(lmdata_b4_filt );                           % Detrend Data
@@ -48,9 +61,9 @@ keep = info_b4_filt.pairs.WL==2 & info_b4_filt.pairs.r2d < 40 & info_b4_filt.MEA
 
 % Visualize
 figure('Position',[100 100 550 780])
-subplot(3,1,1); plot(lmdata_b4_filt(keep,:)'); 
+subplot(3,1,1); semilogy(data(keep,:)'); 
 set(gca,'XLimSpec','tight'), xlabel('Time (samples)'), 
-ylabel('log(\phi/\phi_0)') 
+ylabel('\phi') 
 m=max(max(abs(lmdata_b4_filt(keep,:))));
 subplot(3,1,2); imagesc(lmdata_b4_filt(keep,:),[-1,1].*m); 
 colorbar('Location','northoutside');
@@ -68,7 +81,7 @@ lmdata = logmean(data);                                                   % Logm
 info = FindGoodMeas(lmdata, info, 0.075);                                 % Detect Noisy Channels
 lmdata = detrend_tts(lmdata);                                             % Detrend Data
 lmdata = highpass(lmdata, .02, info.system.framerate);                    % High Pass Filter (0.02 Hz)
-lmdata = lowpass(lmdata, 1, info.system.framerate);                       % Low Pass Filter 1 (1.0 Hz)
+lmdata = lowpass(lmdata, omega_lp1, info.system.framerate);                       % Low Pass Filter 1 (1.0 Hz)
 hem = gethem(lmdata, info);                                               % Superficial Signal Regression
 [lmdata, ~] = regcorr(lmdata, info, hem);
 lmdata = lowpass(lmdata, 0.5, info.system.framerate);                     % Low Pass Filter 2 (0.5 Hz)
@@ -99,8 +112,7 @@ GrayPlots_Rsd_by_Wavelength(lmdata,info); % As above but now with all wavelength
 
 %% Block Averaging the measurement data and view
 badata = BlockAverage(lmdata, info.paradigm.synchpts(info.paradigm.Pulse_2), dt);
-
-badata=bsxfun(@minus,badata,mean(badata,2));
+badata=bsxfun(@minus,badata,mean(badata(:,1:4),2));
 
 figure('Position',[100 100 550 780])
 subplot(2,1,1); plot(badata(keep,:)'); 
@@ -157,15 +169,15 @@ tp_Eg=squeeze(badata_HbOvol(:,:,:,tp));
 % Explore PlotSlices - The basics (Slide 22 in ppt)
 PlotSlices(MNI_dim)                             % Anatomy only
 PlotSlices(MNI_dim,A.info.tissue.dim)           % Anatomy + volumetric data
-PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Anatomy + volumetric data + functional data
+PlotSlices(MNI_dim,A.info.tissue.dim,params,tp_Eg); % Anatomy + volumetric data + functional data
 
 % Visualize the data (Slide 23 in ppt)
 PlotSlices(tp_Eg,A.info.tissue.dim);            % Data by itself
 PlotSlices(MNI_dim,A.info.tissue.dim,[],tp_Eg); % Data with anatomical underlay
 % Set parameters to visualize more specific aspects of data
 Params.Scale=0.8*max(abs(tp_Eg(:)));     % Scale wrt/max of data
-Params.Th.P=0.5*Params.Scale;            % Threshold to see strong activations
-Params.Th.N=-Params.Th.P;                % Thresholds go both ways
+Params.Th.P=0.4*Params.Scale;            % Threshold to see strong activations
+Params.Th.N=-0.010;                % Thresholds go both ways
 Params.Cmap='jet';
 PlotSlices(MNI_dim,A.info.tissue.dim,Params,tp_Eg);
 
@@ -177,8 +189,8 @@ PlotSlicesTimeTrace(MNI_dim,A.info.tissue.dim,Params,badata_HbOvol,info)
 
 % Explore the not-block-averaged data a bit more interactively (slide 24 in ppt)
 HbOvol = Good_Vox2vol(cortex_HbO,A.info.tissue.dim);
-Params.Scale=4e-3;
-Params.Th.P=1e-3;
+Params.Scale=1e-3;
+Params.Th.P=1e-4;
 Params.Th.N=-Params.Th.P;
 PlotSlicesTimeTrace(MNI_dim,A.info.tissue.dim,Params,HbOvol,info)
 
