@@ -1,5 +1,4 @@
 function [hPatchesL,hPatchesR,params2,hF] = PlotLRMeshes(meshL, meshR, params)
-
 % PLOTLRMESHES Renders a pair of hemispheric meshes.
 %
 %   PLOTLRMESHES(meshL, meshR) renders the data in a pair of left and right
@@ -113,11 +112,18 @@ end
 if ~isfield(params, 'lighting')  ||  isempty(params.lighting)
     params.lighting = 'gouraud';
 end
-if ~isfield(params, 'view')  ||  isempty(params.view)
-    params.view = 'lat';
-end
 if ~isfield(params, 'ctx')  ||  isempty(params.ctx)
     params.ctx = 'std';
+end
+if ~isfield(params, 'view')  ||  isempty(params.view)
+    params.view = 'lat';
+    if strcmp(params.ctx, 'flat')
+        params.view = 'lat';
+    end
+end
+
+if ~isfield(params, 'FaceColor')
+    params.FaceColor = [0.5,0.5,0.5];
 end
 % Set c_max. Ignore setting Scale, just ask if it's there.
 if isfield(params, 'Scale')  &&  ~isempty(params.Scale)
@@ -181,6 +187,7 @@ end
 %% Image Hemispheres. Reposition meshes for standard transverse orientation.
 [Lnodes, Rnodes] = adjust_brain_pos(meshL, meshR, params);
 
+
 %% Set Lighting and Persepctive.
 set(params.fig_handle, 'Units', 'inches');
 switch params.view
@@ -204,19 +211,58 @@ switch params.view
 end
 set(params.fig_handle, 'Units', 'pixels');
 
-%% Image Left Side.
-[dataL, CMAP, params2] = applycmap(meshL.data, [], params);
-hPatchesL = patch('Faces', meshL.elements(:, 1:3), 'Vertices', Lnodes,...
-    'EdgeColor', 'none', 'FaceColor', FaceColor, 'FaceVertexCData', dataL,...
-    'FaceLighting', params.lighting, 'FaceAlpha', params.alpha,...
-    'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
 
-%% Image Right Side.
-[dataR, CMAP, params2] = applycmap(meshR.data, [], params);
-hPatchesR = patch('Faces', meshR.elements(:, 1:3), 'Vertices', Rnodes,...
-    'EdgeColor', 'none', 'FaceColor', FaceColor, 'FaceVertexCData', dataR,...
-    'FaceLighting', params.lighting, 'FaceAlpha', params.alpha,...
-    'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+%% Adjust visualization parameters
+switch params.ctx
+    case 'flat'
+        params.FaceColor = 'interp';
+        FaceColor = params.FaceColor;
+        params.EdgeColor = 'interp';
+        EdgeColor = params.EdgeColor;
+        if isfield(params, 'reg')
+            if params.reg
+                [FV_CDataL,CMAP,params2] = applycmap(meshL.data, meshL.region, params);
+                [FV_CDataR,CMAP,params2] = applycmap(meshR.data, meshR.region, params);
+            else
+                params.FaceColor = 'interp'; params.EdgeColor = 'None';
+                [FV_CDataL, CMAP, params2] = applycmap(meshL.data, [], params);
+                [FV_CDataR, CMAP, params2] = applycmap(meshR.data, [], params);
+            end
+        else
+            params.FaceColor = 'interp'; params.EdgeColor = 'None';
+                [FV_CDataL, CMAP, params2] = applycmap(meshL.data, [], params);
+                [FV_CDataR, CMAP, params2] = applycmap(meshR.data, [], params);
+        end
+            hPatchesL = patch('Faces', meshL.elements(:, 1:3), 'Vertices', Lnodes,...
+            'EdgeColor', EdgeColor, 'FaceColor', FaceColor, 'FaceVertexCData', FV_CDataL,...
+            'FaceLighting', params.lighting, 'FaceAlpha', params.alpha,...
+            'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+
+        % Image Right Side.
+        hPatchesR = patch('Faces', meshR.elements(:, 1:3), 'Vertices', Rnodes,...
+            'EdgeColor', EdgeColor, 'FaceColor', FaceColor, 'FaceVertexCData', FV_CDataR,...
+            'FaceLighting', params.lighting, 'FaceAlpha', params.alpha,...
+            'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+
+        
+    case {'std', 'inf', 'vinf'}
+        %% Image Left Side.
+        [dataL, CMAP, params2] = applycmap(meshL.data, [], params);
+        hPatchesL = patch('Faces', meshL.elements(:, 1:3), 'Vertices', Lnodes,...
+            'EdgeColor', 'none', 'FaceColor', FaceColor, 'FaceVertexCData', dataL,...
+            'FaceLighting', params.lighting, 'FaceAlpha', params.alpha,...
+            'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+
+        % Image Right Side.
+        [dataR, CMAP, params2] = applycmap(meshR.data, [], params);
+        hPatchesR = patch('Faces', meshR.elements(:, 1:3), 'Vertices', Rnodes,...
+            'EdgeColor', 'none', 'FaceColor', FaceColor, 'FaceVertexCData', dataR,...
+            'FaceLighting', params.lighting, 'FaceAlpha', params.alpha,...
+            'AmbientStrength', 0.25, 'DiffuseStrength', .75, 'SpecularStrength', .1);
+
+end
+
+
 
 %% Visual Formatting.
 set(gca, 'Color', BkgdColor, 'XColor', LineColor, 'YColor', LineColor);
@@ -239,6 +285,7 @@ if params.CBar_on
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
     end
 end
+colormap(CMAP);
 hF = params.fig_handle;
 
 %

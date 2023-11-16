@@ -1,5 +1,4 @@
 function PlotMeshSurface(mesh, params)
-
 % PLOTMESHSURFACE Creates a 3D surface mesh visualization.
 % 
 %   PLOTMESHSURFACE(mesh) creates a 3D visualization of the surface mesh
@@ -112,18 +111,26 @@ if ~isfield(params,'TC'),params.TC=0;end
 if ~isfield(params,'PD'), params.PD=0;end
 if ~isfield(params,'FaceColor'), params.FaceColor=[0.25, 0.25, 0.25];end
 if ~isfield(params,'EdgeColor'), params.EdgeColor='k';end
+if ~params.reg && ~isfield(mesh, 'data')
+    if ~isfield(params, 'FaceColor')
+        params.FaceColor = [0.25,0.25,0.25];
+    end
+else
+    params.FaceColor = 'interp';
+end
+
 if ~isfield(params,'EdgesON'), params.EdgesON=1;end
-if isfield(params,'AmbientStrength'), 
+if isfield(params,'AmbientStrength')
     AmbientStrength=params.AmbientStrength;
 else
     AmbientStrength=0.25;
 end
-if isfield(params,'DiffuseStrength'), 
+if isfield(params,'DiffuseStrength')
     DiffuseStrength=params.DiffuseStrength;
 else
     DiffuseStrength=0.75;
 end
-if isfield(params,'SpecularStrength'), 
+if isfield(params,'SpecularStrength')
     SpecularStrength=params.SpecularStrength;
 else
     SpecularStrength=0.1;
@@ -152,6 +159,8 @@ switch params.ctx
         mesh.nodes=mesh.SPHnodes;
     case 'flat'
         mesh.nodes = mesh.Fnodes;
+        params.EdgeColor = 'interp';
+        params.FaceColor = 'interp';
 end
 
 
@@ -185,7 +194,6 @@ if ~isfield(m,'data')       % NO DATA
         FaceColor = params.FaceColor;
         EdgeColor = params.EdgeColor;
         FaceLighting = 'flat';
-%         AmbientStrength = 0.5;        
         h = patch('Faces', m.elements, 'Vertices',m.nodes,...
             'EdgeColor', EdgeColor,'EdgeAlpha',params.EdgeAlpha,... 
             'FaceColor', FaceColor,...
@@ -213,14 +221,11 @@ if ~isfield(m,'data')       % NO DATA
             params.DR=1;
         end
         cb=1;
-        CMAP=params.Cmap.P;
         EdgeColor = params.EdgeColor;
         FaceColor = params.FaceColor;
+        FaceColor = 'interp';
         FaceLighting = 'gouraud';
-%         AmbientStrength = 0.25;
-%         DiffuseStrength = 0.75; % or 0.75
-%         SpecularStrength = 0.1;        
-        FV_CData=params.Cmap.P(mode(reshape(m.region(m.elements(:)),[],3),2),:);        
+        [FV_CData,CMAP] = applycmap(m.region, [], params);
         h = patch('Faces', m.elements, 'Vertices', m.nodes,...
             'EdgeColor', EdgeColor, 'FaceColor', FaceColor,...
             'FaceVertexCData', FV_CData, 'FaceLighting', FaceLighting,...
@@ -240,9 +245,6 @@ else                        % DATA
     EdgeColor = params.EdgeColor;
     FaceColor = 'interp';
     FaceLighting = 'gouraud';
-%     AmbientStrength = 0.25;
-%     DiffuseStrength = 0.75; % or 0.75
-%     SpecularStrength = 0.5;
     h = patch('Faces', m.elements, 'Vertices', m.nodes,...
         'EdgeColor', EdgeColor, 'FaceColor', FaceColor,...
         'FaceVertexCData', FV_CData, 'FaceLighting', FaceLighting,...
@@ -413,6 +415,7 @@ if cb
     end
 end
 end
-
-
+if strcmp(params.ctx, 'flat')
+    view([0 90]);
+end
 %
