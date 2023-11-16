@@ -111,13 +111,7 @@ if ~isfield(params,'TC'),params.TC=0;end
 if ~isfield(params,'PD'), params.PD=0;end
 if ~isfield(params,'FaceColor'), params.FaceColor=[0.25, 0.25, 0.25];end
 if ~isfield(params,'EdgeColor'), params.EdgeColor='k';end
-if ~params.reg && ~isfield(mesh, 'data')
-    if ~isfield(params, 'FaceColor')
-        params.FaceColor = [0.25,0.25,0.25];
-    end
-else
-    params.FaceColor = 'interp';
-end
+
 
 if ~isfield(params,'EdgesON'), params.EdgesON=1;end
 if isfield(params,'AmbientStrength')
@@ -162,7 +156,13 @@ switch params.ctx
         params.EdgeColor = 'interp';
         params.FaceColor = 'interp';
 end
-
+if ~params.reg && ~isfield(mesh, 'data')
+    if ~isfield(params, 'FaceColor')
+        params.FaceColor = [0.25,0.25,0.25];
+    end
+elseif strcmp(params.ctx, 'flat')
+    params.FaceColor = 'interp';
+end
 
 
 %% Get face centers of elements for S/D pairs.
