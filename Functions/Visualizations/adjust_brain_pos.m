@@ -70,6 +70,8 @@ switch params.ctx
         str = 'Inodes';
     case 'vinf'
         str = 'VInodes';
+    case 'flat'
+        str = 'Fnodes';
 end
 Lnodes = meshL.(str);
 Rnodes = meshR.(str);
@@ -105,6 +107,19 @@ Rnodes(:, 1) = Rnodes(:, 1) - min(Rnodes(:, 1));
         str = 'VInodes';
 Lnodes(:, 1) = Lnodes(:, 1) - max(Lnodes(:, 1));
 Rnodes(:, 1) = Rnodes(:, 1) - min(Rnodes(:, 1));
+    case 'flat'
+        str = 'Fnodes';
+        Lnodes(:, 1) = Lnodes(:, 1) - max(Lnodes(:, 1));
+        Rnodes(:, 1) = Rnodes(:, 1) - min(Rnodes(:, 1));
+        Nln = size(Lnodes, 1);
+        temp = cat(1, Lnodes, Rnodes);
+        temp1 = rotate_cap(temp, [-90, 0, 90]);
+        temp2 = rotate_cap(temp, [-90,-0,-90]);%[-90,-10,-90]);
+        Lnodes = temp1(1:Nln, :);
+        Rnodes = temp2((Nln + 1):end, :);
+%         Rnodes = Rnodes(:, 1,1) +100;
+        
+      
 end
 
 
@@ -127,6 +142,12 @@ cmL = mean(Lnodes, 1); % rotate right hemi  for visualization
     Rnodes(:, 2) = Rnodes(:, 2) - max(Rnodes(:, 2)) + min(Lnodes(:, 2)) + dy;
 end
 
+
+%% Translate if necessary
+if strcmp(params.ctx, 'flat')
+    Lnodes(:,2) = Lnodes(:,2) - 30;
+    Rnodes(:,2) = Rnodes(:,2) - 40;
+end
 
 
 %
