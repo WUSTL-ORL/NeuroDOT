@@ -52,6 +52,14 @@ switch mode
 %         
         
         % Adjust order of dimensions depending on the orientation
+        if ~isfield(header_in, 'orientation')
+            if isfield(header_in, 'acq')
+                if strcmp(header_in.acq, 'coronal')
+                    header_in.orientation = 3;
+                end
+            end
+        end
+        
         switch header_in.orientation
             case 4
                 tempv = order(3);
@@ -313,7 +321,13 @@ switch mode
              val_flip_new(:) = val_flip(new_dim);
              val_flip_combined = val_flip & val_flip_new;
              [~,idx2] = find(val_flip_combined == 1);
-             img_in = flip(img_in, idx2);
+             if strcmp(header_in.acq, 'coronal')
+                 img_in = flip(img_in, 1);
+                 img_in = flip(img_in, 2);
+                 img_in = flip(img_in, 3);
+             else
+                 img_in = flip(img_in, idx2);
+             end
          end
         
          [~, idx_flip] = find(val_flip > 0);
