@@ -158,7 +158,7 @@ elseif ischar(params.freqs)
         case 'pulse'
             params.freqs =[0.5,2.0]; % Pulse band            
         case 'fc'
-            params.freqs =[0.009,0.08]; % Pulse band
+            params.freqs =[0.009,0.08]; % FC band
     end
 end
 if ~isfield(params, 'freqsBW')  
