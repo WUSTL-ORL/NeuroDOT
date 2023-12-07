@@ -117,7 +117,7 @@ params.fig_handle=figure('Units','Normalized',...
 
 %% Light level fall off
 if params.LFO_GI==1
-    keep=info.MEAS.GI;
+    keep=params.LFO_GI;
     keep=(sum(reshape(keep,Nm,[]),2)>=1);
 else
     keep=ones(Nm,1)==1;
@@ -143,13 +143,17 @@ if isfield(info, 'MEAS')
     end
 end
 
-if isfield(info.MEAS,'Clipped')
+if isfield(info.MEAS, 'Clipped')
     hold on;
-    keep=info.MEAS.Clipped;
-    semilogy(info.pairs.r3d(keep),Phi_0(keep),'xw');
-    leg=cat(1,leg,'Clipped');
-    legend(leg,'Color','k','TextColor','w')
-end 
+    if params.LFO_GI~=0
+        keep = info.MEAS.Clipped & params.LFO_GI;
+    else
+        keep = info.MEAS.Clipped;
+    end
+    semilogy(info.pairs.r3d(keep), Phi_0(keep),'xw');
+    leg = cat(1,leg,'Clipped');
+    legend(leg, 'Color', 'k', 'TextColor', 'w');
+end
 
 if params.NEPth
     hold on
