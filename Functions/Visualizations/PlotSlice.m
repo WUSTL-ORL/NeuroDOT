@@ -128,6 +128,10 @@ end
 if ~isfield(params, 'cbmode')  ||  isempty(params.cbmode)
     params.cbmode = 0;
 end
+
+if ~isfield(params, 'bgW')
+    params.bgW = [0,0,0];
+end
 % Set c_max. Ignore setting Scale, just ask if it's there.
 if isfield(params, 'Scale')  &&  ~isempty(params.Scale)
     c_max = params.Scale;
@@ -254,8 +258,22 @@ end
 %% Apply color mapping.
 if isempty(overlay)
     [FUSED, CMAP] = applycmap(underlay, [], params);
+    if isfield(params, 'bgW')
+        FUSED = reshape(FUSED, [], 3);
+        idx = sum(~FUSED,2)==3;
+        FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
+        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz,3]);
+    end
 else
-    [FUSED, CMAP] = applycmap(overlay, underlay, params);
+     [FUSED, CMAP] = applycmap(overlay, underlay, params);
+     if isfield(params, 'bgW')
+        FUSED = reshape(FUSED, [], 3);
+        idx = sum(~FUSED,2)==3;
+        FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
+        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz,3]);
+    end
+    if isempty(FUSED),return;end
+
 end
 
 %% Display the view
