@@ -32,7 +32,7 @@ end
 %% General data QC with synchpts if present
 Plot_RawData_Time_Traces_Overview(data,info);           % Time traces
 info = Plot_RawData_Cap_DQC(data, info);                % Cap-relevant views
-info = Plot_RawData_Metrics_II_DQC(data,info)                  % Raw data quality figs
+info = Plot_RawData_Metrics_II_DQC(data,info);          % Raw data quality figs
 
 
 %% View data before filtering
