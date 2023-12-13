@@ -5,13 +5,6 @@
 % visualizations. The NeuroDOT_Tutorial_Full_Data_Processing.pptx uses
 % NeuroDOT_Data_Sample_CCW1.mat. 
 
-%% Add paths
-addpath(genpath('/data/culver/data1/matlab_codes/NIRFASTer-master'),'-BEGIN')
-addpath(genpath('/data/culver/data1/matlab_codes/NeuroDOT_NITRC-Release'),'-BEGIN')
-addpath(genpath('/data/culver/data1/matlab_codes/NeuroDOT_Internal_Additional_Files_and_Functions'),'-BEGIN')
-addpath(genpath('/data/culver/data1/matlab_codes/gifti-1.4'),'-BEGIN')
-addpath(genpath('/data/culver/data1/Paul/SCOT_Paul/util'))
-
 %% Load Measurement data
 dataset='CCW2'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
 load(['NeuroDOT_Data_Sample_',dataset,'.mat']); % data, info, flags
