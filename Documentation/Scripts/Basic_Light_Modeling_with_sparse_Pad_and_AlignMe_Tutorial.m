@@ -179,7 +179,7 @@ PlotSlices(maskCrop,infoT1,pS) %visualize smaller mask
 %% Generate High Density Head Mesh (Can take up to 15 min)
 %If you get an error when running NirfastMesh_Region
 %try chagning the mesh name and clearing your output directory of all files
-meshname=['_HD_Mesh0'];      % Provide a name for your mesh name here, if making multiple meshes, provide a different name for each mesh
+meshname=['HD_Mesh0'];      % Provide a name for your mesh name here, if making multiple meshes, provide a different name for each mesh
 param.facet_distance=2.0;   % Node position error tolerance at boundary
 param.facet_size=0.8;       % boundary element size parameter
 param.cell_size=1.5;        % Volume element size parameter - (for this mesh, 1.2 is the lowest you can set the cell_size for to have less than 999,999 nodes)

@@ -1,9 +1,10 @@
+%% OVERVIEW
 % 1. start with Mask and Pad
 % 2. make a Low Density mesh of the mask
-% 3. use Hummingbird to place the Pad on the LD mesh
+% 3. use AlignMe to place the Pad on the LD mesh
 % 4. remove unneeded components of the mask
 % 5. make a HD mesh of the scooped mask
-% 6. run Hummingbird on the LD-aligned Pad and the HD mesh
+% 6. run AlignMe on the LD-aligned Pad and the HD mesh
 % 7. update the info file and name it specifically for this light model
 % 8. prepare mesh for nirfast
 % 9. set flags and run makeAnirfast
@@ -12,18 +13,17 @@
 % 12. view LD mesh, HD mesh, array, and cortex together
 
 
+%% NOTE
+% When running this script, please DO NOT HIT THE GREEN TRIANGLE "RUN" BUTTON
+% Please run individual code sections by highlighting and evalutating the highlighted selection
+% Or, you can hit "ctrl + enter" on each section of code once the section's background turns beige
+
 
 %% Pathing and Parameters
 %Set Output Directory
 %Change the path on the following line to whatever output directory you want to use
 outputdir = ''; % put path to directory in between quotes
 cd(outputdir)
-
-% Are your pad's 2D optode positions shorter for visualization purposes
-% i.e. are your 2D optode positions in a style similar to EEG?
-% If YES, set style = 1      If NO, set style = 0
-% By default style is set to 0
-style = 1;
 
 %Parameter Initialization
 p.Cmap='jet'; p.Scale=5; p.Th.P=0; p.Th.N=-p.Th.P; p.PD=1; p.BG=[0,0,0];
@@ -32,7 +32,7 @@ pS = pM; pS = rmfield(pS, 'orientation'); % make copy of params, to be used with
 
 
 %% Load a Segmented Volume and generate head mesh
-[mask,infoT1]=LoadVolumetricData(['Segmented_MNI152nl_on_MNI111'],[],'4dfp');
+[mask,infoT1]=LoadVolumetricData(['Segmented_MNI152nl_on_MNI111_nifti'],[],'nii');
 PlotSlices(mask,infoT1,p)       % Visualize the segmented mask: 
         % Note, PlotSlices is an interactive plot. 
         % Hit q or the middle mouse button to quit
@@ -77,15 +77,8 @@ view([135,30])%view the mesh where the nose of the head is pointing down and to 
 
 
 %% Load initial Pad file depending on data structure:
-padname='FullHead_32x32';
+padname='AdultV24x28';
 load(['Pad_',padname,'.mat']); % Pad file
-
-% If using a sparse grid where 2D positions are shorter than 3D positions for visualization purposes, 
-% Change 2D positions to 3D positions so HB does not error
-if style == 1
-    info.pairs.r2d = info.pairs.r3d; 
-end
-
 tpos=cat(1,info.optodes.spos3,info.optodes.dpos3);
 Ns=size(info.optodes.spos3,1);
 Nd=size(info.optodes.dpos3,1);
@@ -97,59 +90,62 @@ paramsFoci.color(Ns+1,:) = [0.3010, 0.7450, 0.9330]; %light blue for d1
 paramsFoci.radius = 2; %set radius of spheres to 2
 
 %Visualize Pad
-PlotSD(tpos(1:Ns,:),tpos((Ns+1):end,:),'norm'); %3D plot of pad
+Draw_Foci_191203(tpos, paramsFoci);view([-40,30]) %3D plot of pad
 PlotCap(info) %2D plot of pad
 
 % Visualize LD mesh with optode positions 
 % Optodes have not been relaxed onto mesh yet
-PlotMeshSurface(meshLD,pM);PlotSD(tpos(1:Ns,:),tpos((Ns+1):end,:),'norm',gcf);
-view([135,30])%view the mesh where the nose of the head is pointing down and to the right
+PlotMeshSurface(meshLD,pM);Draw_Foci_191203(tpos, paramsFoci);
+view([0,90])%view the mesh where the nose of the head is pointing down and to the right
 %this will give you a good view of where the center of the mesh is
 %you should be able to see a few optodes peeking out of the mesh
 %the array has yet to be lined up correctly, which you'll do in the next section with hummingbird
 
 
-%% Make sure only NN1 and NN2 exist for meas < 6cm
-% Visualize scatterplot of Nearest neighbors for all measurements under 6cm
-keep = info.pairs.r3d < 60; %Set cutoff at 6cm (60mm), we won't use any measurements larger than this
-figure;
-scatter(info.pairs.NN(keep),info.pairs.r3d(keep));
-xlabel('NN');ylabel('r3d');title('NN vs SD separation');
-
-% If the plot shows measurements for NN3 or greater, run the following lines (See slide 12 of tutorial powerpoint)
-info.pairs.NN(info.pairs.r3d < 30) = 1; %Set all meas with separation < 3cm to NN1
-info.pairs.NN(info.pairs.r3d >= 30 & info.pairs.r3d < 60) = 2; %Set all meas in between 3cm and 6cm separation to NN2
-figure; %Re-visualize
-scatter(info.pairs.NN(keep),info.pairs.r3d(keep));
-xlabel('NN');ylabel('r3d');title('NN vs SD separation');
-
-
-%% HUMMINGBIRD Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
+%% AlignMe Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
+% Location of atlas fiducials                    Mesh2EEG output
+atlasFiducials = [- 0.65,  -84.1, -31.88; ... % Nasion --> EEGPts(1,:)
+                  - 0.65, 117.69, -11.78; ... % Inion  EEGPts(329,:)
+                   80.78,  15.95, -41.89; ... % LPA    EEGPts(155,:)
+                  -80.78,  15.95, -41.89; ... % RPA    EEGPts(175,:)
+                   0.233,   9.63, 97.296];    % Cz     EEGPts(165,:)
+               
 % Create an instance of our custom DataStorage HANDLE class to store variables
-ds = DataStorage();
+ds = DataStorage(); 
 
-% input structure
+% Input structure
 ds.dI.tpos = tpos;       
 ds.dI.mesh = meshLD;
+ds.dI.pad = info;
 ds.dI.pM = pM;
 ds.dI.paramsFoci = paramsFoci;
 ds.dI.Ns = Ns;
-ds.dI.rad = rad;
+ds.dI.photoPath = ''; %no participant photos for this tutorial, so leave as empty string
+ds.dI.imageType = '.jpeg'; %type of image file used, default is .jpeg
+ds.dI.atlasFiducials = atlasFiducials;
 
-% Create an instance of your App Designer application,
-% passing variable 'ds' into the app.  
+% Create an instance of your App Designer application, passing variable 'ds' into the app.  
 % The code is stuck at this line until your app closes, which destroys 'myapp'
 % But the data is assigned to ds variable in workspace
-myapp = Hummingbird(ds);
+% Run AlignMe
+myapp=AlignMe_2020b(ds);
 while isvalid(myapp); pause(0.1); end % Wait for app to close before continuing script
 
-% get relaxed optode positions from Hummingbird
+% get relaxed optode positions from AlignMe
 tposNew = ds.dO.tpos2_relaxed;
 
 % visualize mesh with relaxed optodes
 pM.reg=0;
 PlotMeshSurface(meshLD,pM);Draw_Foci_191203(tposNew,paramsFoci)
 view(0,0) %posterior view
+
+% Get affine matrix that can be used to transform FROM participant space TO MNI space
+if isfield(ds.dO, 'affineTform') %if mesh scaled, affineTform field will exist, save it to workspace
+    affine_Subj2MNI = [ds.dO.affineTform, zeros(3,1)];
+    save('affine_matrix_Subject_to_MNI.mat', 'affine_Subj2MNI')
+else %otherwise, set affine_Subj2MNI to eye(4)
+    affine_Subj2MNI = eye(4);
+end
 
 
 %% Generate smaller mask based on optode locations
@@ -160,10 +156,10 @@ PlotSlices(maskCrop,infoT1,pS) %visualize smaller mask
 %% Generate High Density Head Mesh (Can take up to 15 min)
 %If you get an error when running NirfastMesh_Region
 %try chagning the mesh name and clearing your output directory of all files
-meshname=['HD_mesh0'];      % Provide a name for your mesh name here, if making multiple meshes, provide a different name for each mesh
+meshname=['HD_Mesh0'];      % Provide a name for your mesh name here, if making multiple meshes, provide a different name for each mesh
 param.facet_distance=2.0;   % Node position error tolerance at boundary
 param.facet_size=0.8;       % boundary element size parameter
-param.cell_size=1.5;        % Volume element size parameter - (for this mesh, 1.2 is the lowest you can set the cell_size for to have less than 999,999 nodes)
+param.cell_size=1.0;        % Volume element size parameter
 param.Mode=0;               % Set Mode=0 to make nirfast compliant mesh
 param.info=infoT1;          % Make sure info is infoT1 like with LD mesh
 param.Offset=[0,0,0];
@@ -172,6 +168,7 @@ tic;meshHD=NirfastMesh_Region(maskCrop,meshname,param);toc
 %make copy of mesh that only contains nodes and elements for visualization purposes
 visMeshHD.nodes = meshHD.nodes;
 visMeshHD.elements = meshHD.elements;
+PlotMeshSurface(visMeshHD,pM);view([70,60]) %Visualize in index space
 %view should be as if you're looking at the mesh from above and on the right side
 %mesh will also be angled so that the top left corner is in the top center of the plot
 
@@ -179,32 +176,39 @@ visMeshHD.elements = meshHD.elements;
 meshHD.nodes=change_space_coords(meshHD.nodes,infoT1,'coord'); %for actual mesh
 visMeshHD.nodes=change_space_coords(visMeshHD.nodes,infoT1,'coord'); %for mesh that's visualized
 PlotMeshSurface(visMeshHD,pM);view([70,60]) %Visualize in coordinate space
-PlotMeshSurface(visMeshHD,pM);view([70,-80]) %Visualize in coordinate space
 %view should be as if you're looking at the mesh from above and on the right side
 %mesh will also be angled so that the top left corner is in the top center of the plot
 
 
 %% Relax optodes onto HD Mesh
-% make DataStorage class
+% Create an instance of  DataStorage class
 ds_HD = DataStorage();
 
-% input structure
+% Input structure
 ds_HD.dI.tpos = tposNew;       
 ds_HD.dI.mesh = meshHD;
+ds_HD.dI.pad = info;
 ds_HD.dI.pM = pM;
 ds_HD.dI.paramsFoci = paramsFoci;
 ds_HD.dI.Ns = Ns;
-ds_HD.dI.rad = rad;
+ds_HD.dI.photoPath = ''; %no participant photos for this tutorial, so leave as empty string
+ds_HD.dI.imageType = '.jpeg'; %type of image file used, default is .jpeg
+ds_HD.dI.atlasFiducials = atlasFiducials;
 
-%run hummingbird
-myapp = Hummingbird(ds_HD);
+% Create an instance of your App Designer application,
+% passing variable 'ds' into the app.  
+% The code is stuck at this line until your app closes, which destroys 'myapp'
+% But the data is assigned to ds variable in workspace
+% Run AlignMe
+myapp = AlignMe_2020b(ds_HD);
 while isvalid(myapp); pause(0.1); end % Wait for app to close before continuing script
 
-% get relaxed optode positions from Hummingbird
+% get relaxed optode positions from AlignMe
 tposNew_HD = ds_HD.dO.tpos2_relaxed;
 
 % visualize mesh with relaxed optodes
-PlotMeshSurface(meshHD,pM);Draw_Foci_191203(tposNew_HD,paramsFoci)
+pM.reg=0;
+PlotMeshSurface(visMeshHD,pM);Draw_Foci_191203(tposNew_HD,paramsFoci)
 view(0,0) %posterior view
 
 
@@ -231,9 +235,9 @@ save(['Pad_',meshname,'_',gridname,'_', '.mat'],'info')
 %% PREPARE! --> mesh with grid array in same file set for NIRFAST
 mesh=meshHD;
 mesh=PrepareMeshForNIRFAST(mesh,[meshname,'_',gridname],tposNew_HD);
-PlotMeshSurface(mesh,pM);PlotSD(mesh.source.coord(1:Ns,:),...
-    mesh.source.coord((Ns+1):end,:),'render',gcf);
-view([135,40]) %view mesh from behind with an angled top down view
+PlotMeshSurface(mesh,pM);Draw_Foci_191203(tposNew_HD, paramsFoci);
+view([0,0]) %posterior view
+
 
 % One last visualization check...
 % A portion of the mesh will be removed for this specific visualization
@@ -241,14 +245,14 @@ view([135,40]) %view mesh from behind with an angled top down view
 m3=CutMesh(mesh,intersect(find(mesh.nodes(:,3)>0),find(mesh.nodes(:,1)>0)));
 [Ia,Ib]=ismember(m3.nodes,mesh.nodes,'rows');Ib(Ib==0)=[];
 m3.region=mesh.region(Ib);
-PlotMeshSurface(m3,pM);PlotSD(mesh.source.coord(1:Ns,:),...
-    mesh.source.coord((1+Ns):end,:),'render',gcf);
-view([135,40]) %view mesh from behind with an angled top down view
+PlotMeshSurface(m3,pM);Draw_Foci_191203(tposNew_HD, paramsFoci);
+view([135,40]) %view mesh from behind with an angled top-down view
+
 
 
 %% Calculate Sensitivity Profile
 % Set flags
-flags.tag=[padname,'_on_',meshname,'_test'];
+flags.tag=[padname,'_on',meshname,'_test'];
 flags.gridname=gridname;
 flags.meshname=meshname;
 flags.head='info';
@@ -271,13 +275,13 @@ flags.op.musp_bone=[0.94,0.84];
 flags.op.musp_csf=[0.3,0.3];
 flags.op.musp_gray=[0.8359,0.6726];
 flags.op.musp_white=[1.1908,1.0107];
-flags.op.n_skin=[1.4,1.4];          % Index of refration
+flags.op.n_skin=[1.4,1.4];          % Index of refraction
 flags.op.n_bone=[1.4,1.4];
 flags.op.n_csf=[1.4,1.4];
 flags.op.n_gray=[1.4,1.4];
 flags.op.n_white=[1.4,1.4];
 flags.srcnum=Ns;                    % Number of sources
-flags.t4=eye(4);                    % T1/dim to MNI atlas *** change this to register your vol to atlas
+flags.t4=affine_Subj2MNI;           % Affine matrix for going from subject-specific space to MNI space
 flags.t4_target='MNI'; % string
 flags.makeA=1; % don't make A, just make G
 flags.Hz=0;
@@ -304,40 +308,23 @@ info.tissue.infoT1=infoT1;
 info.tissue.affine_target='MNI';
 info.tissue.flags=flags;
 
-temp_pairs=struct;
-temp_pairs.Src=info.pairs.Src;
-temp_pairs.Det=info.pairs.Det;
-temp_pairs.NN=info.pairs.NN;
-temp_pairs.WL=info.pairs.WL;
-temp_pairs.lambda=info.pairs.lambda;
-temp_pairs.Mod=info.pairs.Mod;
-temp_pairs.r2d=info.pairs.r2d;
-temp_pairs.r3d=info.pairs.r3d;
-info.pairs=temp_pairs;
-
 save(['A_',flags.tag,'.mat'],'A','info','-v7.3') %save A
-
-% Get A with all SD separations within 5cm
-keep=info.pairs.r3d<=50; % for sparse density pad, only save measurements where SD separation is within 50mm (5cm)
-temp=struct;
-temp.Src=info.pairs.Src(keep);
-temp.Det=info.pairs.Det(keep);
-temp.NN=info.pairs.NN(keep);
-temp.WL=info.pairs.WL(keep);
-temp.lambda=info.pairs.lambda(keep);
-temp.Mod=info.pairs.Mod(keep);
-temp.r2d=info.pairs.r2d(keep);
-temp.r3d=info.pairs.r3d(keep);
-info.pairs=temp;
-A=A(keep,:); %A with all SD within 5cm
-
-save(['A_r3d_lth_50_',flags.tag,'.mat'],'A','info','-v7.3') %save A with only 1st to 5th NN
 
 
 %% Visualize aspects of sensitivity profile
 t1=affine3d_img(mask,infoT1,dim,eye(4)); % put anatomical volume in dim space
 
-keep=info.pairs.WL==2 & info.pairs.Src==1 & info.pairs.Det==1; % SD pair set here
+% Visualize Single SD pair (S1 D6)
+keep=info.pairs.WL==2 & info.pairs.Src==1 & info.pairs.Det==6; % SD pair set here
+foo=squeeze(A(keep,:));              % Single meas pair
+fooV=Good_Vox2vol(foo',dim);
+fooV=fooV./max(fooV(:));
+fooV=log10(1e2.*fooV);                  % top 2 o.o.m.
+pA.PD=1;pA.Scale=2;pA.Th.P=0;pA.Th.N=-pA.Th.P;
+PlotSlices(t1,dim,pA,fooV)
+
+% Visualize Single SD pair (S2 D2)
+keep=info.pairs.WL==2 & info.pairs.Src==2 & info.pairs.Det==2; % SD pair set here
 foo=squeeze(A(keep,:));              % Single meas pair
 fooV=Good_Vox2vol(foo',dim);
 fooV=fooV./max(fooV(:));
@@ -346,7 +333,7 @@ pA.PD=1;pA.Scale=2;pA.Th.P=0;pA.Th.N=-pA.Th.P;
 PlotSlices(t1,dim,pA,fooV)
 
 % FFR
-keep=(info.pairs.WL==2 & info.pairs.r3d<=40);
+keep=(info.pairs.WL==2 & info.pairs.r2d<=40);
 a=squeeze(A(keep,:));
 iA=Tikhonov_invert_Amat(a,0.01,0.1);
 iA=smooth_Amat(iA,dim,5); %5 = smoothing parameter
@@ -358,7 +345,7 @@ pA.PD=1;pA.Scale=1;pA.Th.P=1e-2;pA.Th.N=-pA.Th.P;
 PlotSlices(t1,dim,pA,fooV)
 
 
-%% Visualize alighnment of LD mesh, HD mesh, array, and cortices
+%% Visualize alignment of LD mesh, HD mesh, array, and cortices
 %  View alignment
 Cortical_mesh = load(['MNI164k_big.mat']);
 Anat.CtxL = Cortical_mesh.MNIl;
@@ -367,11 +354,11 @@ pA0l=struct;
 figure('Color','k','Position',[500,100,1050,1000])
 pM1.fig_handle=gca;pM1.FaceColor=[1,1,1].*0.5;pM1.EdgeColor = 'none';
 pM1.SpecularStrength=0.25;pM1.DiffuseStrength=0.5;
-PlotMeshSurface(meshHD,pM1)                        % HD mesh
+% PlotMeshSurface(meshHD,pM1)                        % HD mesh
 pA0l.fig_handle=gca;
 pA0l.FaceColor=[1,1,1].*0.5;pA0l.EdgeColor='none';
 pA0l.AmbientStrength=0.25;pA0l.DiffuseStrength=0.25;
-pA0l.SpecularStrength=0.025;
+pA0l.SpecularStrength=0.025; pA0l.ctx = 'inf';
 PlotMeshSurface(Anat.CtxL,pA0l)                 % Cortical Surfaces
 PlotMeshSurface(Anat.CtxR,pA0l)
 pA2.fig_handle=gca;
@@ -387,5 +374,3 @@ axis off
 % For posterior view, uncomment the following line
 % view([0,0])
 
-% For Dorsal view, uncomment the following line
-% view([0,90])
