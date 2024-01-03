@@ -311,7 +311,14 @@ end
 %% Apply color mapping.
 if isempty(overlay)
     [FUSED, CMAP] = applycmap(underlay, [], params);
+    if isfield(params, 'bgW')
+        FUSED = reshape(FUSED, [], 3);
+        idx = sum(~FUSED,2)==3;
+        FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
+        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz,3]);
+    end
     if isempty(FUSED),return;end
+    
 else
     [FUSED, CMAP] = applycmap(overlay, underlay, params);
     if isfield(params, 'bgW')
