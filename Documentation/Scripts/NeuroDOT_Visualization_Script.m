@@ -1,4 +1,4 @@
-%% NEURODOT VISUALIZATION TUTORIAL SCRIPT
+edit%% NEURODOT VISUALIZATION TUTORIAL SCRIPT
 % This script uses the NeuroDOT_Full_Processing_Script as a base to help
 % teach new users about the different visualization options available in
 % the NeuroDOT toolbox
@@ -15,7 +15,7 @@ load(['NeuroDOT_Data_Sample_',dataset,'.mat']); % data, info, flags
 
 % Set parameters for A and block length for quick processing examples
 switch dataset
-    case {'CCW1','CCW2','CW1','OUT'}
+    case {'CCW1','CCW2','CW1','OUT1'}
         A_fn='A_AdultV24x28.mat';   % Sensitivity Matrix
         dt=36;                      % Block length
         tp=16;                      % Example (block averaged) time point
@@ -26,7 +26,7 @@ switch dataset
         tp=32;                      % Example (block averaged) time point
         
     case {'HW1','HW2','RW1','GV1','HW3_Noisy'}
-        A_fn='A_Adult_96x92_on_Example_Mesh_test.mat';   % Sensitivity Matrix
+        A_fn='A_Adult_96x92.mat';   % Sensitivity Matrix
         dt=30;                      % Block length
         tp=16;                      % Example (block averaged) time point
         
