@@ -354,11 +354,11 @@ pA0l=struct;
 figure('Color','k','Position',[500,100,1050,1000])
 pM1.fig_handle=gca;pM1.FaceColor=[1,1,1].*0.5;pM1.EdgeColor = 'none';
 pM1.SpecularStrength=0.25;pM1.DiffuseStrength=0.5;
-% PlotMeshSurface(meshHD,pM1)                        % HD mesh
+PlotMeshSurface(meshHD,pM1)                        % HD mesh
 pA0l.fig_handle=gca;
 pA0l.FaceColor=[1,1,1].*0.5;pA0l.EdgeColor='none';
 pA0l.AmbientStrength=0.25;pA0l.DiffuseStrength=0.25;
-pA0l.SpecularStrength=0.025; pA0l.ctx = 'inf';
+pA0l.SpecularStrength=0.025; pA0l.ctx = 'std';
 PlotMeshSurface(Anat.CtxL,pA0l)                 % Cortical Surfaces
 PlotMeshSurface(Anat.CtxR,pA0l)
 pA2.fig_handle=gca;
