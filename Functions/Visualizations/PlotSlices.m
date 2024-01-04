@@ -425,12 +425,10 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             end
         end
         
-        % Add a colorbar.
+       % Add a colorbar.
         colormap(CMAP)
         h2 = colorbar(eval([lower(orlist{end}(1:3)), 'ax']), 'Color', LineColor);
         
-        % Set default ticks to min, mid, max of colorscale 2/7/23
-        set(h2, 'Ticks', [c_min, c_mid, c_max], 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
         % Py version has section here where we double check that ticks are kosher
         % Not sure if this is 100% necessary for matlab
         ticks = h2.Ticks; %get whatever ticks matlab is using
@@ -446,6 +444,8 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             ticks_new(3) = limits(2);
         end
         set(h2, 'Ticks', ticks_new);
+        % Set labels to min, mid, and max of colorscale
+        set(h2, 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
         
         % Back to OG colorbar code
         if params.cbmode

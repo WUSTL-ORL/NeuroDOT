@@ -491,8 +491,6 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         colormap(CMAP)
         h2 = colorbar(traax, 'Color', LineColor);
         
-        % Set default ticks to min, mid, max of colorscale 2/7/23
-        set(h2, 'Ticks', [c_min, c_mid, c_max], 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
         % Py version has section here where we double check that ticks are kosher
         % Not sure if this is 100% necessary for matlab
         ticks = h2.Ticks; %get whatever ticks matlab is using
@@ -513,6 +511,8 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         if params.cbmode
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
         end
+        % Set labels to min, mid, and max of colorscale
+        set(h2, 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
         
         %% Add point-and-click navigation.
         if lookon == 0
