@@ -83,27 +83,23 @@ switch params.dimension
         % Get optode positions.
         spos = info.optodes.spos2;
         dpos = info.optodes.dpos2;
-        
+        l = min(pdist2(info.optodes.spos2,info.optodes.dpos2),[],'all')/2;
         if params.rhombus
             % Calculate side length and create square vectors.
-            l = norm(spos(1, :) - spos(2, :)) / 2;
             xsq = [l, 0, -l, 0]; % Okay, they're really rhombi, but you get the point.
             ysq = [0, -l, 0, l];
         else
             % Calculate side length and create square vectors.
 %             nn1S=info.pairs.Src(find(info.pairs.NN==1,1));
 %             nn1D=info.pairs.Det(find(info.pairs.NN==1,1));
-            
-            l = norm(spos(1, :) - dpos(1, :)) / 2;
             xsq = [l, -l, -l, l]; % Okay, they're really rhombi, but you get the point.
             ysq = [l, l, -l, -l];
         end
         
         if params.eeg_style
-            l = norm(spos(1, :) - spos(2, :)) / 2;
             [xsq,ysq,z]=cylinder(2);
-            xsq=xsq(1,:).*(l/7);
-            ysq=ysq(1,:).*(l/7);
+            xsq=xsq(1,:).*(l/2);
+            ysq=ysq(1,:).*(l/2);
         end
             
         
