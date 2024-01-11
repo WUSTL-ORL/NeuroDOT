@@ -61,7 +61,7 @@ dc=zeros(numc,numNodes);
 
 
 %% (2) Choose wavelengths and get Gfuncts then save them
-for lambda=1:2
+for lambda=1:numc
     TimeWL=tic;
     for n=regtypes'
         roi=find(region==n);
