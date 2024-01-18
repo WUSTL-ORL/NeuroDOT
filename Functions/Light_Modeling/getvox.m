@@ -39,7 +39,7 @@ if ~isfield(flags.info,'nVz'),flags.info.nVz=58;end
 if ~isfield(flags.info,'acq'),flags.info.acq='sagittal';end
 if ~isfield(flags.info,'center'),flags.info.center=[50,-73,-80];end
 if ~isfield(flags.info,'mmppix'),flags.info.mmppix=[1,-1,-1];end
-
+if ~isfield(flags, 'center_shift'), flags.center_shift = [-1,1,1];end
 
 %% Determine Threshold and nodes within the threshold range
 nodelevel=max(squeeze(sum(abs(G),1)),[],1);
@@ -87,7 +87,7 @@ MPR111 = change_space_coords(...
     flags.info,'coord');
 dim111=[dim.xv(end),dim.yv(end),dim.zv(end)];
 dr=(MPR111-dim111);
-dim.center=flags.info.center+dr-[0,2,2]; % fixed 201013
+dim.center=flags.info.center+dr-flags.center_shift.*flags.voxmm; % fixed 240118
 
 
     case 1 % index based mesh nodes
