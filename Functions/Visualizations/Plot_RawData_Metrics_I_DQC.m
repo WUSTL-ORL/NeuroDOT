@@ -116,12 +116,17 @@ params.fig_handle=figure('Units','Normalized',...
 
 
 %% Light level fall off
-if params.LFO_GI==1
+if isscalar(params.LFO_GI) % Updated 2/14/23 ES: allow for scalar inputs to LFO_GI
+    if params.LFO_GI == 1
+        keep = info.MEAS.GI;
+    elseif params.LFO_GI == 0
+        keep=ones(Nm,1)==1;
+    end
+else
     keep=params.LFO_GI;
     keep=(sum(reshape(keep,Nm,[]),2)>=1);
-else
-    keep=ones(Nm,1)==1;
 end
+
 Phi_0=mean(data,2);
 M=ceil(max(log10(Phi_0(:))));
 yM=10^M;
