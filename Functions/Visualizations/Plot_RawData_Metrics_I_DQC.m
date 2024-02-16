@@ -119,6 +119,7 @@ params.fig_handle=figure('Units','Normalized',...
 if isscalar(params.LFO_GI) % Updated 2/14/23 ES: allow for scalar inputs to LFO_GI
     if params.LFO_GI == 1
         keep = info.MEAS.GI;
+        keep=(sum(reshape(keep,Nm,[]),2)>=1);
     elseif params.LFO_GI == 0
         keep=ones(Nm,1)==1;
     end
