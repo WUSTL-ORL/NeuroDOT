@@ -30,4 +30,4 @@ Also within the "Documentation" folder are several other tutorial appendices for
 
 If you have any suggestions or questions regarding NeuroDOT, please submit your feedback through this Google Form: https://forms.gle/iEYfEZhfj99FVEs29
 
-We are still adding to the toolbox, so please do not hesitate to reach out if you have questions. (Emma Speh: espeh@wustl.edu, Ari Segel: ari@wustl.edu, Adam Eggebrecht: aeggebre@wustl.edu)
+NeuroDOT is constantly undergoing new developments to adapt to the evolving needs of the fNIRS community. Please do not hesitate to reach out if you have questions. (Emma Speh: espeh@wustl.edu, Ari Segel: ari@wustl.edu, Adam Eggebrecht: aeggebre@wustl.edu)
