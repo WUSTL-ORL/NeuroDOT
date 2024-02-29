@@ -5,7 +5,7 @@ Table of Contents:
 1. Installation
 2. Getting Started
 3. Reference Material
-
+4. Feedback
 
 1. Installation
 
@@ -26,4 +26,8 @@ The toolbox contains 4 folders: Data, Documentation, Functions, and Support_File
 Also within the "Documentation" folder are several other tutorial appendices for beginner and advanced users, function reference files, and extended versions of each tutorial that can be viewed in the MATLAB Help Viewer. Additionally, for any function in NeuroDOT, you can type "help [function name]" into the MATLAB command line and view the function reference that way.
 
 
-4. We are still adding to the toolbox, so please do not hesitate to reach out if you have questions. (Emma Speh: espeh@wustl.edu, Ari Segel: ari@wustl.edu, Adam Eggebrecht: aeggebre@wustl.edu)
+4. Feedback
+
+If you have any suggestions or questions regarding NeuroDOT, please submit your feedback through this Google Form: https://forms.gle/iEYfEZhfj99FVEs29
+
+We are still adding to the toolbox, so please do not hesitate to reach out if you have questions. (Emma Speh: espeh@wustl.edu, Ari Segel: ari@wustl.edu, Adam Eggebrecht: aeggebre@wustl.edu)
