@@ -301,7 +301,9 @@ switch mode
         end
         for k = 1:length(val_flip)
             if any(orig_sform(1:3,k) < 0)
-                img_in = flip(img_in, k);
+                if k ~= 4
+                    img_in = flip(img_in, k);
+                end
             end
         end    
          %Permute if needed
@@ -326,14 +328,18 @@ switch mode
                  img_in = flip(img_in, 2);
                  img_in = flip(img_in, 3);
              else
-                 img_in = flip(img_in, idx2);
+                 if idx2 ~= 4
+                     img_in = flip(img_in, idx2);
+                 end
              end
          end
         
          [~, idx_flip] = find(val_flip > 0);
         if any(idx_flip) > 0
             for i = 1:length(idx_flip)
-                img_xfm = flip(img_in, idx_flip(i));
+                if idx_flip(i) ~= 4
+                    img_xfm = flip(img_in, idx_flip(i));
+                end
             end
 
         else

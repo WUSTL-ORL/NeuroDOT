@@ -60,7 +60,7 @@ load(filename); % Load data and info
 %% Create SNIRF Data and Metadata Structures
 if type == 'snirf'
     snf = snirfcreate;
-    snf.conversionProgram = 'ndot2snirf';
+    snf.nirs.conversionProgram = 'ndot2snirf';
     if exist('data','var')
         snf.nirs.data.dataTimeSeries = data'; 
     end
@@ -246,12 +246,10 @@ if type == 'snirf'
             info.system = struct('framerate',[],'init_framerate',[],'Padname',[]);
         end
         if isfield(info.system, 'framerate')  
-            if ~isfield(info, 'misc') 
-                T = 1/info.system.framerate;
-                nTp = size(snf.nirs.data.dataTimeSeries,1);
-                timeArray = (1:nTp)*T;
-                snf.nirs.data.time = timeArray; % required snirf field
-            end
+            T = 1/info.system.framerate;
+            nTp = size(snf.nirs.data.dataTimeSeries,1);
+            timeArray = (1:nTp)*T;
+            snf.nirs.data.time = timeArray; % required snirf field
             snf.nirs.metaDataTags.framerate = info.system.framerate;
         else
             snf.nirs.data.time = [1:length(data)]'.*1; %required snirf field
@@ -314,10 +312,9 @@ if type == 'snirf'
                                 if strcmp(info.io.a.tag, 'resta')
                                     info.io.a.tag = 'rest';   
                                 end
-                                snf.nirs.stim(2).name =info.io.a.tag; 
+                             
                             else
                                 if isfield(info.io, 'tag')
-                                    snf.nirs.stim(2).name =info.io.tag; 
                                     snf.nirs.stim(1).name = 'rest';
                                 end
                             end
@@ -342,7 +339,13 @@ if type == 'snirf'
         end
         end
         
-        
+    %% Aux
+    if length(snf.nirs.aux.time) == 0
+        snf.nirs.aux.name = 0;
+        snf.nirs.aux.dataTimeSeries =0;
+        snf.nirs.aux.time = 0;
+        snf.nirs.aux.timeOffset = 0;
+    end
     %% Create Remaining Required SNIRF measurementList Fields
     snf.nirs.data.measurementList.dataTypeIndex = repmat([0], size(data,1),1); % 0 
     snf.nirs.data.measurementList.dataType = repmat([001], size(data,1),1);    % required Snirf field
