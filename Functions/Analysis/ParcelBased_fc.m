@@ -1,4 +1,4 @@
-function [fcMaps,fcMatrix,ParcelTT]=ParcelBased_fc_230721(data,Parcels,dim,params)
+function [fcMaps,fcMatrix,ParcelTT]=ParcelBased_fc(data,Parcels,dim,params)
 %
 % This function calculates Parcel Based functional connectivity between a
 % volumetric data set (data) and a set of volumetrically defined parcels. 
