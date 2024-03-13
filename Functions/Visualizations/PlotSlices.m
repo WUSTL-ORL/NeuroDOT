@@ -315,7 +315,7 @@ if isempty(overlay)
         FUSED = reshape(FUSED, [], 3);
         idx = sum(~FUSED,2)==3;
         FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
-        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz,3]);
+        FUSED = reshape(FUSED, [nVx, nVy, nVz,3]);
     end
     if isempty(FUSED),return;end
     
@@ -325,7 +325,7 @@ else
         FUSED = reshape(FUSED, [], 3);
         idx = sum(~FUSED,2)==3;
         FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
-        FUSED = reshape(FUSED, [infoVol.nVx, infoVol.nVy, infoVol.nVz,3]);
+        FUSED = reshape(FUSED, [nVx, nVy, nVz,3]);
     end
     if isempty(FUSED),return;end
     
