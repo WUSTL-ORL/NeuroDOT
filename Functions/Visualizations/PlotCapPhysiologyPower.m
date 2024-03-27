@@ -218,6 +218,8 @@ floIdx=idxPm+idxP1-BWfc;
 fhiIdx=idxPm+idxP1+BWfc;
 
 if floIdx<1, floIdx=1;end
+if fhiIdx > length(ftdomain), fhiIdx = length(ftdomain);end
+
 Pmax=sum(ftmag(:,(floIdx):(fhiIdx)).^2,2); % sum pulse power
 fNoise=setdiff([(idxPm-BWfc):(idxPM+BWfc)],(floIdx):(fhiIdx));
 fNoise(fNoise<1)=[];
