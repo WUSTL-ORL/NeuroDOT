@@ -93,7 +93,7 @@ if NDtf
 end
 
 %% Crop data to synchpts if necessary.
-keep=info_in.pairs.r2d<params.r2d_dist & info_in.pairs.WL==params.WL;
+keep=(info_in.pairs.r2d<=params.r2d_dist) & (info_in.pairs.WL==params.WL);
 foo=squeeze(data(keep,:)); 
 foo=highpass(foo,0.02,info_in.system.framerate);% bandpass filter, omega_hp=0.02;    
 foo=lowpass(foo,omega_lp1,info_in.system.framerate);% bandpass filter, omega_lp=1;    
