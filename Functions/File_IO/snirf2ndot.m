@@ -345,7 +345,7 @@ if type == 'snirf'
                 
                     
                 for j = 1: length(info.paradigm.synchpts)
-                    [~,info.paradigm.synchpts(j)] = min(abs(timeArray - info.paradigm.synchtimes(j)));
+                    [~,info.paradigm.synchpts(j)] = min(abs(timeArray - double(info.paradigm.synchtimes(j))));
                 end
                 info.paradigm.init_synchpts = info.paradigm.synchpts;
             else
@@ -379,7 +379,7 @@ if type == 'snirf'
                 end
                 info.paradigm.synchtimes = info.paradigm.synchpts;
                 for j = 1: length(info.paradigm.synchpts)
-                    [~,info.paradigm.synchpts(j)] = min(abs(timeArray - info.paradigm.synchtimes(j)));
+                    [~,info.paradigm.synchpts(j)] = min(abs(timeArray - double(info.paradigm.synchtimes(j))));
                 end
                 info.paradigm.init_synchpts = info.paradigm.synchpts;
             end
