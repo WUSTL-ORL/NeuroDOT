@@ -47,7 +47,7 @@ tposNew = ds.dO.tpos2_relaxed;
 
 % visualize mesh with relaxed optodes
 pM.reg=0;
-PlotMeshSurface(meshLD,pM);Draw_Foci_191203(tposNew,paramsFoci)
+PlotMeshSurface(mesh,pM);Draw_Foci_191203(tposNew,paramsFoci)
 view(0,0) %posterior view
 
 % Get affine matrix that can be used to transform FROM participant space TO MNI space
