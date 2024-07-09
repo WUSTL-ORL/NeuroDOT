@@ -32,7 +32,7 @@ function SaveVolumetricData(volume, header, filename, pn, file_type)
 % grant any rights or licenses to any other patents, copyrights, or 
 % other forms of intellectual property owned or controlled by Washington 
 % University.
-% 
+%  
 % YOU AGREE THAT THE SOFTWARE PROVIDED HEREUNDER IS EXPERIMENTAL AND IS 
 % PROVIDED AS IS, WITHOUT ANY WARRANTY OF ANY KIND, EXPRESSED OR 
 % IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY 
@@ -133,8 +133,12 @@ switch lower(file_type)
         if exist(pn)
             cd(pn)
         end
-
-        niftiwrite(single(nii.img), filename, nii.hdr);
+        if strcmp(file_type, '.nii.gz')
+            niftiwrite(single(nii.img), filename, nii.hdr, "Compressed", true);
+        else
+            niftiwrite(single(nii.img), filename, nii.hdr);
+        end
+    
 end
 end
 
