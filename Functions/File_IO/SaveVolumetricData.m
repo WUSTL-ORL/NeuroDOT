@@ -79,7 +79,7 @@ switch lower(file_type)
         fwrite(fid, volume, header.format);
         fclose(fid);
         
-    case {'nifti', 'nii','.nii'}
+    case {'nifti', 'nii','.nii','.nii.gz'}
         % Implemented 2/20/2023 ES
         if strcmp(file_type, '.nii')
             file_type = 'nii';
