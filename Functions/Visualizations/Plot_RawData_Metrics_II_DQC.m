@@ -148,7 +148,11 @@ r1=mean(info.pairs.r3d(keep));
 WL2reg_a=lmdata(keep,:);
 [ftmag0, ftdomain] = fft_tts(WL2reg_a,fr);
 ftmag=rms(ftmag0,1);
-semilogx(ftdomain,ftmag,'--r','LineWidth',1);hold on
+if params.logfft
+    loglog(ftdomain,ftmag,'--r','LineWidth',1);hold on
+else
+    semilogx(ftdomain,ftmag,'--r','LineWidth',1);hold on
+end
 
 keep=(info.pairs.lambda==max(wls)) & info.MEAS.GI & ...
         info.pairs.r3d>=params.rlimits(2,1) & ...
@@ -159,7 +163,11 @@ r2=mean(info.pairs.r3d(keep));
 WL2reg_b=lmdata(keep,:);
 [ftmag0, ftdomain] = fft_tts(WL2reg_b,fr);
 ftmag=rms(ftmag0,1);
-semilogx(ftdomain,ftmag,'-m','LineWidth',1);    
+if params.logfft
+    loglog(ftdomain,ftmag,'-m','LineWidth',1);
+else
+    semilogx(ftdomain,ftmag,'-m','LineWidth',1);
+end
 xlim([1e-3,fr/2])
 xlabel('Frequency [Hz]');
 ylabel('|P1 [au]|');
