@@ -109,7 +109,7 @@ pad1.optodes.spos3 = pad1.optodes.spos3(1:S_end_right,:);
 pad1.optodes.dpos3 = pad1.optodes.dpos3(1:D_end_right,:);
 pad1.optodes.spos2 = pad1.optodes.spos2(1:S_end_right,:);
 pad1.optodes.dpos2 = pad1.optodes.dpos2(1:D_end_right,:);
-pad1 = Generate_pad_from_grid_230329(pad1.optodes,params_cap);
+pad1 = Generate_pad_from_grid(pad1.optodes,params_cap);
 pad1.pairs.r2d = pad1.pairs.r3d;
 
 % Optode pos and visualization params for AlignMe
@@ -138,7 +138,7 @@ pad2.optodes.spos3 = pad2.optodes.spos3(1+S_end_right:end,:);
 pad2.optodes.dpos3 = pad2.optodes.dpos3(1+D_end_right:end,:);
 pad2.optodes.spos2 = pad2.optodes.spos2(1+S_end_right:end,:);
 pad2.optodes.dpos2 = pad2.optodes.dpos2(1+D_end_right:end,:);
-pad2 = Generate_pad_from_grid_230329(pad2.optodes,params_cap);
+pad2 = Generate_pad_from_grid(pad2.optodes,params_cap);
 pad2.pairs.r2d = pad2.pairs.r3d;
 
 %optode pos and visualization params
