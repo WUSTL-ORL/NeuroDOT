@@ -58,8 +58,13 @@ else
     GVwin = params.GVwin;
 end
 
-if ~isfield(info_out,'paradigm'),info_out.paradigm=struct;end
-
+if ~isfield(info_out,'paradigm')
+    info_out.paradigm=struct;
+    Nt = size(data,2);
+    info_out.paradigm.synchpts = [1, Nt];
+    info_out.paradigm.synchtype = [1, 1];
+    info_out.paradigm.Pulse_1 = [1, 2];
+end
 if ~exist('bthresh', 'var')
     bthresh = 0.075; % Empirically derived threshold value.
 end 
