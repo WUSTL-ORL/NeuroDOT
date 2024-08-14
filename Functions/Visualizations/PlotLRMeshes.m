@@ -139,9 +139,9 @@ if isfield(params, 'PD')  &&  ~isempty(params.PD)  &&  params.PD
 else
     c_mid = 0;
     c_min = -c_max;
-end
+end 
 
-if ~isfield(params,'CBar_on'),params.CBar_on=0;end
+if ~isfield(params,'CBar_on'),params.CBar_on=0;end 
 if params.CBar_on
     if (~isfield(params, 'cbticks')  ||  isempty(params.cbticks))  &&...
             (~isfield(params, 'cblabels')  ||  isempty(params.cblabels))
