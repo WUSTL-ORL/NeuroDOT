@@ -77,10 +77,10 @@ YArray =[info.optodes.spos2(:,2); info.optodes.dpos2(:,2)];
 if (max(YArray)- min(YArray)) >= (max(XArray)- min(XArray))*0.8
     tall = 1;
     params.fig_handle=figure('Units','Normalized',...
-        'Position',[0.05,0.05,.95,0.75],'Color','k');
+        'Position',[0.05,0.05,.75,0.8],'Color','k');
 else
     params.fig_handle=figure('Units','Normalized',...
-        'Position',[0.05,0.05,1,0.75],'Color','k');
+        'Position',[0.05,0.05,0.8,0.75],'Color','k');
 end
 %% Check for good measurements
 if  ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
@@ -98,7 +98,7 @@ if tall == 1
         params.rlimits=Rlimits(2,:);
         PlotCapMeanLL(data, info, params);
     else
-        subplot(2,4,1)
+        subplot(1,3,1)
         params.rlimits = Rlimits(1,:);
         info_out.MEAS.Phi_o= PlotCapMeanLL(data,info,params);
     end
@@ -126,7 +126,7 @@ if tall == 1
         params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
         info = PlotCapGoodMeas(info, params);
     else
-        subplot(2,4,3);
+        subplot(1,3,3);
         params.rlimits=[min(Rlimits(:)),max(Rlimits(:))];
         info = PlotCapGoodMeas(info, params);
     end
@@ -154,7 +154,7 @@ if tall == 1
         params.rlimits=Rlimits(2,:);
         [info_out.MEAS.Pulse_SNR_R2, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
     else
-        subplot(2,4,2);                             % Close neighborhood
+        subplot(1,3,2);                             % Close neighborhood
         params.rlimits=Rlimits(1,:);
         [info_out.MEAS.Pulse_SNR_R1, SNR_DQ]=PlotCapPhysiologyPower(data, info, params);
     end
