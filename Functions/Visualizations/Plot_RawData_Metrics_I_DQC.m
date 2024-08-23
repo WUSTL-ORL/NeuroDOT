@@ -49,7 +49,7 @@ if isfield(info.system,'init_framerate')
 else
     fr=info.system.framerate;
 end
-if ~isfield(params,'logfft'),params.logfft=0;end
+if ~isfield(params,'logfft'),params.logfft=1;end
 if ~isfield(params,'LFO_GI'),params.LFO_GI=0;end
 
 if isfield(info, 'MEAS')
