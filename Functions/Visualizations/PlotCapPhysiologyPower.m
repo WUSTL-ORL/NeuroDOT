@@ -61,7 +61,7 @@ end
 
 LineColor = 'w';
 BkgdColor = 'k';
-Nm = size(info.pairs,1);
+Nm = size(info.pairs.Src,1);
 Ns = length(unique(info.pairs.Src));
 Nd = length(unique(info.pairs.Det));
 cs = unique(info.pairs.WL); % WLs.
