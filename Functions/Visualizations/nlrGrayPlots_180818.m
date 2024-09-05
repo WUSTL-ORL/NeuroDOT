@@ -1,11 +1,21 @@
-function nlrGrayPlots_180818(nlrdata,info)
+function nlrGrayPlots_180818(nlrdata,info,params)
 %
 % This function generates a gray plot figure for measurement pairs
-% for just clean WL==2 data. It is assumed that the input data is
-% nlrdata that has already been filtered and resampled. The data is grouped
-% into info.pairs.r2d<20, 20<=info.pairs.r2d<30, and 30<=info.pairs.r2d<40.
+% for just clean WL==2 data. You can adjust params.WL to select a different 
+% wavelength to assess; by default, WL2 will be used.It is assumed that the
+% input data is nlrdata that has already been filtered and resampled. The 
+% data is grouped into info.pairs.r2d<20, 20<=info.pairs.r2d<30, and 
+% 30<=info.pairs.r2d<40.
 
 %% Parameters and Initialization
+if ~exist('params','var')
+    params = struct;
+end
+
+if ~isfield(params, 'WL')
+    params.WL = 2;
+end
+
 if isfield(info, 'MEAS')
     if istable(info.MEAS)
         info.MEAS = table2struct(info.MEAS, 'ToScalar', true);
@@ -23,7 +33,7 @@ BkndColor='k';
 
 if isfield(info,'GVTD'),Nrt=size(info.GVTD,1);end
 % M=max(abs(nlrdata(:)));
-wl=unique(info.pairs.lambda(info.pairs.WL==2));
+wl=unique(info.pairs.lambda(info.pairs.WL==params.WL));
 figure('Units','normalized','OuterPosition',[0.1 0.1 0.5 0.5],...
     'Color',BkndColor);
 
@@ -37,11 +47,11 @@ else
 end
 
 %% Prepare data and imagesc together
-keep.d1=info.MEAS.GI & info.pairs.r2d<20 & info.pairs.WL==2;
+keep.d1=info.MEAS.GI & info.pairs.r2d<20 & info.pairs.WL==params.WL;
 keep.d2=info.MEAS.GI & info.pairs.r2d>=20 & info.pairs.r2d<30 &...
-            info.pairs.WL==2;
+            info.pairs.WL==params.WL;
 keep.d3=info.MEAS.GI & info.pairs.r2d>=30 & info.pairs.r2d<40 &...
-            info.pairs.WL==2;
+            info.pairs.WL==params.WL;
 
 SepSize=round((sum(keep.d1)+sum(keep.d2)+sum(keep.d3))/50);
 data1=cat(1,squeeze(nlrdata(keep.d1,:)),nan(SepSize,Nt),....*-M
