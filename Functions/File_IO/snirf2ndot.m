@@ -330,13 +330,22 @@ if type == 'snirf'
                 Total_synchtypes = [];
                 Npulses = length(snf.nirs.stim);
                 for i = 1:length(snf.nirs.stim)
-                    Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
-                    Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
+                    if isempty(snf.nirs.stim(i).data)
+                        Total_synchs = [Total_synchs; []];
+                        Total_synchtypes = [Total_synchtypes; []];
+                    else
+                        Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
+                        Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
+                    end
                 end
                 [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
                 info.paradigm.synchtype = Total_synchtypes(sortedIdx);
                 for j = 1:Npulses
-                    info.misc.stimDuration(j) = snf.nirs.stim(j).data(1,2);
+                    if size(snf.nirs.stim(j).data, 2) <= 1
+                        info.paradigm.stimDuration(j) = 1;
+                    else
+                    info.paradigm.stimDuration(j) = snf.nirs.stim(j).data(1,2);
+                    end
                     info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
                     info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
                 end
@@ -367,7 +376,11 @@ if type == 'snirf'
                 pulses = sort(pulses);
                 for j = 1:Npulses
                     pulse = string(pulses(j));
-                    info.misc.stimDuration(j) = snf.nirs.(pulse).data(1,2);
+                    if size(snf.nirs.(pulse).data, 2) == 1
+                        info.paradigm.stimDuration(j) = 1;
+                    else
+                        info.paradigm.stimDuration(j) = snf.nirs.(pulse).data(1,2);
+                    end
                     Total_synchs = [Total_synchs; snf.nirs.(pulse).data(:,1)];
                     Total_synchtypes = [Total_synchtypes; j.*ones(length(snf.nirs.(pulse).data(:,1)),1 )];
                 end
