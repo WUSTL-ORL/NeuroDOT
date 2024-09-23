@@ -272,7 +272,7 @@ if type == 'snirf'
                     gridTemp.spos2=snf.nirs.probe.sourcePos2D;
                     gridTemp.dpos2=snf.nirs.probe.detectorPos2D;
                     %Enforce that arrays are column-wise
-                    if size(gridTemp.spos3,2) > size(gridTemp.spos3,1)
+                    if size(gridTemp.spos2,2) > size(gridTemp.spos2,1)
                         gridTemp.spos2 = gridTemp.spos2';
                         gridTemp.dpos2 = gridTemp.dpos2';
                     end
