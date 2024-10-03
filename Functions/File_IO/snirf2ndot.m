@@ -1,4 +1,4 @@
-function [data, info] = snirf2ndot(filename, save_file, output, type)
+function [data, info] = snirf2ndot(filename, save_file, output, snirfData, type)
 %
 % snirf2ndot(filename,output,type) takes a file with the '.snirf' extension
 % in the SNIRF format and converts it to NeuroDOT formatting. 
@@ -14,6 +14,10 @@ function [data, info] = snirf2ndot(filename, save_file, output, type)
 %
 % 'Output' is the filename (without extension) to be saved in NeuroDOT
 % format. Output files are saved as '.mat.' 
+%
+% 'snirfData' provides the option to convert workspace variables in the SNIRF
+% format to NeuroDOT format, bypassing loading a SNIRF file.
+%
 % 'Type' is an optional input -
 % the only currently acceptable value for this field is 'snirf.'
 
@@ -46,6 +50,15 @@ function [data, info] = snirf2ndot(filename, save_file, output, type)
 % IN BREACH OF CONTRACT, TORT OR OTHERWISE, EVEN IF SUCH PARTY IS 
 % ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
+if isempty(filename)
+    if exist('snirfData', 'var')
+        snf = snirfData;
+        filename = 'snirf2ndot_output';
+    end
+else
+    snf = loadsnirf(filename);
+end
+
 if ~exist('save_file','var')
     save_file = 1;
 end
@@ -58,7 +71,6 @@ if ~exist('output','var')
     output = filename;
 end
 
-snf = loadsnirf(filename);
 
 if type == 'snirf' 
     if isfield(snf, 'original_header')
@@ -66,6 +78,9 @@ if type == 'snirf'
     end
     if isfield(snf.nirs, 'data')
         data = snf.nirs.data.dataTimeSeries';% Snirf measurement list describes each channel as a column of the data
+        if length(snf.nirs.data.measurementList) == size(snf.nirs.data.dataTimeSeries,1)
+            data = data';
+        end
         if isfield(snf.nirs.data, 'time')
             info.system.framerate = 1/(mean(diff(snf.nirs.data.time)));
             info.system.init_framerate = info.system.framerate;
@@ -330,22 +345,13 @@ if type == 'snirf'
                 Total_synchtypes = [];
                 Npulses = length(snf.nirs.stim);
                 for i = 1:length(snf.nirs.stim)
-                    if isempty(snf.nirs.stim(i).data)
-                        Total_synchs = [Total_synchs; []];
-                        Total_synchtypes = [Total_synchtypes; []];
-                    else
-                        Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
-                        Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
-                    end
+                    Total_synchs = [Total_synchs; snf.nirs.stim(i).data(:,1)];
+                    Total_synchtypes = [Total_synchtypes; i.*ones(length(snf.nirs.stim(i).data(:,1)),1 )];
                 end
                 [info.paradigm.synchpts, sortedIdx] = sort(Total_synchs);
                 info.paradigm.synchtype = Total_synchtypes(sortedIdx);
                 for j = 1:Npulses
-                    if size(snf.nirs.stim(j).data, 2) <= 1
-                        info.paradigm.stimDuration(j) = 1;
-                    else
-                    info.paradigm.stimDuration(j) = snf.nirs.stim(j).data(1,2);
-                    end
+                    info.misc.stimDuration(j) = snf.nirs.stim(j).data(1,2);
                     info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
                     info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
                 end
@@ -376,11 +382,7 @@ if type == 'snirf'
                 pulses = sort(pulses);
                 for j = 1:Npulses
                     pulse = string(pulses(j));
-                    if size(snf.nirs.(pulse).data, 2) == 1
-                        info.paradigm.stimDuration(j) = 1;
-                    else
-                        info.paradigm.stimDuration(j) = snf.nirs.(pulse).data(1,2);
-                    end
+                    info.misc.stimDuration(j) = snf.nirs.(pulse).data(1,2);
                     Total_synchs = [Total_synchs; snf.nirs.(pulse).data(:,1)];
                     Total_synchtypes = [Total_synchtypes; j.*ones(length(snf.nirs.(pulse).data(:,1)),1 )];
                 end
