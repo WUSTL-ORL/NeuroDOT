@@ -2,9 +2,6 @@ function [data, info] = lumo2ndot(filename, save_file, output)
 %
 % lumo2ndot(filename,output,) takes a file with the '.lufr' extension
 % in the LumoData format and converts it to NeuroDOT formatting. 
-% This function depends on the functions snirf2ndot from NeuroDOT and
-% loadsnirf from snirf: https://github.com/fNIRS/snirf
-
 % 'Filename' is the name of the file to be converted, followed by the 
 % .lufr extension.
 
@@ -19,7 +16,7 @@ function [data, info] = lumo2ndot(filename, save_file, output)
 % Only the fields that are needed to run NeuroDOT are extracted
 
 % Copyright (c) 2017 Washington University 
-% Created By: Ari Segel
+% Created By: Ari Segel and Emma Speh
 % Eggebrecht et al., 2014, Nature Photonics; Zeff et al., 2007, PNAS.
 %
 % Washington University hereby grants to you a non-transferable, 
@@ -57,7 +54,7 @@ end
 %% Load and get data/info from new LUMO data architecture
 
 lumoData = LumoData(filename);
-snirfData = lumoData.write_SNIRF([filename, '.snf']); %snirf is easier to deal with than LumoData structure
+snirfData = lumoData.write_SNIRF([output, '.snf']); %snirf is easier to deal with than LumoData structure
 events = lumoData.evts;
 
 if isempty(events) %handle what happens when the events structure in the LUMO data is empty
@@ -66,8 +63,7 @@ if isempty(events) %handle what happens when the events structure in the LUMO da
 end
     
 %% Run SNIRF converter
-
-[data, info] = snirf2ndot([filename, '.snf'],0);
+[data, info] = snirf2ndot([],1,output,snirfData);
 
 % make sure pairs structure is doubles and not int32's
 info.pairs.Src = double(info.pairs.Src);
