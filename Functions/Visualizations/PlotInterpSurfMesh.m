@@ -64,6 +64,20 @@ if ~exist('params', 'var')  ||  isempty(params)
 end
 
 
+%%  Check Volume Dimensions
+[volNx,volNy,volNz] = size(squeeze(volume(:,:,:,1)));
+
+if (volNx < dim.nVx || volNy < dim.nVy || volNz < dim.nVz)
+   warning(['*** volume and surface mesh have incompatible dimensions',...
+   sprintf('\n\t (volume: %d %d %d ; mesh: %d %d %d)\n',volNx,volNy,volNz,dim.nVx,dim.nVy,dim.nVz),...
+   'volume may render incorrectly (or not at all) ***']);
+end
+
+if ~exist('params', 'var')  ||  isempty(params)
+    params = [];
+end
+
+
 %% Interpolate surface mesh into maps.
 mapL = vol2surf_mesh(meshL, volume, dim, params);
 mapR = vol2surf_mesh(meshR, volume, dim, params);

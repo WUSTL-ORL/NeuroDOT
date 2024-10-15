@@ -190,6 +190,7 @@ end
 
 %% Set Lighting and Persepctive.
 set(params.fig_handle, 'Units', 'inches');
+delete(gca); % resets lighting if we are called repeated times
 switch params.view
     case {'lat', 'med'}
         view([-90, 0]);
@@ -284,6 +285,7 @@ if params.CBar_on
             h2 = colorbar(gca, 'Color', LineColor, 'Location', 'eastoutside');
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
     end
+    set(h2,'Limits',[0 1]); % some colormaps truncate the limits
 end
 colormap(CMAP);
 hF = params.fig_handle;
