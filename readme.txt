@@ -3,9 +3,10 @@ NEURODOT README
 Table of Contents:
 
 1. Installation
-2. Getting Started
-3. Reference Material
-4. Feedback
+2. Dependencies
+3. Getting Started
+4. Reference Material
+5. Feedback
 
 1. Installation
 
@@ -15,18 +16,29 @@ To install NeuroDOT, copy the unzipped folder into the directory of your choosin
 
 addpath(genpath('[INSTALL DRIVE AND PATH]\NeuroDOT\'))
 
+2. Dependencies
 
-2. Getting Started
+To use NeuroDOT, the following dependencies are necessary to be installed:
+	1. Matlab 2020b (https://www.mathworks.com/products/new_products/release2020b.html)
+   	2. NIRFASTer (https://github.com/nirfaster/NIRFASTer) 
+   	3. SNIRF (https://github.com/fNIRS/snirf) 
+  	4. easyh5 (https://github.com/NeuroJSON/easyh5) 
+  	5. jsnirfy (https://github.com/NeuroJSON/jsnirfy) 
+   	6. GIFTI (https://github.com/gllmflndn/gifti) 
+   	7. FreeSurfer 7.2 (https://surfer.nmr.mgh.harvard.edu/fswiki/rel7downloads) 
+   	8. Connectome Workbench (https://humanconnectome.org/software/get-connectome-workbench) 
+
+3. Getting Started
 
 The toolbox contains 4 folders: Data, Documentation, Functions, and Support_Files. In the Documentation folder you will find the User Manual, the Overview, and the  Tutorials. These will give you all the basic information needed to work with fNIRS data in NeuroDOT. Additionally, there are scripts in the Documentation/Scripts folder that cover all of the material in the various Tutorials.
 
 
-3. Reference Material
+4. Reference Material
 
 Also within the "Documentation" folder are several other tutorial appendices for beginner and advanced users, function reference files, and extended versions of each tutorial that can be viewed in the MATLAB Help Viewer. Additionally, for any function in NeuroDOT, you can type "help [function name]" into the MATLAB command line and view the function reference that way.
 
 
-4. Feedback
+5. Feedback
 
 If you have any suggestions or questions regarding NeuroDOT, please submit your feedback through this Google Form: https://forms.gle/iEYfEZhfj99FVEs29
 
