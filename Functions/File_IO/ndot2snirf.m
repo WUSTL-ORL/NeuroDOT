@@ -58,7 +58,7 @@ load(filename); % Load data and info
 
 
 %% Create SNIRF Data and Metadata Structures
-if type == 'snirf'
+if strcmp(type , 'snirf')
     snf = snirfcreate;
     snf.nirs.conversionProgram = 'ndot2snirf';
     if exist('data','var')
@@ -223,19 +223,19 @@ if type == 'snirf'
         end
         if isfield(info,'pairs')
             if isfield(info.pairs, 'Src')
-                snf.nirs.data.measurementList.sourceIndex = info.pairs.Src; %required Snirf/Ndot field
+                snf.nirs.data.measurementLists.sourceIndex = info.pairs.Src; %required Snirf/Ndot field
             end
             if isfield(info.pairs, 'Det')
-                snf.nirs.data.measurementList.detectorIndex = info.pairs.Det; %required Snirf/Ndot field
+                snf.nirs.data.measurementLists.detectorIndex = info.pairs.Det; %required Snirf/Ndot field
             end
             if isfield(info.pairs, 'WL')
-                snf.nirs.data.measurementList.wavelengthIndex = info.pairs.WL; %required Snirf/Ndot field
+                snf.nirs.data.measurementLists.wavelengthIndex = info.pairs.WL; %required Snirf/Ndot field
             end
             if isfield(info.pairs, 'Mod')
-                snf.nirs.data.measurementList.Mod = cellstr(info.pairs.Mod(:)); %required Snirf/Ndot field
+                snf.nirs.data.measurementLists.Mod = cellstr(info.pairs.Mod(:)); %required Snirf/Ndot field
             end
             if isfield(info.pairs, 'lambda')
-                snf.nirs.data.measurementList.wavelengthActual = info.pairs.lambda;
+                snf.nirs.data.measurementLists.wavelengthActual = info.pairs.lambda;
                 snf.nirs.probe.wavelengths = [unique(info.pairs.lambda)]; %required Snirf/Ndot field
             end
         end
@@ -346,9 +346,9 @@ if type == 'snirf'
         snf.nirs.aux.time = 0;
         snf.nirs.aux.timeOffset = 0;
     end
-    %% Create Remaining Required SNIRF measurementList Fields
-    snf.nirs.data.measurementList.dataTypeIndex = repmat([0], size(data,1),1); % 0 
-    snf.nirs.data.measurementList.dataType = repmat([001], size(data,1),1);    % required Snirf field
+    %% Create Remaining Required SNIRF measurementLists Fields
+    snf.nirs.data.measurementLists.dataTypeIndex = repmat([0], size(data,1),1); % 0 
+    snf.nirs.data.measurementLists.dataType = repmat([001], size(data,1),1);    % required Snirf field
     
     
     %% Save Output .snirf file
