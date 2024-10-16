@@ -240,7 +240,11 @@ if strcmp(type , 'snirf')
             end
         end
         
-        
+        % Remove measurementList to avoid confusion with measurementLists
+        if isfield(snf.nirs.data,'measurementList')
+            snf.nirs.data = rmfield(snf.nirs.data,'measurementList');
+        end
+
           %% info.system
         if ~isfield(info, 'system')
             info.system = struct('framerate',[],'init_framerate',[],'Padname',[]);
