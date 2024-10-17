@@ -189,8 +189,9 @@ end
 
 
 %% Set Lighting and Persepctive.
-set(params.fig_handle, 'Units', 'inches');
-delete(gca); % resets lighting if we are called repeated times
+if isfield(params, 'render_tool')
+    set(params.fig_handle, 'Units', 'inches');
+end
 switch params.view
     case {'lat', 'med'}
         view([-90, 0]);
@@ -210,7 +211,9 @@ switch params.view
         light('Position', [500, -20, 0], 'Style', 'local');
         light('Position', [0, -200, 50], 'Style', 'local');
 end
-set(params.fig_handle, 'Units', 'pixels');
+if isfield(params, 'render_tool')
+    set(params.fig_handle, 'Units', 'pixels');
+end
 
 
 %% Adjust visualization parameters
