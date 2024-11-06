@@ -3,12 +3,12 @@ function info_out = FindGoodMeas(data, info_in, bthresh, params)
 % FINDGOODMEAS Performs "Good Measurements" analysis.
 %
 %   info_out = FINDGOODMEAS(data, info_in) takes a light-level array "data"
-%   in the MEAS x TIME format, and calculates the std of each channel
-%   as its noise level. These are then thresholded by the default value of
-%   0.075 to create a logical array, and both are returned as MEAS x 1
-%   columns of the "info.MEAS" table. If pulse synch point information
-%   exists in "info.system.synchpts", then FINDGOODMEAS will crop the data 
-%   to the start and stop pulses.
+%   in the MEAS x TIME format which has been log-meaned, and calculates 
+%   the std of each channel as its noise level. These are then thresholded 
+%   by the default value of 0.075 to create a logical array, and both are 
+%   returned as MEAS x 1 columns of the "info.MEAS" table. If pulse synch
+%   point information exists in "info.system.synchpts", then FINDGOODMEAS 
+%   will crop the data to the start and stop pulses.
 %
 %   info_out = FINDGOODMEAS(data, info_in, bthresh) allows the user to
 %   specify a threshold value.
@@ -52,6 +52,9 @@ if ~exist('params','var')
     params = struct;
 end
 
+if ~isfield(params, 'DtKeep')
+    params.DtKeep = 1;
+end
 if ~isfield(params,'GVwin')
     GVwin=600;
 else
@@ -64,6 +67,16 @@ if ~isfield(info_out,'paradigm')
     info_out.paradigm.synchpts = [1, Nt];
     info_out.paradigm.synchtype = [1, 1];
     info_out.paradigm.Pulse_1 = [1, 2];
+end
+if ~isfield(info_out, 'MEAS')
+    info_out.MEAS = struct;
+end
+
+if ~isfield(info_out.MEAS, 'Clipped')
+    info_out.MEAS.Clipped = zeros(size(data,1),1,'logical');
+end
+if ~isfield(info_out.MEAS, 'DtKeep')
+    info_out.MEAS.DtKeep = max(abs(diff(data,1,2)),[],2)<params.DtKeep;
 end
 if ~exist('bthresh', 'var')
     bthresh = 0.075; % Empirically derived threshold value.
@@ -98,7 +111,8 @@ if NDtf
 end
 
 %% Crop data to synchpts if necessary.
-keep=(info_in.pairs.r2d<=params.r2d_dist) & (info_in.pairs.WL==params.WL);
+keep=(info_in.pairs.r2d<=params.r2d_dist) & (info_in.pairs.WL==params.WL) ...
+    & (info_out.MEAS.DtKeep) & (~info_out.MEAS.Clipped);
 foo=squeeze(data(keep,:)); 
 foo=highpass(foo,0.02,info_in.system.framerate);% bandpass filter, omega_hp=0.02;    
 foo=lowpass(foo,omega_lp1,info_in.system.framerate);% bandpass filter, omega_lp=1;    
@@ -154,6 +168,9 @@ else
 end
 if isfield(info_out.MEAS,'Clipped')
     info_out.MEAS.GI=info_out.MEAS.GI & ~info_out.MEAS.Clipped; 
+end
+
+info_out.MEAS.GI=(info_out.MEAS.GI.*info_out.MEAS.DtKeep)==1;
 end
 
 
