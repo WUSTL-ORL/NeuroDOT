@@ -327,6 +327,16 @@ if type == 'snirf'
                 info.optodes.spos3 = gridTemp.spos3*mult;
                 info.optodes.dpos3 = gridTemp.dpos3*mult;
                 info.pairs.r3d = info.pairs.r3d*mult;
+                avg_r2d = mean(info.pairs.r2d);
+                if (avg_r2d >=1) && (avg_r2d <=10) % Changed max_log to min_log 2/1/23
+                    mult = 10;
+                elseif (avg_r2d >=0.1) && (avg_r2d <=1)
+                    mult = 100;
+                elseif (avg_r2d >=0) && (avg_r2d <=0.1)
+                    mult = 1000;
+                else
+                    mult = 1;
+                end      
                 info.pairs.r2d = info.pairs.r2d*mult;
             end                                        
         
