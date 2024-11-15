@@ -141,7 +141,7 @@ else
         info = PlotCapGoodMeas(info, params);
     end
 end
-
+info_out.DQ_metrics.percentGM = info.DQ_metrics.percentGM;
 %% Cap Physiology Plot
 params=rmfield(params,'mode');
 if tall == 1
