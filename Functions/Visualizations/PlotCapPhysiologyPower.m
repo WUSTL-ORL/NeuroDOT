@@ -292,15 +292,15 @@ SNR_DQ.max_SNR_NN1 = max(SNR_NN1);
 SNR_DQ.med_SNR_NN1 = median(SNR_NN1);
 SNR_DQ.avg_SNR_NN1 = mean(SNR_NN1);
 
-keepNN2 = info.pairs.NN == 2 & ...
+keepRsd = info.pairs.r3d <= 35 & ...
+        info.pairs.r3d >=15 & ...
         info.pairs.WL==2 & ...
         GM;
-SNR_NN2 = Plevels(keepNN2);
-
-SNR_DQ.min_SNR_NN2 = min(SNR_NN2); 
-SNR_DQ.max_SNR_NN2 = max(SNR_NN2);
-SNR_DQ.med_SNR_NN2 = median(SNR_NN2);
-SNR_DQ.avg_SNR_NN2 = mean(SNR_NN2);
+SNR_Rsd = Plevels(keepRsd);
+SNR_DQ.min_SNR_Rsd = min(SNR_Rsd); 
+SNR_DQ.max_SNR_Rsd = max(SNR_Rsd);
+SNR_DQ.med_SNR_Rsd = median(SNR_Rsd);
+SNR_DQ.avg_SNR_Rsd = mean(SNR_Rsd);
 
 
 
