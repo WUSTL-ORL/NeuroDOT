@@ -10,7 +10,8 @@ function SaveVolumetricData(volume, header, filename, pn, file_type)
 %   filename input, as long as the extension is included in the file name
 %   and matches a supported file type.
 %
-%   Supported File Types/Extensions: '.4dfp' 4dfp, '.nii' NIFTI.
+%   Supported File Types/Extensions: '.4dfp' '4dfp', for 4DFP format, and
+%   '.nii', 'nii','.nii.gz','nifti' for NIFTI format.
 %
 %   NOTE: This function uses the NIFTI_Reader toolbox available on MATLAB
 %   Central. This toolbox has been included with NeuroDOT 2.
@@ -52,7 +53,7 @@ if ~exist('file_type', 'var')  &&  ~exist('pn', 'var')
 end
 
 switch lower(file_type)
-    case '4dfp'
+    case {'4dfp', '.4dfp'}
         if header.nVt~=size(volume,4)
         disp(['Warning: Stated header 4th dimension size ',...
         num2str(header.nVt),' does not equal the size of the volume ',...
