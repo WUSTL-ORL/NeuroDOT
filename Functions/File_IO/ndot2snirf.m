@@ -274,7 +274,7 @@ if type == 'snirf'
                         dur =repmat(1, [length(pulses),1]); 
                     end
                 else
-                    if isfield(info.paradigm, 'Pulse_2') & isfield(info.paradigm, 'Pulse_1')
+                    if isfield(info.paradigm, 'Pulse_2') & isfield(info.paradigm, 'Pulse_1')  & ~isfield(info.paradigm, 'Pulse_3')
                         difference = diff(info.paradigm.synchpts);
                         difference = difference(2:length(difference));
                         temp_1 = info.paradigm.Pulse_1(2:length(info.paradigm.Pulse_1));
@@ -282,7 +282,11 @@ if type == 'snirf'
                         dur = [round(difference(1)./info.system.framerate), round(mean(difference(temp_1))./info.system.framerate)];
                     else
                         difference = diff(info.paradigm.synchpts);
-                        dur = [round(mean(difference))./info.system.framerate];
+                        dur = [];
+                        for i = 1:length(pulses)
+                            dur = [dur, round(mean(difference))./info.system.framerate]; 
+                        end
+                        
                     end
                 end
                 for i = 1: length(pulses)
