@@ -136,7 +136,14 @@ ym=10^m;
 subplot(3,6,[1,2,7,8],'Position',[0.05,0.42,0.28,0.55]) 
 Phi_0_to_plot=reshape(Phi_0,Nm,[]);
 r=info.pairs.r3d(info.pairs.lambda==wls(1));
-semilogy(r(keep),Phi_0_to_plot(keep,:),'.');
+dataTipSrc = info.pairs.Src(info.pairs.lambda==wls(1));
+dataTipDet = info.pairs.Det(info.pairs.lambda==wls(1));
+s = semilogy(r(keep),Phi_0_to_plot(keep,:),'.');
+% semilogy returns array of two s (for both colors), so apply datatips to both
+s(1).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Src",dataTipSrc(keep));
+s(2).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Src",dataTipSrc(keep));
+s(1).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Det",dataTipDet(keep));
+s(2).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Det",dataTipDet(keep));
 axis([0,100,ym,yM])
 xlabel('Source-Detector Separation ( mm )','Color','w')
 ylabel('{\Phi_0 _R_M_S} ( {\mu}W )','Color','w')
@@ -156,7 +163,11 @@ if isfield(info.MEAS, 'Clipped')
     else
         keep = info.MEAS.Clipped;
     end
-    semilogy(info.pairs.r3d(keep), Phi_0(keep),'xw');
+    sClip = semilogy(info.pairs.r3d(keep), Phi_0(keep),'xw');
+    if ( sum(info.MEAS.Clipped) )
+        sClip.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Src",info.pairs.Src(keep));
+        sClip.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Det",info.pairs.Det(keep));
+    end
     leg = cat(1,leg,'Clipped');
     legend(leg, 'Color', 'k', 'TextColor', 'w');
 end

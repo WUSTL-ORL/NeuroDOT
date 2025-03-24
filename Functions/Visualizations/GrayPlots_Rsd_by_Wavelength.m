@@ -48,11 +48,26 @@ keep.d3=info.MEAS.GI & info.pairs.r2d>=30 & info.pairs.r2d<40 &...
 SepSize=round((sum(keep.d1)+sum(keep.d2)+sum(keep.d3))/50);
 data1=cat(1,squeeze(data(keep.d1,:)),nan(SepSize,Nt),....*-M
         squeeze(data(keep.d2,:)),nan(SepSize,Nt),... .*-M   
-        squeeze(data(keep.d3,:)));    
+        squeeze(data(keep.d3,:))); 
+
+% Replicate the reformatting of the data on info.pairs.Src/Det
+data1_Src=cat(1,squeeze(info.pairs.Src(keep.d1)),nan(SepSize,1),...
+        squeeze(info.pairs.Src(keep.d2)),nan(SepSize,1),...
+        squeeze(info.pairs.Src(keep.d3)));
+data1_SrcRep = repmat(data1_Src,1,Nt);
+data1_Det=cat(1,squeeze(info.pairs.Det(keep.d1)),nan(SepSize,1),...
+        squeeze(info.pairs.Det(keep.d2)),nan(SepSize,1),...
+        squeeze(info.pairs.Det(keep.d3)));   
+data1_DetRep = repmat(data1_Det,1,Nt);
+
     
 M=nanstd((data1(:))).*3;
 
-imagesc(data1,[-1,1].*M)
+imgsc = imagesc(data1,[-1,1].*M);
+dt = datatip(imgsc); delete(dt); % Create and delete a datatip (creates the DataTipTemplate function)
+imgsc.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Src",data1_SrcRep);
+imgsc.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow("Det",data1_DetRep);
+
 hold on
 
 % Plot synchs
