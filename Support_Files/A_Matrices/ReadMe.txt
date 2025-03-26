@@ -1,2 +1,2 @@
 Please see the Scripts for Head Modeling to generate meshes and A-matrices.
-Alternatively, please contact the developers for access to these large files.
+These files are too large to include on GitHub. You can download them on NITRC: https://www.nitrc.org/frs/?group_id=1563 
