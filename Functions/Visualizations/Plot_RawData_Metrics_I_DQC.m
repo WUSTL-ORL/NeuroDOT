@@ -106,7 +106,8 @@ end
 
 %% Check for good measurements
 if ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
-    info = FindGoodMeas(logmean(data), info, params.bthresh,params);
+    [lmdata, info.MEAS.Phi_0] = logmean(data);
+    info = FindGoodMeas(lmdata, info, params.bthresh,params);
 end
 
 
@@ -195,7 +196,7 @@ DQ_metrics.max_log_WL2 = log10(DQ_metrics.max_val_WL2);
 DQ_metrics.range_WL2 = DQ_metrics.max_log_WL2 - DQ_metrics.min_log_WL2;
 
 %% <fft> for max wavelength at 2 distances
-lmdata = logmean(data);
+[lmdata, info.MEAS.Phi_0] = logmean(data);
 
 subplot(3,6,13:14,'Position',[0.05,0.05,0.28,0.3])
 keep=(info.pairs.lambda==max(wls)) & info.MEAS.GI & ...

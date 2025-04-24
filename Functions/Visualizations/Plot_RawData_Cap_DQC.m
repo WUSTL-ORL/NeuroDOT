@@ -74,7 +74,7 @@ if ~isreal(data),data=abs(data);end
 tall =0;
 XArray =[info.optodes.spos2(:,1); info.optodes.dpos2(:,1)];
 YArray =[info.optodes.spos2(:,2); info.optodes.dpos2(:,2)];
-if (max(YArray)- min(YArray)) >= (max(XArray)- min(XArray))*0.8
+if (max(YArray)- min(YArray)) >= (max(XArray)- min(XArray))*0.6
     tall = 1;
     params.fig_handle=figure('Units','Normalized',...
         'Position',[0.05,0.05,.75,0.8],'Color','k');
@@ -84,7 +84,8 @@ else
 end
 %% Check for good measurements
 if  ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
-    info = FindGoodMeas(logmean(data), info, params.bthresh,params);
+    [lmdata, info.MEAS.Phi_0] = logmean(data);
+    info = FindGoodMeas(lmdata, info, params.bthresh,params);
 end
 
 %% Mean signal level at each optode

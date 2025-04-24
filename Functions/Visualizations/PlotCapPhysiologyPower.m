@@ -198,7 +198,7 @@ end
 
 
 %% Calculate power
-if ~params.OD, data=logmean(data);end
+if ~params.OD, [data, info.MEAS.Phi_0]=logmean(data);end
 [ftmag, ftdomain] = fft_tts(data(:,t0:tF),fr);
 
 keep=info.pairs.r2d>=params.rlimits(1,1) & ...

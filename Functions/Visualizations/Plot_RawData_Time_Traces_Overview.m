@@ -64,7 +64,7 @@ params.fig_handle=figure('Units','Normalized',...
 
 %% Check for good measurements
 if ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
-    lmdata=logmean(data);
+    [lmdata, info.MEAS.Phi_0]=logmean(data);
     info = FindGoodMeas(lmdata, info, params.bthresh,params);
 end
 

@@ -62,7 +62,7 @@ WLs=unique(info.pairs.WL,'stable');
 
 
 %% Calculate logmean and stds
-lmdata=logmean(data);
+[lmdata, info.MEAS.Phi_0] = logmean(data);
 Nlmm=size(lmdata,1);
 Phi_0=mean(abs(data),2);
 std_Phi_0=std(abs(data),[],2);

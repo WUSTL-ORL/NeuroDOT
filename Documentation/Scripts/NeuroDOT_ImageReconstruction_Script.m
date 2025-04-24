@@ -34,7 +34,7 @@ end
 
 
 %% PRE-PREOCESSING PIPELINE
-lmdata = logmean(data);                                 % Logmean Light Levels
+[lmdata, info.MEAS.Phi_0] = logmean(data);                                 % Logmean Light Levels
 info = FindGoodMeas(lmdata, info, 0.075);               % Detect Noisy Channels
 lmdata = detrend_tts(lmdata);                           % Detrend Data
 lmdata = highpass(lmdata, .02, info.system.framerate);  % High Pass Filter (0.02 Hz)

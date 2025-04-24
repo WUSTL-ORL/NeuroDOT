@@ -44,7 +44,7 @@ if info.system.framerate/2 < omega_lp1
     omega_lp1 = (info.system.framerate/2)*0.90;
 end
 
-lmdata_b4_filt = logmean(data);                                           % Logmean Light Levels
+[lmdata_b4_filt, info.MEAS.Phi_0] = logmean(data);                                           % Logmean Light Levels
 info_b4_filt  = FindGoodMeas(lmdata_b4_filt , info, 0.075);               % Detect Noisy Channels
 lmdata_b4_filt  = detrend_tts(lmdata_b4_filt );                           % Detrend Data
 info_b4_filt.GVTD = CalcGVTD(lmdata_b4_filt(info_b4_filt.MEAS.GI & info_b4_filt.pairs.r2d<20,:));         % Calculate GVTD
@@ -70,7 +70,7 @@ nlrGrayPlots_180818(lmdata_b4_filt,info_b4_filt); % Gray Plot with synch points
 
 %% PRE-PREOCESSING PIPELINE
 % Note: the first 3 lines are repeated from above but with changed variable names
-lmdata = logmean(data);                                                   % Logmean Light Levels
+[lmdata, info.MEAS.Phi_0] = logmean(data);                                                   % Logmean Light Levels
 info = FindGoodMeas(lmdata, info, 0.075);                                 % Detect Noisy Channels
 lmdata = detrend_tts(lmdata);                                             % Detrend Data
 lmdata = highpass(lmdata, .02, info.system.framerate);                    % High Pass Filter (0.02 Hz)
