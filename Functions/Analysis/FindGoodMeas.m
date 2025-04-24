@@ -55,6 +55,10 @@ end
 if ~isfield(params, 'DtKeep')
     params.DtKeep = 1;
 end
+if ~isfield(params, 'AbsDiff')
+    params.AbsDiff = 0.5;
+end
+
 if ~isfield(params,'GVwin')
     GVwin=600;
 else
@@ -70,6 +74,15 @@ if ~isfield(info_out,'paradigm')
 end
 if ~isfield(info_out, 'MEAS')
     info_out.MEAS = struct;
+end
+
+if ~isfield(params,'FloorTh')
+    params.FloorTh = 1e-7;
+end
+if ~isfield(info_out.MEAS, 'FloorTh')
+    if isfield(info_out.MEAS, 'Phi_0') 
+        info_out.MEAS.FloorTh = ~any(info_out.MEAS.Phi_0 < params.FloorTh,2);
+    end
 end
 
 if ~isfield(info_out.MEAS, 'Clipped')
@@ -114,7 +127,8 @@ end
 keep=(info_in.pairs.r2d<=params.r2d_dist) & (info_in.pairs.WL==params.WL) ...
     & (info_out.MEAS.DtKeep) & (~info_out.MEAS.Clipped);
 foo=squeeze(data(keep,:)); 
-foo=highpass(foo,0.02,info_in.system.framerate);% bandpass filter, omega_hp=0.02;    
+foo=highpass(foo,0.02,info_in.system.framerate);% bandpass filter, omega_hp=0.02;
+absdata = highpass(data,0.02, info_in.system.framerate); 
 foo=lowpass(foo,omega_lp1,info_in.system.framerate);% bandpass filter, omega_lp=1;    
 foo=foo-circshift(foo,1,2);
 foo(:,1)=0;
@@ -150,6 +164,12 @@ else
     STD = std(data, [], 2);
 end
 
+
+%% Calculate the absolute difference between maximum and minimum of each measurement
+AbsDiff = abs(max(absdata,[],2)-min(absdata,[],2));
+keepAbsDiff = AbsDiff < params.AbsDiff;
+info_out.MEAS.AbsDiff = AbsDiff;
+
 %% Populate in table of on-the-fly calculated stuff.
 if (exist('t0','var') && exist('tf','var'))
     info_out.GVTDparams.t0=t0;
@@ -166,11 +186,16 @@ else
     info_out.MEAS.STD=STD;
     info_out.MEAS.GI=STD <= bthresh;
 end
+
 if isfield(info_out.MEAS,'Clipped')
     info_out.MEAS.GI=info_out.MEAS.GI & ~info_out.MEAS.Clipped; 
 end
 
-info_out.MEAS.GI=(info_out.MEAS.GI.*info_out.MEAS.DtKeep)==1;
+info_out.MEAS.GI = info_out.MEAS.GI & info_out.MEAS.DtKeep;
+info_out.MEAS.GI = info_out.MEAS.GI & keepAbsDiff;
+if isfield(info_out.MEAS, 'FloorTh')
+    info_out.MEAS.GI = info_out.MEAS.GI & info_out.MEAS.FloorTh;
+end
 end
 
 
