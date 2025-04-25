@@ -214,7 +214,9 @@ for i = 1:3, subplot(3,1,i), xlim([100 200]), end
 
 
 %% Global variance of the temporal derivative (GVTD)
-[info.GVTD, info.DQ_metrics.med_GVTD] = CalcGVTD(rdata(info.MEAS.GI & info.pairs.r2d<20,:));         % Calculate GVTD
+[info.GVTD, info.DQ_metrics.med_GVTD] = CalcGVTD(lp2data(info.MEAS.GI & info.pairs.r2d<20,:));         % Calculate GVTD
+info.GVTD_filt_rs=resample_tts(info.GVTD',info,1,1e-5,...
+    info.system.init_framerate)';
 nlrGrayPlots_180818(rdata,info)
 
 %% Block Averaging
