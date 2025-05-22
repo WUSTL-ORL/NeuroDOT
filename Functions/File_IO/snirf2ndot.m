@@ -345,7 +345,7 @@ if type == 'snirf'
         else
             if length(snf.nirs.data.time) == 2 % Create Time array if one is not provided
                 T = 1/info.system.framerate;
-                nTp = size(snf.nirs.data.dataTimeSeries,1);
+                nTp = size(snf.nirs.data.dataTimeSeries,2);
                 timeArray = (0:nTp-1)*T;
             else
                 timeArray = snf.nirs.data.time;

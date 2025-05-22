@@ -222,11 +222,12 @@ nlrGrayPlots_180818(rdata,info)
 %% Block Averaging
 badata = BlockAverage(rdata, info.paradigm.synchpts(info.paradigm.Pulse_2), dt);
 badata=bsxfun(@minus,badata,mean(badata(:,1:4),2));
+
 preprocessed = badata;
 
 figure('Position',[100 100 550 780])
-subplot(2,1,1); plot(badata(keep,:)'), set(gca,'XLimSpec','tight'), xlabel('Time (samples)'), ylabel('log(\phi/\phi_0)') % plot signals 
-subplot(2,1,2); imagesc(badata(keep,:)), colorbar('Location','northoutside'), xlabel('Time (samples)'), ylabel('Measurement #') % show signals as image
+subplot(2,1,1); plot(badata(keep,:)'), set(gca,'XLimSpec','tight'), xlabel('Time (seconds)'), ylabel('log(\phi/\phi_0)') % plot signals 
+subplot(2,1,2); imagesc(badata(keep,:)), colorbar('Location','northoutside'), xlabel('Time (seconds)'), ylabel('Measurement #') % show signals as image
 
 
 %%

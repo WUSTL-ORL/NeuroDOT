@@ -96,12 +96,12 @@ view([0,90])
 
 %% AlignMe Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
 % Location of atlas fiducials                    Mesh2EEG output
-atlasFiducials = [- 0.65,  -84.1, -31.88; ... % Nasion --> EEGPts(1,:)
-                  - 0.65, 117.69, -11.78; ... % Inion  EEGPts(329,:)
-                   80.78,  15.95, -41.89; ... % LPA    EEGPts(155,:)
-                  -80.78,  15.95, -41.89; ... % RPA    EEGPts(175,:)
-                   0.233,   9.63, 97.296];    % Cz     EEGPts(165,:)
-               
+atlasFiducials = [  0.47,  80.62, -40.84; ... % Nasion --> EEGPts(1,:)
+                    0.47, -80.62, -40.84; ... % Inion  EEGPts(329,:)
+                  -80.64, -19.42, -41.87; ... % LPA    EEGPts(155,:)
+                   82.48, -19.42, -41.87; ... % RPA    EEGPts(175,:)
+                   -1.46, -37.43, 99.026; ... % Cz     EEGPts(165,:)
+                   ];        
 % Create an instance of our custom DataStorage HANDLE class to store variables
 ds = DataStorage(); 
 

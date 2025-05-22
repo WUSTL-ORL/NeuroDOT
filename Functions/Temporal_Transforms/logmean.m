@@ -17,15 +17,15 @@ function [data_out,Phi_0] = logmean(data_in)
 %   The temporal average of Phi (what we use for baseline) is best
 %   calculated on the Real/Imaginary decription: 
 %
-%       Phi_o=<phi>=mean(data_in,2) = A_o*exp(i*(th_o));
+%       Phi_0=<phi>=mean(data_in,2) = A_o*exp(i*(th_o));
 %
 %   Taking the logarithm of complex ratio:
 %
 %       Y_Rytov=-log(phi/<phi>)=-log[A*exp(i*th)/A_o*exp(i*th_o)]
 %                              =-[log(A/A_o) + i(th-th_o)];
 %
-%       Y_Rytov_Re=-log(abs(data_in/Phi_o));
-%       Y_Rytov_Im=-angle(data_in/Phi_o);
+%       Y_Rytov_Re=-log(abs(data_in/Phi_0));
+%       Y_Rytov_Im=-angle(data_in/Phi_0);
 %
 %   Though this looks like 1 complex number, these components of Y should
 %   not mix, so the imaginary component will be tacked onto the end of the

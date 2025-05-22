@@ -79,6 +79,7 @@ info.pairs.NN = double(info.pairs.NN);
 % Add auxiliary data to info.misc
 info.misc.accel = accelerometer;
 info.misc.gyr = gyroscope;
+info.MEAS.Clipped = clipping;
 
 %% Save Output NeuroDOT File
 

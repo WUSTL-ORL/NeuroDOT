@@ -93,7 +93,7 @@ if tall == 1
     if numNNs == 2
         subplot(2,4,1);
         params.rlimits=Rlimits(1,:);
-        info_out.MEAS.Phi_o=PlotCapMeanLL(data, info, params);
+        info_out.MEAS.Phi_0=PlotCapMeanLL(data, info, params);
 
         subplot(2,4,2);
         params.rlimits=Rlimits(2,:);
@@ -101,13 +101,13 @@ if tall == 1
     else
         subplot(1,3,1)
         params.rlimits = Rlimits(1,:);
-        info_out.MEAS.Phi_o= PlotCapMeanLL(data,info,params);
+        info_out.MEAS.Phi_0= PlotCapMeanLL(data,info,params);
     end
 else
     if numNNs == 2
         subplot(4,2,1);
         params.rlimits=Rlimits(1,:);
-        info_out.MEAS.Phi_o=PlotCapMeanLL(data, info, params);
+        info_out.MEAS.Phi_0=PlotCapMeanLL(data, info, params);
 
         subplot(4,2,2);
         params.rlimits=Rlimits(2,:);
@@ -115,7 +115,7 @@ else
     else
         subplot(1,3,1)
         params.rlimits = Rlimits(1,:);
-        info_out.MEAS.Phi_o= PlotCapMeanLL(data,info,params);
+        info_out.MEAS.Phi_0= PlotCapMeanLL(data,info,params);
     end
 end
 

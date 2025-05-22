@@ -17,7 +17,6 @@
 %   correct "pad file"
 %   mode: 'participant' or 'atlas' options for head modeling procedure
 %   pt: participant ID
-%   atlasDir: Path to FreeSurfer output directory
 %   codeDir: Path to location of fsLR code
 
 % This script performs the following tasks:
@@ -50,7 +49,7 @@ dataout = ''             % Select the directory for fsLR outputs to be placed.
                                                             
 fn = '';                 % The T1-weighted MRI sent to FreeSurfer  (omit file extension):
 file_type = 'nii';       % File extension of T1 (nii or 4dfp)
-T1_path = '';            % Hardcoded, do not change
+T1_path = '';            
 
 % If you have a T2-weighted MRI which is in register with the T1 MRI, 
 % the name (with no extensions): 
@@ -60,7 +59,7 @@ if strcmp(t2Mode, 'on')
     fn_T2 = ''; 
 end
 
-padname = 'LUMO_adult_visual';         %  the imaging array to use
+padname ='LUMO_adult_visual';         %  the imaging array to use
 mode = 'participant';                  % 'atlas' for atlas-based head model,'participant' for participant head model
 pt = '';                               % Participant ID here (NOTE: this must be changed each time the script is run)
 
@@ -354,11 +353,12 @@ xlabel('NN');ylabel('r3d');title('NN vs SD separation');
 
 
 %% 2b-c. AlignMe Section:  Move grid from arbitrary location to approximate target on mesh, Relax grid on head and view
-atlasFiducials = [- 0.65,  -84.1, -31.88; ... % Nasion --> EEGPts(1,:)
-                  - 0.65, 117.69, -11.78; ... % Inion  EEGPts(329,:)
-                   80.78,  15.95, -41.89; ... % LPA    EEGPts(155,:)
-                  -80.78,  15.95, -41.89; ... % RPA    EEGPts(175,:)
-                   0.233,   9.63, 97.296];    % Cz     EEGPts(165,:)
+atlasFiducials = [  0.47,  80.62, -40.84; ... % Nasion --> EEGPts(1,:)
+                    0.47, -80.62, -40.84; ... % Inion  EEGPts(329,:)
+                  -80.64, -19.42, -41.87; ... % LPA    EEGPts(155,:)
+                   82.48, -19.42, -41.87; ... % RPA    EEGPts(175,:)
+                   -1.46, -37.43, 99.026; ... % Cz     EEGPts(165,:)
+                   ];        
                
 % Create an instance of our custom DataStorage HANDLE class to store variables
 ds = DataStorage(); 
