@@ -190,7 +190,7 @@ end
 
 %% Set Lighting and Persepctive.
 if isfield(params, 'render_tool')
-    set(params.fig_handle, 'Units', 'inches');
+    delete(gca);
 end
 switch params.view
     case {'lat', 'med'}
