@@ -192,6 +192,7 @@ end
 if isfield(params, 'render_tool')
     delete(gca);
 end
+set(params.fig_handle, 'Units', 'inches');
 switch params.view
     case {'lat', 'med'}
         view([-90, 0]);
