@@ -66,28 +66,14 @@ if type == 'snirf'
     end
         if exist('info','var')   
             % Set time, length, and frequency units
-            if isfield(info, 'misc')
-                if isfield(info.misc, 'time')
-                    snf.nirs.data.time = info.misc.time;
-                end
-                if isfield(info.misc, 'TimeUnit')
-                    snf.nirs.metaDataTags.TimeUnit = info.misc.TimeUnit;
-                end
-                if isfield(info.misc, 'LengthUnit')
-                    snf.nirs.metaDataTags.LengthUnit = info.misc.LengthUnit;
-                end
-                if isfield(info.misc, 'FrequencyUnit')
-                    snf.nirs.metaDataTags.FrequencyUnit = info.misc.FrequencyUnit;
-                end
-            else
-                snf.nirs.metaDataTags.TimeUnit = 's'; 
-                snf.nirs.metaDataTags.LengthUnit = 'mm';
-                snf.nirs.metaDataTags.FrequencyUnit = 'Hz';
-                T = 1/info.system.framerate;
-                nTp = size(snf.nirs.data.dataTimeSeries,1);
-                snf.nirs.data.time = (1:nTp)*T;
-            end
-            
+
+            snf.nirs.metaDataTags.TimeUnit = 's'; 
+            snf.nirs.metaDataTags.LengthUnit = 'mm';
+            snf.nirs.metaDataTags.FrequencyUnit = 'Hz';
+            T = 1/info.system.framerate;
+            nTp = size(snf.nirs.data.dataTimeSeries,1);
+            snf.nirs.data.time = (1:nTp)*T;
+
             
         %% info.io
         if isfield(info, 'io')
@@ -185,7 +171,7 @@ if type == 'snirf'
                 end
             end
             if isfield(info.io, 'unix_time')
-                snf.nirs.metaDataTags.UnixTime = info.io.unix_time; %optional Snirf field
+                snf.nirs.metaDataTags.UnixTime = info.io.unix_time; %oinfo.system.init_framerate)';ptional Snirf field
             end
             if isfield(info.io, 'Nt')
                 if full == 1
@@ -232,7 +218,7 @@ if type == 'snirf'
                 snf.nirs.data.measurementList.wavelengthIndex = info.pairs.WL; %required Snirf/Ndot field
             end
             if isfield(info.pairs, 'Mod')
-                snf.nirs.data.measurementList.Mod = cellstr(info.pairs.Mod(:)); %required Snirf/Ndot field
+                snf.nirs.data.measurementList.Mod = cellstr(info.pairs.Mod); %required Snirf/Ndot field
             end
             if isfield(info.pairs, 'lambda')
                 snf.nirs.data.measurementList.wavelengthActual = info.pairs.lambda;
@@ -267,28 +253,15 @@ if type == 'snirf'
                 idxPulse = ismember(cellfun(@(x) x(1:6), fields, 'UniformOutput', false), 'Pulse_');
                 pulses = fields(idxPulse);
                 k = 0;
-                if isfield(info, 'misc')
-                    if isfield(info.misc, 'stimDuration')
-                        dur = info.misc.stimDuration;
-                    else
-                        dur =repmat(1, [length(pulses),1]); 
-                    end
-                else
-                    if isfield(info.paradigm, 'Pulse_2') & isfield(info.paradigm, 'Pulse_1')  & ~isfield(info.paradigm, 'Pulse_3')
-                        difference = diff(info.paradigm.synchpts);
-                        difference = difference(2:length(difference));
-                        temp_1 = info.paradigm.Pulse_1(2:length(info.paradigm.Pulse_1));
-                        temp_1 = temp_1 - 2;
-                        dur = [round(difference(1)./info.system.framerate), round(mean(difference(temp_1))./info.system.framerate)];
-                    else
-                        difference = diff(info.paradigm.synchpts);
-                        dur = [];
-                        for i = 1:length(pulses)
-                            dur = [dur, round(mean(difference))./info.system.framerate]; 
-                        end
-                        
-                    end
+              
+                difference = [diff(info.paradigm.synchpts),0];
+                dur = zeros(length(info.paradigm.synchpts),1);
+                for i = 1:length(pulses)
+                    pulse_differences = difference(1,info.paradigm.([pulses{i}]));
+                    dur(info.paradigm.([pulses{i}])) = pulse_differences./info.system.framerate;% = [dur, round(mean(difference))./info.system.framerate]; 
                 end
+                        
+                
                 for i = 1: length(pulses)
                     k = k + 1;
                     if ~isfield(info.paradigm, 'synchtype')
@@ -307,7 +280,7 @@ if type == 'snirf'
                         if size(info.paradigm.synchtype,2) > 1
                             info.paradigm.synchtype = info.paradigm.synchtype';
                         end
-                        snf.nirs.stim(k).data = [info.paradigm.synchtimes(info.paradigm.([pulses{i}])),repmat(dur(i),1, np)',info.paradigm.synchtype(info.paradigm.([pulses{i}]))]; 
+                        snf.nirs.stim(k).data = [info.paradigm.synchtimes(info.paradigm.([pulses{i}])),dur(info.paradigm.([pulses{i}])),info.paradigm.synchtype(info.paradigm.([pulses{i}]))]; 
                         snf.nirs.stim(k).name = num2str(i);
                     end
                         if isfield(info,'io')
