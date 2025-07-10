@@ -253,12 +253,11 @@ if type == 'snirf'
                 idxPulse = ismember(cellfun(@(x) x(1:6), fields, 'UniformOutput', false), 'Pulse_');
                 pulses = fields(idxPulse);
                 k = 0;
-              
                 difference = [diff(info.paradigm.synchpts),0];
                 dur = zeros(length(info.paradigm.synchpts),1);
                 for i = 1:length(pulses)
                     pulse_differences = difference(1,info.paradigm.([pulses{i}]));
-                    dur(info.paradigm.([pulses{i}])) = pulse_differences./info.system.framerate;% = [dur, round(mean(difference))./info.system.framerate]; 
+                    dur(info.paradigm.([pulses{i}])) = pulse_differences./info.system.framerate; 
                 end
                         
                 
