@@ -19,13 +19,12 @@ addpath(genpath('[INSTALL DRIVE AND PATH]\NeuroDOT\'))
 2. Dependencies
 
 To use NeuroDOT, the following dependencies are necessary to be installed:
-	1. Matlab 2020b (https://www.mathworks.com/products/new_products/release2020b.html)
-		1. Matlab 2020b and add-on toolboxes:
-		2. Signal Processing Toolbox
-		3. Deep Learning Toolbox
-		4. Image Processing Toolbox
-		5. Statistics and Machine Learning Toolbox
-		6. Parallel Computing Toolbox
+	1. Matlab 2020b and add-on toolboxes:(https://www.mathworks.com/products/new_products/release2020b.html)
+		1. Signal Processing Toolbox
+		2. Deep Learning Toolbox
+		3. Image Processing Toolbox
+		4. Statistics and Machine Learning Toolbox
+		5. Parallel Computing Toolbox
    	2. NIRFASTer (https://github.com/nirfaster/NIRFASTer) 
    	3. SNIRF (https://github.com/fNIRS/snirf) 
   	4. easyh5 (https://github.com/NeuroJSON/easyh5) 
