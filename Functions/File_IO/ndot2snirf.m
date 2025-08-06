@@ -312,9 +312,9 @@ if type == 'snirf'
             if isfield(info.misc,'aux')
                 snf.nirs.aux = info.misc.aux;
             else
-                snf.nirs.aux.name = 0;
-                snf.nirs.aux.dataTimeSeries =0;
-                snf.nirs.aux.time = 0;
+                snf.nirs.aux.name = 'n/a';
+                snf.nirs.aux.dataTimeSeries =[0,0];
+                snf.nirs.aux.time = [0,0];
                 snf.nirs.aux.timeOffset = 0;
             end
         end
@@ -322,8 +322,8 @@ if type == 'snirf'
         
     %% Aux
     if length(snf.nirs.aux.time) == 0
-        snf.nirs.aux.name = 0;
-        snf.nirs.aux.dataTimeSeries =0;
+        snf.nirs.aux.name = 'n/a';
+        snf.nirs.aux.dataTimeSeries =[0,0];
         snf.nirs.aux.time = 0;
         snf.nirs.aux.timeOffset = 0;
     end
