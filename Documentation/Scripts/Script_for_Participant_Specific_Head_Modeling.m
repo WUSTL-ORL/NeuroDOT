@@ -42,14 +42,14 @@
 %% 0: Parameters and initialization
 dataroot = '';           % Make a new directory and set your path here
 
-dataout = ''             % Select the directory for fsLR outputs to be placed. 
+dataout = '';             % Select the directory for fsLR outputs to be placed. 
                          % Note: dataout must be a full path,
                          % i.e. C:/Users/username/dataroot/dataout.
                          % Do NOT place a "/" at the end of the path 
                                                             
 fn = '';                 % The T1-weighted MRI sent to FreeSurfer  (omit file extension):
 file_type = 'nii';       % File extension of T1 (nii or 4dfp)
-T1_path = '';            
+T1_path = '';               
 
 % If you have a T2-weighted MRI which is in register with the T1 MRI, 
 % the name (with no extensions): 
@@ -202,7 +202,7 @@ subjSessID = ['sub-',pt];
 subjsSessID = pt;
 
 % Create Anat structure
-params.res = 'high'; %set to 'low' for 32k or 'high' for 164k
+params.res = 'low'; %set to 'low' for 32k or 'high' for 164k
 switch params.res
     case 'low'
         Anat=Convert_FSLR_WB_Ctx2mat(pt, [dataout, '/fs_LR'],params);
@@ -662,4 +662,24 @@ axis off
 
 %Display in lateral view
 view([90,0])
+
+
+%% Transform to MNI space
+tal_xfm = importdata('talairach.xfm'); % load talairach transform output from FreeSurfer (in /mri/transforms)
+pt_to_TT = tal_xfm.data;
+MNI_to_TT =loadAviT4([],'MNI152_to_TT_t4');
+TT_to_MNI = inv(MNI_to_TT);
+pt_to_MNI = inv(pt_to_TT)*TT_to_MNI;
+
+
+%% Visualize on MNI cortices
+[MNI, infoMNI] = LoadVolumetricData('Segmented_MNI152nl_on_MNI111', [],'4dfp');
+load('MNI164k_big');
+FFR_on_MNI = affine3d_img(ffrV, infoT1, infoMNI, pt_to_MNI);
+
+%Visualization parameters
+pA.Scale = 0.8*max(ffrV(:));pA.Th.P = 0;pA.Th.N = -pA.Th.P;pA.PD = 0;pA.view = 'post'; 
+% Pial Surface
+pA.ctx = 'std';
+PlotInterpSurfMesh(FFR_on_MNI,MNIl,MNIr, infoMNI,pA);
 
