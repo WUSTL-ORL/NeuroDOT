@@ -50,6 +50,10 @@ function PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
 %                                           Options are all RGB values [0,1].
 %                                           For paper-ready figures with a
 %                                           white background [1,1,1].
+%       layout     ['blocked','extended']  'blocked' gives 2x2 subplots
+%                                           (good for blocked data); 
+%                                           'extended" gives 1x3 with
+%                                           fullwidth timeseries underneath
 %
 %
 %   Note: APPLYCMAP has further options for using "params" to specify
@@ -120,6 +124,11 @@ end
 % if ~isfield(params, 'Th'),      params.Th.P=0;params.Th.N=0;end
 % if ~isfield(params, 'Scale'),   params.Scale=0.8*max(overlay(:));end
 % if ~isfield(params, 'BG'),      params.BG=[0,0,0];end
+
+if ~isfield(params, 'layout')  ||  isempty(params.layout)
+   params.layout = 'blocked';
+end
+
 
 if ~isfield(params, 'fig_size')  ||  isempty(params.fig_size)
     params.fig_size = [20, 100, 840, 720];
@@ -355,7 +364,12 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             a = ax{1};
             
             % Create subplot.
-            subplot(2, 2, a)
+
+            if strcmp(params.layout,'extended')
+                subplot(2, 3, a);
+            else
+                subplot(2, 2, a)
+            end
             
             % Acquire overlay image.
             switch a
@@ -432,8 +446,15 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         end
        
         %% Fourth subplot is the time trace.
+
         params2 = params;
-        params2.fig_handle = subplot(2, 2, 4);
+
+        if strcmp(params.layout,'extended')
+            params2.fig_handle = subplot(2, 3, [4,5,6]);
+        else
+            params2.fig_handle = subplot(2, 2, 4);
+        end
+
         
         if ~exist('overlay', 'var')  ||  isempty(overlay)
             DATA = underlay;
@@ -487,7 +508,13 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         
         
         %% Add a colorbar to bottom of whole thing.
-        subplot(2, 2, 3)
+
+        if strcmp(params.layout,'extended')
+            subplot(2, 3, 3)
+        else
+            subplot(2, 2, 3)
+        end
+        
         colormap(CMAP)
         h2 = colorbar(traax, 'Color', LineColor);
         
