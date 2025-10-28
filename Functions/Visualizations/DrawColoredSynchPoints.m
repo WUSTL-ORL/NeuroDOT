@@ -39,13 +39,13 @@ if SPfr
 else
     synchs=info.paradigm.synchpts;
 end
-for j=1:4
+for j=1:7
     if ~isfield(info.paradigm,['Pulse_',num2str(j)])
         info.paradigm.(['Pulse_',num2str(j)])=[];
     end
 end
 
-%% Draw lines
+% %% Draw lines
 for j=1:length(synchs)    % Draw synch pt bars
     if ismember(j,info.paradigm.Pulse_1)
         plot([1,1].*synchs(j),yLim,'r','LineWidth',1)
