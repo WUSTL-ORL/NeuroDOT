@@ -211,6 +211,13 @@ switch params.view
         light('Position', [-500, -20, 0], 'Style', 'local');
         light('Position', [500, -20, 0], 'Style', 'local');
         light('Position', [0, -200, 50], 'Style', 'local');
+    case {'anterior'}
+        view([180,0])
+        light('Position', [0, 200, 0], 'Style', 'local');
+        % These two lines create minimal lighting good luck.
+%         light('Position', [-50, -500, 100], 'Style', 'infinite');
+        light('Position', [-5, -5, 0], 'Style', 'infinite');
+        light('Position', [5, -5, 0], 'Style', 'infinite');
 end
 if isfield(params, 'render_tool')
     set(params.fig_handle, 'Units', 'pixels');
@@ -287,6 +294,10 @@ if params.CBar_on
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
         case {'post', 'dorsal'}
             h2 = colorbar(gca, 'Color', LineColor, 'Location', 'eastoutside');
+            set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
+        case {'frontal'}
+            h2 = colorbar(gca, 'Color', LineColor, 'Location', 'eastoutside');
+            h2.Position = [pos(1)+0.6, pos(2), pos(3)/30, pos(4)];
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
     end
     set(h2,'Limits',[0 1]); % some colormaps truncate the limits
