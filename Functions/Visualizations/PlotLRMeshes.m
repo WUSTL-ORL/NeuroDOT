@@ -295,7 +295,7 @@ if params.CBar_on
         case {'post', 'dorsal'}
             h2 = colorbar(gca, 'Color', LineColor, 'Location', 'eastoutside');
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
-        case {'frontal'}
+        case {'anterior'}
             h2 = colorbar(gca, 'Color', LineColor, 'Location', 'eastoutside');
             h2.Position = [pos(1)+0.6, pos(2), pos(3)/30, pos(4)];
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
