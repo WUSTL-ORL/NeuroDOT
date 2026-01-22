@@ -667,6 +667,7 @@ view([90,0])
 %% Transform to MNI space
 tal_xfm = importdata('talairach.xfm'); % load talairach transform output from FreeSurfer (in /mri/transforms)
 pt_to_TT = tal_xfm.data;
+pt_to_TT(4,:) = [0,0,0,1];
 MNI_to_TT =loadAviT4([],'MNI152_to_TT_t4');
 TT_to_MNI = inv(MNI_to_TT);
 pt_to_MNI = inv(pt_to_TT)*TT_to_MNI;
