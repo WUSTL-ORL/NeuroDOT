@@ -40,10 +40,10 @@ SE_sa2 = strel('ball', params.Rba2, 0);% bknd dilate(2): final scalp boundary
 
 %% zero pad to be safe
 disp('<<< Adding buffer to volumes')
-T1n=Zero_Pad_Vol(T1n,info,params.Np);
-T2=Zero_Pad_Vol(T2,info,params.Np);
-bm=Zero_Pad_Vol(bm,info,params.Np);
-aseg=Zero_Pad_Vol(aseg,info,params.Np);
+[T1n,info]=Zero_Pad_Vol(T1n,info,params.Np);
+[T2,info]=Zero_Pad_Vol(T2,info,params.Np);
+[bm,info]=Zero_Pad_Vol(bm,info,params.Np);
+[aseg,info]=Zero_Pad_Vol(aseg,info,params.Np);
 
 
 %% Normalize volumes
