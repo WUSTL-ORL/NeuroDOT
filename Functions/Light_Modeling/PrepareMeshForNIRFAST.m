@@ -33,7 +33,7 @@ function mesh=PrepareMeshForNIRFAST(mesh,meshname,tpos3)
 
 %% Check NIRFAST-style files are present, else make them
 if ~exist([meshname,'.node'],'file')
-%     mesh.source.fixed = 1;
+    mesh.source.fixed = 1>0;
     save_mesh(mesh,meshname);
 end
 
