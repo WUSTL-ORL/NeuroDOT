@@ -26,9 +26,13 @@ function [M,info,I,Q,clipping]=Decode_Acqdecode_Raw(subj,dateA,suf,params)
 
 %% Parameters and Initialization
 mPHeight=0.1;
-mPDist=1000;
 ext='.raw';
 if ~exist('params','var'),params=[];end
+if ~isfield(params,'mPDist')
+    mPDist=1000;
+else
+    mPDist=params.mPDist;
+end
 if ~isfield(params,'overwrite'),params.overwrite=1;end
 if ~isfield(params,'sr'),params.sr=96e3;end
 sr=params.sr;
