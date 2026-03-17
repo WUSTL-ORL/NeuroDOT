@@ -84,6 +84,9 @@ pA.PD = 1; pA.Scale = 2; pA.Th.P = 1e-2; pA.Th.N = -pA.Th.P;
 
 % FREESURFER SETUP -----------------------------------------------------------
 
+% operating system you are using, 'Windows', 'Mac', 'Linux'
+FSsetup.OS = ''; 
+
 % full path to top level install directory
 FSsetup.freesurferdir = '/usr/local/freesurfer';
 
@@ -107,9 +110,11 @@ pathtostructural = fullfile(dataroot,[fn '.nii']);
 outputdirectoryname = pt; % created by freesurfer, should not exist
 parentoutputdirectory = dataroot;
 
-
-FScmd = sprintf('recon-all -all -i %s -s %s -sd %s', pathtostructural, outputdirectoryname, parentoutputdirectory);
-
+if strcmp(FSsetup.OS, 'Mac')
+    FScmd = sprintf('recon-all -all -i %s -s %s', pathtostructural, outputdirectoryname);
+else
+    FScmd = sprintf('recon-all -all -i %s -s %s -sd %s', pathtostructural, outputdirectoryname, parentoutputdirectory);
+end
 t=tic;          
 run_freesurfer_command(FScmd,FSsetup);
 toc(t)
