@@ -45,7 +45,7 @@ dof=((se1+se2).^2)./(((se1.^2)./(n1-1))+((se2.^2)./(n2-1)));
 dof(~isfinite(dof))=0;
 
 %% P-values: 2-tailed p-value. to 1st approx, halve if want 1-tailed.
-p=1-tcdf(abs(t),dof); 
+p=2*tcdf(-abs(t),dof);
 p(~isfinite(p))=0;
 
 %% Cohen's d
