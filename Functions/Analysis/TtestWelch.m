@@ -1,4 +1,4 @@
-function [t,p,dof,cohensD]=TtestWelch(X1,X2)
+function [t,p,dof,cohensD]=TtestWelch(X1,X2,tail)
 %
 % This function calculates the t-test between 2 sets of data using the
 % Welch method that does not assume equal mean or variance or samples. The
@@ -44,8 +44,24 @@ t(~isfinite(t))=0;
 dof=((se1+se2).^2)./(((se1.^2)./(n1-1))+((se2.^2)./(n2-1)));
 dof(~isfinite(dof))=0;
 
-%% P-values: 2-tailed p-value. to 1st approx, halve if want 1-tailed.
-p=1-tcdf(abs(t),dof); 
+%% P-values: 2-tailed p-value. to 1st approx, by default.
+
+if nargin==2
+    %2 tailed test if no tail is specified
+    % p values scaled by a factor of 2 in order to account for 2 tailed test
+    p=2*(1-tcdf(abs(t),dof)); 
+elseif strcmp(tail,'both') || strcmp(tail,'b')
+    p=2*(1-tcdf(abs(t),dof)); 
+elseif strcmp(tail,'right') || strcmp(tail,'r')
+    % Right tailed t test
+    p=1-tcdf(t,dof);
+elseif strcmp(tail,'left') || strcmp(tail,'l')
+    % Left tailed t test
+    p = tcdf(t, dof);
+else
+    % Default to 2-tailed t test
+    p=2*(1-tcdf(abs(t),dof)); 
+end
 p(~isfinite(p))=0;
 
 %% Cohen's d
