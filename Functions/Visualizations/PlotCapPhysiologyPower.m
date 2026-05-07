@@ -263,7 +263,7 @@ m=params.Th.P; %min value
 params.Scale=M;%/2;
 % llfo=llfo-M/2;
 
-llfo_len=size(llfo);
+llfo_len=size(llfo,1);
 llfo_Re=zeros(llfo_len);
 for i=1:llfo_len
     if (llfo(i)<0)
