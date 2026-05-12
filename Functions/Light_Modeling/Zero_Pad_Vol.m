@@ -49,11 +49,11 @@ info2.nVy = info2.nVy + 2*Np;
 info2.nVz = info2.nVz + 2*Np;
 
 % Re-calculate center
-new_center = [info2.nVx, info2.nVy, info2.nVz] .* info2.mmppix;
-info2.center = new_center/2;
+info2.center = info1.center + Np .* info1.mmppix;
 
-%% Transform mask to add padding
-IM2 = affine3d_img(IM, info1, info2, eye(4), 'nearest');
+IM2 = zeros(size(IM) + 2*Np);
+IM2((Np+1):(end-Np), (Np+1):(end-Np),...
+    (Np+1):(end-Np)) = IM;
 
 
 end 
