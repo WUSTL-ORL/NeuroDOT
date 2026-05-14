@@ -59,8 +59,8 @@ if ~isfield(params, 'yscale'),params.yscale = 'log';end
 lambdas=unique(info.pairs.lambda,'stable');
 WLs=unique(info.pairs.WL,'stable');
 
-params.fig_handle=figure('Units','Normalized',...
-    'Position',[0.1,0.1,0.8,0.8],'Color','k');
+params.fig_handle=figure('Units','Pixels',...
+    'Position',[5,5,720,480],'Color','k');
 
 %% Check for good measurements
 if ~isfield(info,'MEAS') || ~isfield(info.MEAS,'GI')
