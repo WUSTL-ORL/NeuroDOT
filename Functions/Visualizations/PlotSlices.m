@@ -1,4 +1,4 @@
-function PlotSlices(underlay, infoVol, params, overlay)
+function output_params = PlotSlices(underlay, infoVol, params, overlay)
 
 % PLOTSLICES Creates an interactive three-slice plot.
 %
@@ -48,11 +48,6 @@ function PlotSlices(underlay, infoVol, params, overlay)
 %       orientation 't'                     Select orientation of volume.
 %                                           't' for transverse, 's' for
 %                                           sagittal.
-%       bgW        [0,0,0]                  For images with an overlay, change
-%                                           the background color.
-%                                           Options are all RGB values [0,1].
-%                                           For paper-ready figures with a
-%                                           white background [1,1,1].
 %
 %   Note: APPLYCMAP has further options for using "params" to specify
 %   parameters for the fusion, scaling, and colormapping process.
@@ -111,6 +106,8 @@ end
 
 if ~exist('params', 'var')
     params = [];
+else
+    input_params = params;
 end
 
 % if ~isfield(params, 'PD'),      params.PD=1;end
@@ -265,10 +262,6 @@ if strcmp(params.orientation, 't')
     end
 end
 
-if ~isfield(params, 'bgW')
-    params.bgW = [0,0,0];
-end
-
 %% Populate orientation stuff.
 switch params.orientation
     case 's'
@@ -310,28 +303,12 @@ end
 
 %% Apply color mapping.
 if isempty(overlay)
-    [FUSED, CMAP] = applycmap(underlay, [], params);
-    if isfield(params, 'bgW')
-        FUSED = reshape(FUSED, [], 3);
-        idx = sum(~FUSED,2)==3;
-        FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
-        FUSED = reshape(FUSED, [nVx, nVy, nVz,3]);
-    end
+    [FUSED, CMAP] = applycmap_AS(underlay, [], params);
     if isempty(FUSED),return;end
-    
 else
-    [FUSED, CMAP] = applycmap(overlay, underlay, params);
-    if isfield(params, 'bgW')
-        FUSED = reshape(FUSED, [], 3);
-        idx = sum(~FUSED,2)==3;
-        FUSED(idx,:) = repmat([params.bgW(1),params.bgW(2),params.bgW(3)], sum(idx), 1);
-        FUSED = reshape(FUSED, [nVx, nVy, nVz,3]);
-    end
+    [FUSED, CMAP] = applycmap_AS(overlay, underlay, params);
     if isempty(FUSED),return;end
-    
 end
-
-
 
 %% Display the views on three subplots in a while loop for point-and-click navigation.
 N = 0;
@@ -342,6 +319,7 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         if exist('infoVol', 'var')  &&  isfield(infoVol, 'mmppix')
             coords = change_space_coords(S, infoVol, 'coord');
         end
+        new_S = S;
         for ax = {1, 2, 3}
             a = ax{1};
             
@@ -372,10 +350,13 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             
             if strcmp(params.orientation, 's')  &&  ~strcmp(orlist{a}, 'Sagittal')
                 cel = {[orlist{a}, ' View']; 'Left is Left'; ['Frame ', num2str(S(a))]};
+                new_S(a) = S(a);
             elseif strcmp(params.orientation, 't')  &&  strcmp(orlist{a}, 'Sagittal')
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(nVx - S(a) + 1)]};
+                new_S(a) = nVx - S(a) + 1;
             else
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(S(a))]};
+                new_S(a) = S(a);
             end
             
             if exist('coords', 'var')
@@ -425,29 +406,9 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             end
         end
         
-       % Add a colorbar.
+        % Add a colorbar.
         colormap(CMAP)
         h2 = colorbar(eval([lower(orlist{end}(1:3)), 'ax']), 'Color', LineColor);
-        
-        % Py version has section here where we double check that ticks are kosher
-        % Not sure if this is 100% necessary for matlab
-        ticks = h2.Ticks; %get whatever ticks matlab is using
-        ticks_new  = [min(ticks), ((max(ticks)-min(ticks))/2) + min(ticks), max(ticks)];
-        if ticks_new(2) > ticks_new(3) %if mid > max, reverse sign of mid
-            ticks_new(2) = -1 * ticks_new(2);
-        end
-        limits = h2.Limits;
-        if ticks_new(1) < limits(1) %if lowest tick less than lower limit of cb, set lowest tick to lower limit of cb
-            ticks_new(1) = limits(1);
-        end
-        if ticks_new(3) > limits(2) %if highest tick greater than upper limit of cb, set highest tick to upper limit of cb
-            ticks_new(3) = limits(2);
-        end
-        set(h2, 'Ticks', ticks_new);
-        % Set labels to min, mid, and max of colorscale
-        set(h2, 'TickLabels', {round(c_min,3); round(c_mid,4); round(c_max,3)})
-        
-        % Back to OG colorbar code
         if params.cbmode
             set(h2, 'Ticks', params.cbticks, 'TickLabels', params.cblabels);
         end
@@ -514,7 +475,9 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         S = oldS;
     end
 end
+output_params = input_params;
+output_params.slices = new_S; % Save final set of slices to params structure
 
-
+end
 
 %
