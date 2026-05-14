@@ -112,8 +112,8 @@ end
 
 
 %% Make Figure
-params.fig_handle=figure('Units','Normalized',...
-    'Position',[0.05,0.05,0.8,0.8],'Color','k');
+params.fig_handle=figure('Units','Pixels',...
+    'Position',[5,5,850,600],'Color','k');
 
 
 %% Light level fall off
