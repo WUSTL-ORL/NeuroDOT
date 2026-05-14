@@ -253,6 +253,9 @@ if type == 'snirf'
                 idxPulse = ismember(cellfun(@(x) x(1:6), fields, 'UniformOutput', false), 'Pulse_');
                 pulses = fields(idxPulse);
                 k = 0;
+                if size(info.paradigm.synchpts,1)>size(info.paradigm.synchpts,2)
+                    info.paradigm.synchpts = info.paradigm.synchpts';
+                end
                 difference = [diff(info.paradigm.synchpts),0];
                 dur = zeros(length(info.paradigm.synchpts),1);
                 for i = 1:length(pulses)
@@ -321,7 +324,7 @@ if type == 'snirf'
         end
         
     %% Aux
-    if length(snf.nirs.aux.time) == 0
+    if ~isfield(snf.nirs.aux, 'time')
         snf.nirs.aux.name = 'n/a';
         snf.nirs.aux.dataTimeSeries =[0,0];
         snf.nirs.aux.time = 0;
