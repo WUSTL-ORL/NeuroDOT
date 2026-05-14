@@ -1,4 +1,4 @@
-function PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
+function params = PlotSlicesTimeTrace(underlay, infoVol, params, overlay, info)
 
 % PLOTSLICESTIMETRACE Creates an interactive 4D plot.
 %
@@ -117,6 +117,8 @@ end
 
 if ~exist('params', 'var')
     params = [];
+else
+    input_params = params;
 end
 
 % if ~isfield(params, 'PD'),      params.PD=1;end
@@ -251,7 +253,10 @@ else
         case 't'
             S(1) = nVxU - S(1) + 1;
     end
-    lookon = 0;
+    lookon = 0; % if params.slices is supplied, make static plot, no interactivity
+    if params.interactive == 1 % This allows for an interactive visualization even when param.slices is input during the function call
+        lookon = 1;
+    end
 end
 if strcmp(params.orientation, 't')
     underlay = flip(underlay, 1);
@@ -360,6 +365,7 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         if exist('infoVol', 'var')  &&  isfield(infoVol, 'mmppix')
             coords = change_space_coords(S(1:3), infoVol, 'coord');
         end
+        new_S = S;
         for ax = {1, 2, 3}
             a = ax{1};
             
@@ -395,10 +401,13 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
             
             if strcmp(params.orientation, 's')  &&  ~strcmp(orlist{a}, 'Sagittal')
                 cel = {[orlist{a}, ' View']; 'Left is Left'; ['Frame ', num2str(S(a))]};
+                new_S(a) = S(a);
             elseif strcmp(params.orientation, 't')  &&  strcmp(orlist{a}, 'Sagittal')
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(nVxU - S(a) + 1)]};
+                new_S(a) = nVx - S(a) + 1;
             else
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(S(a))]};
+                new_S(a) = S(a);
             end
             
             if exist('coords', 'var')
@@ -607,8 +616,8 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
         S = oldS;
     end
 end
-
-
+output_params = input_params;
+output_params.slices = new_S; % Save final set of slices to params structure
 
 %
 end
