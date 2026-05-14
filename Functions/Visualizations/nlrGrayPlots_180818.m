@@ -34,7 +34,7 @@ BkndColor='k';
 if isfield(info,'GVTD'),Nrt=size(info.GVTD,1);end
 % M=max(abs(nlrdata(:)));
 wl=unique(info.pairs.lambda(info.pairs.WL==params.WL));
-figure('Units','normalized','OuterPosition',[0.1 0.1 0.5 0.5],...
+figure('Units','Pixels','Position',[5,5,720,480],...
     'Color',BkndColor);
 
 if isfield(info, 'MEAS')
