@@ -303,10 +303,10 @@ end
 
 %% Apply color mapping.
 if isempty(overlay)
-    [FUSED, CMAP] = applycmap_AS(underlay, [], params);
+    [FUSED, CMAP] = applycmap(underlay, [], params);
     if isempty(FUSED),return;end
 else
-    [FUSED, CMAP] = applycmap_AS(overlay, underlay, params);
+    [FUSED, CMAP] = applycmap(overlay, underlay, params);
     if isempty(FUSED),return;end
 end
 
