@@ -404,7 +404,7 @@ while ~any(button == [2, 27, 81, 113]) % 2 = middle mouse button, 27 = Esc, 81 =
                 new_S(a) = S(a);
             elseif strcmp(params.orientation, 't')  &&  strcmp(orlist{a}, 'Sagittal')
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(nVxU - S(a) + 1)]};
-                new_S(a) = nVx - S(a) + 1;
+                new_S(a) = nVxU - S(a) + 1;
             else
                 cel = {[orlist{a}, ' View']; ['Frame ', num2str(S(a))]};
                 new_S(a) = S(a);
