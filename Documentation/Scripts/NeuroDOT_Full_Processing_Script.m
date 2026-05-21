@@ -6,7 +6,7 @@
 % NeuroDOT_Data_Sample_CCW1.mat. 
 
 %% Load Measurement data
-dataset='CCW2'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
+dataset='HW2'; % CCW1, CCW2, CW1, IN1, OUT1, GV1, HW1, HW2, HW3_Noisy,  RW1
 load(['NeuroDOT_Data_Sample_',dataset,'.mat']); % data, info, flags
 
 % Set parameters for A and block length for quick processing examples
@@ -134,7 +134,7 @@ for j = 1:2
     disp('> Inverting A')                
     iA = Tikhonov_invert_Amat(A.A(keep, :), 0.01, 0.1); % Invert A-Matrix
     disp('> Smoothing iA')
-    iA = smooth_Amat(iA, A.info.tissue.dim, 3);         % Smooth Inverted A-Matrix      
+    iA = smooth_Amat(iA, A.info.tissue.dim, 13/2.355);         % Smooth Inverted A-Matrix      
     cortex_mu_a(:, :, j) = reconstruct_img(lmdata(keep, :), iA);% Reconstruct Image Volume
 end
 
@@ -175,7 +175,7 @@ Params.Cmap='jet';
 PlotSlices(MNI_dim,A.info.tissue.dim,Params,tp_Eg);
 
 % Explore the block-averaged data a bit more interactively (slide 24 in ppt)
-Params.Scale=0.8*max(abs(badata_HbOvol(:)));
+Params.Scale=0.5*max(abs(badata_HbOvol(:)));
 Params.Th.P=0;
 Params.Th.N=-Params.Th.P;
 PlotSlicesTimeTrace(MNI_dim,A.info.tissue.dim,Params,badata_HbOvol,info)
@@ -193,7 +193,9 @@ if ~exist('MNIl', 'var'),load(['MNI164k_big.mat']);end
 HbO_atlas = affine3d_img(badata_HbOvol,A.info.tissue.dim,infoB,eye(4));
 tp_Eg_atlas=squeeze(HbO_atlas(:,:,:,tp));
 pS=Params;
-pS.view='post';
+pS.Th.P=0; pS.Th.N=0;
+pS.Scale = 0.6*max(tp_Eg_atlas(:));
+pS.view='lat';
 
 pS.ctx='std'; % Standard pial cortical view
 PlotInterpSurfMesh(tp_Eg_atlas, MNIl,MNIr, infoB, pS);
