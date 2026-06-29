@@ -104,6 +104,9 @@ if ~isfield(params, 'DR')  ||  isempty(params.DR)
 end
 if ~isfield(params, 'Scale')  ||  isempty(params.Scale)
     params.Scale = 0.9 * max(overlay);
+    if params.Scale == 0
+        params.Scale = 0.9 * max(abs(overlay));
+    end
 end
 if ~isfield(params, 'Th')  ||  isempty(params.Th)
     params.Th.P = 0.25 * params.Scale;
