@@ -1,4 +1,4 @@
-function [data, info, clipping] = lumo2ndot(filename, save_file, output)
+function [data, info, clipping] = lumo2ndot(filename, save_file, output,flags)
 %
 % lumo2ndot(filename,output,) takes a file with the '.lufr' extension
 % in the LumoData format and converts it to NeuroDOT formatting. 
@@ -50,13 +50,25 @@ end
 if ~exist('output','var')
     output = filename;
 end
+
+if ~exist('flags','var')
+    flags = struct;
+end
+
+if ~isfield(flags,'crop')
+    flags.crop=0;
+end
     
 %% Load and get data/info from new LUMO data architecture
 
 lumoData = LumoData(filename);
 snirfData = lumoData.write_SNIRF([output, '.snf']); %snirf is easier to deal with than LumoData structure
 events = lumoData.evts;
-clipping = any(lumoData.data.chn_sat,2);
+if flags.crop==1
+    clipping = lumoData.data.chn_sat;
+else
+    clipping = any(lumoData.data.chn_sat,2);
+end
 accelerometer = lumoData.data.node_acc;
 gyroscope = lumoData.data.node_gyr;
 if isempty(events) %handle what happens when the events structure in the LUMO data is empty
@@ -79,7 +91,9 @@ info.pairs.NN = double(info.pairs.NN);
 % Add auxiliary data to info.misc
 info.misc.accel = accelerometer;
 info.misc.gyr = gyroscope;
-info.MEAS.Clipped = clipping;
+if flags.crop==0
+    info.MEAS.Clipped = clipping;
+end
 
 %% Save Output NeuroDOT File
 
