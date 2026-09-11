@@ -314,21 +314,46 @@ if type == 'snirf'
             end
             if isfield(info.misc,'aux')
                 snf.nirs.aux = info.misc.aux;
+                if isfield(info.MEAS,'Clipped')
+                    snf.nirs.aux(1).name = 'saturationFlags';
+                    snf.nirs.aux(1).dataTimeSeries =info.MEAS.Clipped;
+                    snf.nirs.aux(1).time = [0,0];
+                    snf.nirs.aux(1).timeOffset = 0;
+                else
+                    snf.nirs.aux.name = 'n/a';
+                    snf.nirs.aux.dataTimeSeries =[0,0];
+                    snf.nirs.aux.time = [0,0];
+                    snf.nirs.aux.timeOffset = 0;
+                end
             else
-                snf.nirs.aux.name = 'n/a';
-                snf.nirs.aux.dataTimeSeries =[0,0];
-                snf.nirs.aux.time = [0,0];
-                snf.nirs.aux.timeOffset = 0;
+                if isfield(info.MEAS,'Clipped')
+                    snf.nirs.aux(1).name = 'saturationFlags';
+                    snf.nirs.aux(1).dataTimeSeries =info.MEAS.Clipped;
+                    snf.nirs.aux(1).time = [0,0];
+                    snf.nirs.aux(1).timeOffset = 0;
+                else
+                    snf.nirs.aux.name = 'n/a';
+                    snf.nirs.aux.dataTimeSeries =[0,0];
+                    snf.nirs.aux.time = [0,0];
+                    snf.nirs.aux.timeOffset = 0;
+                end
             end
         end
         end
         
     %% Aux
     if ~isfield(snf.nirs.aux, 'time')
-        snf.nirs.aux.name = 'n/a';
-        snf.nirs.aux.dataTimeSeries =[0,0];
-        snf.nirs.aux.time = 0;
-        snf.nirs.aux.timeOffset = 0;
+        if isfield(info.MEAS,'Clipped')
+            snf.nirs.aux(1).name = 'saturationFlags';
+            snf.nirs.aux(1).dataTimeSeries =info.MEAS.Clipped;
+            snf.nirs.aux(1).time = [0,0];
+            snf.nirs.aux(1).timeOffset = 0;
+        else
+            snf.nirs.aux.name = 'n/a';
+            snf.nirs.aux.dataTimeSeries =[0,0];
+            snf.nirs.aux.time = [0,0];
+            snf.nirs.aux.timeOffset = 0;
+        end
     end
     %% Create Remaining Required SNIRF measurementList Fields
     snf.nirs.data.measurementList.dataTypeIndex = repmat([0], size(data,1),1); % 0 

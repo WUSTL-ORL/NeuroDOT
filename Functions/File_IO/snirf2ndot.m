@@ -86,11 +86,13 @@ if type == 'snirf'
             info.system.init_framerate = info.system.framerate;
             
         end
-        if strcmp(snf.nirs.metaDataTags.TimeUnit, 'ms')
-            info.system.framerate = info.system.framerate*1e3;
-            info.system.init_framerate = info.system.framerate;        
+        if isfield(snf.nirs.metaDataTags, 'TimeUnit')
+            if strcmp(snf.nirs.metaDataTags.TimeUnit, 'ms')
+                info.system.framerate = info.system.framerate*1e3;
+                info.system.init_framerate = info.system.framerate;        
+            end
         end
-        
+
             
     end
     
@@ -365,7 +367,7 @@ if type == 'snirf'
                     info.paradigm.(['Pulse_', num2str(j)]) = find(info.paradigm.synchtype == j);            
                     info.paradigm.(['Pulse_', num2str(j)]) = info.paradigm.(['Pulse_', num2str(j)])';
                 end
-                info.paradigm.synchtimes = info.paradigm.synchpts;
+                info.paradigm.synchtimes = info.paradigm.synchpts;%/info.system.framerate;
                 info.paradigm.synchpts = info.paradigm.synchpts;
                 
                     
@@ -421,6 +423,9 @@ if type == 'snirf'
     % Aux
     if isfield(snf.nirs, 'aux')
         info.misc.aux = snf.nirs.aux;
+        if strcmp(snf.nirs.aux(1).name, 'saturationFlags')
+            info.MEAS.Clipped = snf.nirs.aux(1).dataTimeSeries;
+        end
     end
     
     % Order info.pairs and data by wavelength, then by detector
