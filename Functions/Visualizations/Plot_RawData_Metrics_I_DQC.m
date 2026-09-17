@@ -182,6 +182,10 @@ end
 Phi_0_to_plot=reshape(Phi_0,Nm,[]);
 Keep_range = find(r<20);
 
+if isfield(params, 'FloorTh')
+    ylim([params.FloorTh,1]);
+end
+
 DQ_metrics = struct;
 DQ_metrics.min_val_WL1 = min(Phi_0_to_plot(Keep_range,1));
 DQ_metrics.min_log_WL1 = log10(DQ_metrics.min_val_WL1);
