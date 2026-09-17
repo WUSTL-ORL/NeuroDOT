@@ -121,6 +121,10 @@ m=ceil(min(log10(Phi_0(:))))-2;
 Phi_0_to_plot=reshape(Phi_0,Nm,[]);
 Keep_range = find(r<20);
 
+if isfield(params, 'FloorTh')
+    ylim([params.FloorTh,1]);
+end
+
 info.DQ_metrics.WL1.min_val = min(Phi_0_to_plot(Keep_range,1));
 info.DQ_metrics.WL1.min_log = log10(info.DQ_metrics.WL1.min_val);
 info.DQ_metrics.WL1.max_val = max(Phi_0_to_plot(Keep_range,1));
