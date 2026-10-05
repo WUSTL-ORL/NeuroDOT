@@ -20,6 +20,12 @@ if strcmp(params.res, 'high')
 elseif strcmp(params.res, 'low')
     res = '32';
 end
+if ~isfield(params, 'type')
+    params.type = 'orig';
+end
+if ~isfield(params, 'region')
+    params.region = 0;
+end
 
 here=pwd;
 cd(pn)
@@ -27,20 +33,20 @@ cd(pn)
 
 %% Pial Node files
 if strcmp(res, '164')
-    Lname=dir('*.L.pial.164*');
+    Lname=dir(['*.L.pial_',params.type,'.164*']);
     temp=gifti(Lname.name);
     Anat.CtxL.nodes=double(temp.vertices);
     Anat.CtxL.elements=double(temp.faces);
-    Rname=dir('*.R.pial.164*');
+    Rname=dir(['*.R.pial_',params.type,'.164*']);
     temp=gifti(Rname.name);
     Anat.CtxR.nodes=double(temp.vertices);
     Anat.CtxR.elements=double(temp.faces);
 elseif strcmp (res, '32')
-    Lname=dir('*.L.pial.32*');
+    Lname=dir(['*.L.pial_',params.type,'.32*']);
     temp=gifti(Lname.name);
     Anat.CtxL.nodes=double(temp.vertices);
     Anat.CtxL.elements=double(temp.faces);
-    Rname=dir('*.R.pial.32*');
+    Rname=dir(['*.R.pial_',params.type,'.32*']);
     temp=gifti(Rname.name);
     Anat.CtxR.nodes=double(temp.vertices);
     Anat.CtxR.elements=double(temp.faces);
@@ -49,17 +55,17 @@ end
 
 %% Inflated Node files
 if strcmp(res, '164')
-    Lname=dir('*.L.inflated.164*');
+    Lname=dir(['*.L.inflated.164*']);
     temp=gifti(Lname.name);
     Anat.CtxL.Inodes=double(temp.vertices);
-    Rname=dir('*.R.inflated.164*');
+    Rname=dir(['*.R.inflated.164*']);
     temp=gifti(Rname.name);
     Anat.CtxR.Inodes=double(temp.vertices);
 elseif strcmp (res, '32')
-    Lname=dir('*.L.inflated.32*');
+    Lname=dir(['*.L.inflated.32*']);
     temp=gifti(Lname.name);
     Anat.CtxL.Inodes=double(temp.vertices);
-    Rname=dir('*.R.inflated.32*');
+    Rname=dir(['*.R.inflated.32*']);
     temp=gifti(Rname.name);
     Anat.CtxR.Inodes=double(temp.vertices);
 end
@@ -67,65 +73,24 @@ end
 
 %% Very Inflated Node files
 if strcmp(res, '164')
-    Lname=dir('*.L.very_inflated.164*');
+    Lname=dir(['*.L.very_inflated.164*']);
     temp=gifti(Lname.name);
     Anat.CtxL.VInodes=double(temp.vertices);
-    Rname=dir('*.R.very_inflated.164*');
+    Rname=dir(['*.R.very_inflated.164*']);
     temp=gifti(Rname.name);
     Anat.CtxR.VInodes=double(temp.vertices);
 elseif strcmp (res, '32')
-    Lname=dir('*.L.very_inflated.32*');
+    Lname=dir(['*.L.very_inflated.32*']);
     temp=gifti(Lname.name);
     Anat.CtxL.VInodes=double(temp.vertices);
-    Rname=dir('*.R.very_inflated.32*');
+    Rname=dir(['*.R.very_inflated.32*']);
     temp=gifti(Rname.name);
     Anat.CtxR.VInodes=double(temp.vertices);
 end
 
-
-%% Flat Node files
-if strcmp(res, '164')
-    Lname=dir('*.L.flat.164*');
-    temp = gifti(Lname.name);
-    Anat.CtxL.Fnodes = double(temp.vertices);
-    Anat.CtxL.elements=double(temp.faces);
-    Rname=dir('*.R.flat.164*');
-    temp = gifti(Rname.name);
-    Anat.CtxR.Fnodes = double(temp.vertices);
-    Anat.CtxR.elements=double(temp.faces);
-elseif strcmp (res, '32')
-    Lname=dir('*.L.flat.32*');
-    temp = gifti(Lname.name);
-    Anat.CtxL.Fnodes = double(temp.vertices);
-    Anat.CtxL.elements=double(temp.faces);
-    Rname=dir('*.R.flat.32*');
-    temp = gifti(Rname.name);
-    Anat.CtxR.Fnodes = double(temp.vertices);
-    Anat.CtxR.elements=double(temp.faces);
-end
-
-%% Curvature files
-if strcmp(res, '164')
-    Lname=dir('*.L.curvature.164*');
-    temp = gifti(Lname.name);
-    Anat.CtxL.region = double(temp.cdata);
-    Anat.CtxL.region = round(((Anat.CtxL.region/max(Anat.CtxL.region(:))) + 1)*100)
-    Rname=dir('*.R.curvature.164*');
-    temp = gifti(Rname.name);
-    Anat.CtxR.region = double(temp.cdata);
-    Anat.CtxR.region = round(((Anat.CtxR.region/max(Anat.CtxR.region(:))) + 1)*100)
-elseif strcmp (res, '32')
-    Lname=dir('*.L.curvature.32*');
-    temp = gifti(Lname.name);
-    Anat.CtxL.region = double(temp.cdata);
-    Anat.CtxL.region = round(((Anat.CtxL.region/max(Anat.CtxL.region(:))) + 1)*100)
-    Rname=dir('*.R.curvature.32*');
-    temp = gifti(Rname.name);
-    Anat.CtxR.region = double(temp.cdata);
-    Anat.CtxR.region = round(((Anat.CtxR.region/max(Anat.CtxR.region(:))) + 1)*100)
-end
+% Flat map and region creation to be added soon
 
 %% Return to original directory
-save([pt,'_', res,'k_ctx'], 'Anat');
+save([pt,'_', params.type, '_', res,'k_ctx'], 'Anat');
 cd(here)
 
