@@ -31,9 +31,9 @@
 %       2e. Make a NIRFAST-compliant high-density head mesh
 %       2f. Relax optodes on the NIRFAST-compliant mesh for light modeling
 %   3. Light Modeling
-%       3a. Make “A” sensitivity matrix with NIRFASTer
-%       3b. Package metadata and save with “A”
-%       3c. Update bookkeeping in “A” to save space and align with system data
+%       3a. Make ??A?? sensitivity matrix with NIRFASTer
+%       3b. Package metadata and save with ??A??
+%       3c. Update bookkeeping in ??A?? to save space and align with system data
 %       3d. Visualize sensitivity profile and flat field reconstruction
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,10 +64,13 @@ mode = 'participant';                  % 'atlas' for atlas-based head model,'par
 pt = '';                               % Participant ID here (NOTE: this must be changed each time the script is run)
 
 % Path to fsLR script
-fsLRDir = 'NeuroDOT/Functions/Light_Modeling/Participant_Specfic_Head_Modeling_fs_LR_Script.sh'; % Hardcoded, do not change
+fsLRDir = 'NeuroDOT/Documentation/Scripts/Script_for_fs_LR.sh'; % Hardcoded, do not change
 
 % Path to Workbench command 
 workbenchDirectory = '/usr/local/workbench/bin_rh_linux64'; % Set the path to your installation of workbench here
+
+% Path to HCP Pipelines standard_mesh_atlases
+atlasDir = '/usr/local/HCPpipelines-master/global/templates/standard_mesh_atlases';
 
 % Volumetric visualization parameters
 p.Cmap = 'jet'; p.Scale = 1; p.Th.P = 0.5; p.PD = 0;
@@ -121,30 +124,17 @@ toc(t)
 
 
 %% Unpack FreeSurfer Outputs
-% Put T1, brainmask, and aseg on mpr1
-cd([dataroot,'/freesurfer/','/mri/'])
-[status,response]=system(['mri_vol2vol --mov T1.mgz --targ ',...
-    'rawavg.mgz --regheader --o T1-in-rawavg.mgz']);
-[status,response]=system(['mri_label2vol --seg aseg.mgz --temp ',...
-    'rawavg.mgz --o aseg-in-rawavg.mgz --regheader aseg.mgz']);  %#ok<*ASGLU>
-[status,response]=system(['mri_label2vol --seg brainmask.mgz --temp ',...
-    'rawavg.mgz --o brainmask-in-rawavg.mgz --regheader brainmask.mgz']);
-
 % MGZ 2 NIFTI
 disp('Convert *.mgz files to *.nii');          % Convert mgz to nifti
-[status,response]=system(['mri_convert T1-in-rawavg.mgz T1.nii']);
-[status,response]=system(['mri_convert aseg-in-rawavg.mgz aseg.nii']);
-[status,response]=system(['mri_convert brainmask-in-rawavg.mgz brainmask.nii']);
+[status,response]=system(['mri_convert T1.mgz T1.nii']);
+[status,response]=system(['mri_convert aseg.mgz aseg.nii']);
+[status,response]=system(['mri_convert brainmask.mgz brainmask.nii']);
 
 % Now load in volumes to complete segmentation: T1, aseg, brainmask, t2w
 [T1,infoT1] = LoadVolumetricData('T1', [],'nii'); % Output from FreeSurfer 
 T1=T1./max(T1(:));
 [bm,info_bm] = LoadVolumetricData(['brainmask'], [],'nii'); % Load Brain mask
 [aseg, info_aseg] = LoadVolumetricData(['aseg'], [],'nii'); % Load Anatomical segmentation volume
-
-% Navigate back to original T1 data directory
-cd(dataroot)
-[mpr1,infompr1] = LoadVolumetricData(fn, [],'nii'); % Load original T1 input file 
 
 % This section will be run if you are using a T2 in addition to a T1
 switch t2Mode
@@ -161,64 +151,48 @@ end
 PlotSlices(T1,infoT1)
 PlotSlices(aseg,infoT1)
 PlotSlices(T1,infoT1,p,bm)
+PlotSlices(T1,infoT1,p,aseg)
+
+
+%% Generate transform to MNI space
+tal_xfm = importdata('talairach.xfm'); % load talairach transform output from FreeSurfer (in /mri/transforms)
+pt_to_TT = tal_xfm.data;
+pt_to_TT(4,:) = [0,0,0,1];
+MNI_to_TT =loadAviT4([],'MNI152_to_TT_t4');
+TT_to_MNI = inv(MNI_to_TT);
+pt_to_MNI = inv(pt_to_TT)*TT_to_MNI;
+save([pt,'_pt_to_MNI'], pt_to_MNI);
 
 
 %% Run fsLR to put left and right hemispheres in correspondence
 cd(dataroot)
-t1=tic;
-status= evalc(['system([''/',fsLRDir,' ',dataroot,' ',pt,' ',dataroot,'/',pt,...
-    '/mri ',dataroot,'/standard_mesh_atlases ', dataroot, '/freesurfer/mri ', ...
-    dataroot,'/freesurfer',' ',dataroot,'/',pt,' ',dataroot,'/',pt,'/mri/T1.nii ',...
-    dataroot,'/standard_mesh_atlases ', '164', ' ','32', ' ',...
-    workbenchDirectory,'''])']);
+t1 = tic;
+cmd = sprintf('/%s %s/%s %s %s %s %s', ...
+    fsLRDir, dataroot, pt, pt, FSsetup.freesurferdir, atlasDir,workbenchDirectory);
+
+% Run the system command directly
+[status, cmdout] = system(cmd);
 disp('<<< Pipeline to  fs_LR')
 toc(t1)
 
-
 %%
-evalc(['system([''mkdir ',dataout,'/fs_LR/''])']);
-resArray = [32, 164];
-for i = 1:2
-    res = resArray(i);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.L.pial.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.L.inflated.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/', pt,'.L.very_inflated.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.L.flat.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.L.curvature.', num2str(res),'k_fs_LR.shape.gii',' /',...
-        dataout,'/fs_LR/''])']);
-
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.R.pial.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.R.inflated.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/', pt,'.R.very_inflated.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.R.flat.', num2str(res),'k_fs_LR.surf.gii',' /',...
-        dataout,'/fs_LR/''])']);
-    sys = evalc(['system([''cp ',dataroot,'/standard_mesh_atlases/','fsaverage_LR', num2str(res),'k/',pt,'.R.curvature.', num2str(res),'k_fs_LR.shape.gii',' /',...
-        dataout,'/fs_LR/''])']);
-end
-
+cd(['fs_LR_output_directory/',pt]);
 subjSessID = ['sub-',pt];
 subjsSessID = pt;
 
 % Create Anat structure
-params.res = 'low'; %set to 'low' for 32k or 'high' for 164k
-switch params.res
-    case 'low'
-        Anat=Convert_FSLR_WB_Ctx2mat(pt, [dataout, '/fs_LR'],params);
-    case 'high'
-        Anat=Convert_FSLR_WB_Ctx2mat(pt, [dataout, '/fs_LR'],params);
+for resList = [{'high'},{'low'}]
+    params.res=resList;
+    params.type = 'orig'; %set to 'orig' or 'mni'
+    Anat=Convert_FSLR_WB_Ctx2mat(pt, ['fs_LR_output_directory/',pt],params);
+    params.type = 'mni'; %set to 'orig' or 'mni'
+    Anat=Convert_FSLR_WB_Ctx2mat(pt, ['fs_LR_output_directory/',pt],params);
 end
 cd([dataout,'/fs_LR'])
 
 % Visualize pial, inflated, very inflated, and flat surfaces
 res = '164k'; % 164k or 32k 
-load([pt,'_', res, '_ctx.mat']);
+load([pt,'_', params.type,'_',res, '_ctx.mat']);
 
 % Initialize fsLR visualization parameter structure
 params_fsLR = struct;
@@ -234,15 +208,6 @@ PlotLRMeshes(Anat.CtxL,Anat.CtxR,params_fsLR)
 % View very inflated surface
 params_fsLR.ctx = 'vinf';
 PlotLRMeshes(Anat.CtxL,Anat.CtxR,params_fsLR)
-
-% View flat surface
-params_fsLR.ctx = 'flat'; params_fsLR.reg = 1;
-params_fsLR.reg = 1; params_fsLR.FaceColor = 'interp'; params_fsLR.EdgeColor = 'none';
-params_fsLR.view = 'lat';
-PlotMeshSurface(Anat.CtxL,params_fsLR); 
-set(gca, 'color','k', 'Xcolor','k', 'YColor','k'); set(gcf, 'color','k');
-PlotMeshSurface(Anat.CtxR,params_fsLR)
-set(gca, 'color','k', 'Xcolor','k', 'YColor','k'); set(gcf, 'color','k');
 
 
 %% 1b: Segment the rest of the head and make the whole head mask
@@ -334,7 +299,7 @@ PlotCap(info, params_cap) %2D plot of pad
 
 % Visualize LD mesh with optode positions 
 % Optodes have not been relaxed onto mesh yet
-% % Array visualization parameters
+% Array visualization parameters
 PlotMeshSurface(meshLD,pM);Draw_Foci_191203(tpos, paramsFoci);
 
 
@@ -637,7 +602,7 @@ PlotInterpSurfMesh(ffrV, Anat.CtxL, Anat.CtxR, dim, pA);
 %% Visualize alignment of LD mesh, HD mesh, array, and cortices
 % Name of 'orig' cortical mesh file output from fsLR 
 cd([dataout,'/fs_LR']);
-fn_mesh = [pt,'_164k_ctx']; % 
+fn_mesh = [pt,'_orig_164k_ctx']; % 
 % Load cortical mesh
 load([fn_mesh]);
 
@@ -652,6 +617,7 @@ pA0l.fig_handle=gca;
 pA0l.FaceColor=[0.5,0.5,0.5];pA0l.EdgeColor='none';pA0l.BGC = [0,0,0];
 pA0l.AmbientStrength=0.25;pA0l.DiffuseStrength=0.25;
 pA0l.SpecularStrength=0.025;
+
 PlotMeshSurface(Anat.CtxL,pA0l)                 % Cortical Surfaces
 PlotMeshSurface(Anat.CtxR,pA0l)
 pA2.fig_handle=gca;
@@ -669,16 +635,66 @@ axis off
 view([90,0])
 
 
-%% Transform to MNI space
-tal_xfm = importdata('talairach.xfm'); % load talairach transform output from FreeSurfer (in /mri/transforms)
-pt_to_TT = tal_xfm.data;
-pt_to_TT(4,:) = [0,0,0,1];
-MNI_to_TT =loadAviT4([],'MNI152_to_TT_t4');
-TT_to_MNI = inv(MNI_to_TT);
-pt_to_MNI = inv(pt_to_TT)*TT_to_MNI;
+%% Visualize Gordon parcels on participant cortical mesh
+fn_mesh = [pt,'_orig_32k_ctx']; % 
+load('IM_Gordon_2014_333_Parcels.mat','IM','Parcels','Parcel_Nets')
+
+% Load cortical mesh
+load([fn_mesh]);
+
+% (1) Add parcel nodes to Cortices
+Anat.CtxL.data=Parcels.CtxL;
+Anat.CtxR.data=Parcels.CtxR;
+% (2) Set parameters to view as desired
+params.Cmap.P=jet(333);
+params.TC=1;
+params.ctx='inf';           % 'std','inf','vinf'
+params.view='dorsal';       % 'dorsal','post','lat','med'
+PlotLRMeshes(Anat.CtxL,Anat.CtxR, params);
+
+% View Parcels with coloring based on network
+Anat.CtxL.data=Parcel_Nets.CtxL;
+Anat.CtxR.data=Parcel_Nets.CtxR;
+% (2) Set parameters to view as desired
+figure('Color','k','Position',[500,100,1050,1000])
+pA0l.fig_handle=gca;
+pA0l.Cmap.P=IM.cMap;
+pA0l.TC=1;
+pA0l.ctx='inf';         % also, 'std','inf','vinf'
+pA0l.view='lat';        % also, 'post','lat','med'
+PlotLRMeshes(Anat.CtxL,Anat.CtxR, pA0l);
 
 
-%% Visualize on MNI cortices
+% Visualize cortical mesh inside of low-density head mesh 
+pA0l=struct;
+figure('Color','k','Position',[500,100,1050,1000])
+pA0l.FaceColor=[0.5,0.5,0.5];pA0l.EdgeColor='none';pA0l.BGC = [0,0,0];
+pA0l.AmbientStrength=0.25;pA0l.DiffuseStrength=0.25;
+pA0l.SpecularStrength=0.025;
+pA0l.fig_handle=gca;
+pA0l.Cmap.P=IM.cMap;
+pA0l.TC=1;
+pA0l.ctx='inf';         % also, 'std','inf','vinf'
+pA0l.view='lat';        % also, 'post','lat','med'
+PlotMeshSurface(Anat.CtxL,pA0l)                 % Cortical Surfaces
+PlotMeshSurface(Anat.CtxR,pA0l)
+pA2.fig_handle=gca;
+pA2.FaceAlpha=0;
+pA2.EdgeAlpha=0.5;
+pA2.EdgeColor=[0.25,0.25,0.25];%1,1,1].*0.25;
+pA2.BGC = [0,0,0];
+PlotMeshSurface(meshLD,pA2)                     % LD mesh
+set(gcf,'Color','k')
+view([0,0]) % display in posterior view
+axis off
+
+%Display in lateral view
+view([90,0])
+
+
+
+%% Visualize FFR on MNI cortices
+load([pt,'_pt_to_MNI']);
 [MNI, infoMNI] = LoadVolumetricData('Segmented_MNI152nl_on_MNI111', [],'4dfp');
 load('MNI164k_big');
 FFR_on_MNI = affine3d_img(ffrV, infoT1, infoMNI, pt_to_MNI);
@@ -688,4 +704,5 @@ pA.Scale = 0.8*max(ffrV(:));pA.Th.P = 0;pA.Th.N = -pA.Th.P;pA.PD = 0;pA.view = '
 % Pial Surface
 pA.ctx = 'std';
 PlotInterpSurfMesh(FFR_on_MNI,MNIl,MNIr, infoMNI,pA);
+
 
