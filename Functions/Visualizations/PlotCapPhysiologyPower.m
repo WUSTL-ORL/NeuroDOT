@@ -162,7 +162,7 @@ elseif ischar(params.freqs)
     end
 end
 if ~isfield(params, 'freqsBW')  
-   params.freqsBW=[0.009,0.08]; % range from which to determine bandwidth
+   params.freqsBW=[0.1,0.35]; % range from which to determine bandwidth
 end
 
 
@@ -221,7 +221,7 @@ if floIdx<1, floIdx=1;end
 if fhiIdx > length(ftdomain), fhiIdx = length(ftdomain);end
 
 Pmax=sum(ftmag(:,(floIdx):(fhiIdx)).^2,2); % sum pulse power
-fNoise=setdiff([(idxPm-BWfc):(idxPM+BWfc)],(floIdx):(fhiIdx));
+fNoise=setdiff([(floIdx-BWfc):(fhiIdx+BWfc)],(floIdx):(fhiIdx));
 fNoise(fNoise<1)=[];
 fNoise(fNoise>max(length(ftdomain)))=[];
 Control=median(ftmag(:,fNoise).^2,2).*BWfc.*2; 
