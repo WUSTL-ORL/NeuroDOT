@@ -257,8 +257,8 @@ end
 
 %% Scaling and colormapping
 M=max(llfo(:)); %% calculate the max SNR
-params.Th.P=max([min(llfo),0]);
-m=params.Th.P; %min value
+params.Th.P=0;
+m=0; % minimum colorbar value
 % m=M/2;
 params.Scale=M;%/2;
 % llfo=llfo-M/2;
