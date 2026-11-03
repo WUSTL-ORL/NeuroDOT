@@ -62,12 +62,13 @@ A=zeros(numc,srcnum,detnum,numpt,'single');
 
 
 %% Adjoint Formulation and Normalization: 
-if flags.Hz==0 || flags.compute_mua == 1    
+if flags.Hz==0 || flags.compute_mua == 1
     for lambda=1:numc
         disp(['Creating Adjoint for Lambda ',num2str(lambda)])
-        A(lambda,:,:,:)=bsxfun(@times,...
-            reshape(squeeze(Gs(lambda,:,:)),srcnum,1,numpt),...
-            reshape(squeeze(Gd(lambda,:,:)),1,detnum,numpt));
+        % build factors as single to avoid large double temporaries
+        sFactor = single(reshape(squeeze(Gs(lambda,:,:)), srcnum, 1, numpt));
+        dFactor = single(reshape(squeeze(Gd(lambda,:,:)), 1, detnum, numpt));
+        A(lambda,:,:,:) = bsxfun(@times, sFactor, dFactor);
     end
 
 elseif flags.compute_mus              
