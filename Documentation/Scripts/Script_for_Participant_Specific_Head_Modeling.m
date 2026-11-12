@@ -127,8 +127,8 @@ toc(t)
 % MGZ 2 NIFTI
 disp('Convert *.mgz files to *.nii');          % Convert mgz to nifti
 [status,response]=system(['mri_convert T1.mgz T1.nii']);
-[status,response]=system(['mri_convert aseg.mgz aseg.nii']);
-[status,response]=system(['mri_convert brainmask.mgz brainmask.nii']);
+[status,response]=system(['mri_convert aseg.mgz aseg.nii']); %#ok<*ASGLU>
+[status,response]=system(['mri_convert brainmask.mgz brainmask.nii']);  %#ok<*NBRAK>
 
 % Now load in volumes to complete segmentation: T1, aseg, brainmask, t2w
 [T1,infoT1] = LoadVolumetricData('T1', [],'nii'); % Output from FreeSurfer 
@@ -184,7 +184,7 @@ subjsSessID = pt;
 for resList = [{'high'},{'low'}]
     params.res=resList;
     params.type = 'orig'; %set to 'orig' or 'mni'
-    Anat=Convert_FSLR_WB_Ctx2mat(pt, ['fs_LR_output_directory/',pt],params);
+    Anat=Convert_FSLR_WB_Ctx2mat(pt, ['fs_LR_output_directory/',pt],params); 
     params.type = 'mni'; %set to 'orig' or 'mni'
     Anat=Convert_FSLR_WB_Ctx2mat(pt, ['fs_LR_output_directory/',pt],params);
 end
@@ -577,7 +577,7 @@ pA.Scale = 1;
 PlotSlices(t1,dim,pA,ffrV);
 
 %% Visualize on the fsLR Surface
-load([dataout, '/fs_LR/', [pt,'_', res, '_ctx.mat']])
+load([dataout, '/fs_LR/', [pt,'_orig_', res, '_ctx.mat']])
 
 %Visualization parameters
 pA.Scale = 0.8*max(ffrV(:));pA.Th.P = 0;pA.Th.N = -pA.Th.P;pA.PD = 0;pA.view = 'post'; 
@@ -594,9 +594,6 @@ PlotInterpSurfMesh(ffrV, Anat.CtxL, Anat.CtxR, dim, pA);
 pA.ctx = 'vinf';
 PlotInterpSurfMesh(ffrV, Anat.CtxL, Anat.CtxR, dim, pA);
 
-% Flat Surface
-pA.view = 'lat'; pA.ctx = 'flat'; pA.reg = 1;
-PlotInterpSurfMesh(ffrV, Anat.CtxL, Anat.CtxR, dim, pA);
 
 
 %% Visualize alignment of LD mesh, HD mesh, array, and cortices
@@ -700,7 +697,7 @@ load('MNI164k_big');
 FFR_on_MNI = affine3d_img(ffrV, infoT1, infoMNI, pt_to_MNI);
 
 %Visualization parameters
-pA.Scale = 0.8*max(ffrV(:));pA.Th.P = 0;pA.Th.N = -pA.Th.P;pA.PD = 0;pA.view = 'post'; 
+pA.Scale = 0.8*max(ffrV(:));pA.PD = 0;pA.view = 'post'; 
 % Pial Surface
 pA.ctx = 'std';
 PlotInterpSurfMesh(FFR_on_MNI,MNIl,MNIr, infoMNI,pA);
