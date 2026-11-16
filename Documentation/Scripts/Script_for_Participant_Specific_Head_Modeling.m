@@ -161,7 +161,7 @@ pt_to_TT(4,:) = [0,0,0,1];
 MNI_to_TT =loadAviT4([],'MNI152_to_TT_t4');
 TT_to_MNI = inv(MNI_to_TT);
 pt_to_MNI = inv(pt_to_TT)*TT_to_MNI;
-save([pt,'_pt_to_MNI'], pt_to_MNI);
+save([pt,'_pt_to_MNI'], 'pt_to_MNI');
 
 
 %% Run fsLR to put left and right hemispheres in correspondence
